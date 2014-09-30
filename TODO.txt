@@ -1,0 +1,16 @@
+
+OS X 10.10 Yosemite TODO list:
+------------------------------
+
+1) Change kernel name from "mach_kernel" to "kernel" in FileIo.cpp and Options.cpp 
+
+2) Change kernel path to: /System/Library/Kernels
+
+3) add efi:/chosen/random-seed
+
+4) implement LZVN decompression routine.
+
+5) read Apple logo from: /usr/standalone/i386/EfiLoginUI/appleLogo.efires
+
+6) Update PictData with new images.
+ 
