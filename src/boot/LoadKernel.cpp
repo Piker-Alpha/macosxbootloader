@@ -9,6 +9,7 @@
 
 #define KERNEL_CACHE_MAGIC													0x636f6d70
 #define KERNEL_CACHE_LZSS													0x6c7a7373
+#define KERNEL_CACHE_LZVN													0x6c7a766e
 
 //
 // compressed header
@@ -487,7 +488,7 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 			//
 			// check compressed type
 			//
-			if(fileHeader.CompressType != SWAP_BE32_TO_HOST(KERNEL_CACHE_LZSS))
+			if(fileHeader.CompressType != SWAP_BE32_TO_HOST(KERNEL_CACHE_LZSS) && fileHeader.CompressType != SWAP_BE32_TO_HOST(KERNEL_CACHE_LZVN))
 				try_leave(status = EFI_NOT_FOUND);
 
 			//
@@ -539,8 +540,16 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 			//
 			// decompress it
 			//
-			if(EFI_ERROR(status = BlDecompress(compressedBuffer, compressedSize, uncompressedBuffer, uncompressedSize, &readLength)))
-				try_leave(NOTHING);
+			if(fileHeader.CompressType == SWAP_BE32_TO_HOST(KERNEL_CACHE_LZSS))
+			{
+				if(EFI_ERROR(status = BlDecompressLZSS(compressedBuffer, compressedSize, uncompressedBuffer, uncompressedSize, &readLength)))
+					try_leave(NOTHING);
+			}
+			else if(fileHeader.CompressType == SWAP_BE32_TO_HOST(KERNEL_CACHE_LZVN))
+			{
+				if(EFI_ERROR(status = BlDecompressLZVN(compressedBuffer, compressedSize, uncompressedBuffer, uncompressedSize, &readLength)))
+					try_leave(NOTHING);
+			}
 
 			//
 			// length check

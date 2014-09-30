@@ -329,7 +329,7 @@ STATIC EFI_STATUS CspConvertLogoImage(BOOLEAN normalLogo, EFI_UGA_PIXEL** logoIm
 		if(!imageData)
 			try_leave(status = EFI_OUT_OF_RESOURCES);
 
-		if(EFI_ERROR(status = BlDecompress(imageInfo[index].Buffer, imageInfo[index].BufferSize, imageData, imageSize, &imageSize)))
+		if(EFI_ERROR(status = BlDecompressLZSS(imageInfo[index].Buffer, imageInfo[index].BufferSize, imageData, imageSize, &imageSize)))
 			try_leave(NOTHING);
 
 		//
@@ -908,7 +908,7 @@ EFI_STATUS CsDrawBootImage(BOOLEAN normalLogo)
 		//
 		// decompress data
 		//
-		if(EFI_ERROR(status = BlDecompress(CspHiDPIMode ? CspIndicator2x : CspIndicator, CspHiDPIMode ? sizeof(CspIndicator2x) : sizeof(CspIndicator), dataBuffer, imageSize, &imageSize)))
+		if(EFI_ERROR(status = BlDecompressLZSS(CspHiDPIMode ? CspIndicator2x : CspIndicator, CspHiDPIMode ? sizeof(CspIndicator2x) : sizeof(CspIndicator), dataBuffer, imageSize, &imageSize)))
 			try_leave(NOTHING);
 
 		//
@@ -965,7 +965,7 @@ EFI_STATUS CsDrawPanicImage()
 		UINTN imageWidth													= CspHiDPIMode ? 920 : 460;;
 		UINTN imageHeight													= CspHiDPIMode ? 570 : 285;
 		UINTN imageSize														= imageWidth * imageHeight;
-		if(EFI_ERROR(status = BlDecompress(CspHiDPIMode ? CspPanicDialog2x : CspPanicDialog, CspHiDPIMode ? sizeof(CspPanicDialog2x) : sizeof(CspPanicDialog), imageData, imageSize, &imageSize)))
+		if(EFI_ERROR(status = BlDecompressLZSS(CspHiDPIMode ? CspPanicDialog2x : CspPanicDialog, CspHiDPIMode ? sizeof(CspPanicDialog2x) : sizeof(CspPanicDialog), imageData, imageSize, &imageSize)))
 			try_leave(NOTHING);
 
 		//

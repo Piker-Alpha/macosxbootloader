@@ -123,6 +123,11 @@ UINT32 BlGetCurrentUnixTime();
 UINT32 BlAlder32(VOID CONST* inputBuffer, UINTN bufferLength);
 
 //
-// uncompress
+// uncompress LZSS
 //
-EFI_STATUS BlDecompress(VOID CONST* compressedBuffer, UINTN compressedSize, VOID* uncompressedBuffer, UINTN uncompressedBufferSize, UINTN* uncompressedSize);
+EFI_STATUS BlDecompressLZSS(VOID CONST* compressedBuffer, UINTN compressedSize, VOID* uncompressedBuffer, UINTN uncompressedBufferSize, UINTN* uncompressedSize);
+
+//
+// uncompress LZVN
+//
+EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, VOID* uncompressedBuffer, UINTN uncompressedBufferSize, UINTN* uncompressedSize);

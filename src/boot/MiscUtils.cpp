@@ -733,9 +733,9 @@ UINT32 BlAlder32(VOID CONST* inputBuffer, UINTN bufferLength)
 }
 
 //
-// uncompress
+// uncompress LZSS
 //
-EFI_STATUS BlDecompress(VOID CONST* compressedBuffer, UINTN compressedSize, VOID* uncompressedBuffer, UINTN uncompressedBufferSize, UINTN* uncompressedSize)
+EFI_STATUS BlDecompressLZSS(VOID CONST* compressedBuffer, UINTN compressedSize, VOID* uncompressedBuffer, UINTN uncompressedBufferSize, UINTN* uncompressedSize)
 {
 	#define N																4096
 	#define F																18
@@ -803,5 +803,13 @@ EFI_STATUS BlDecompress(VOID CONST* compressedBuffer, UINTN compressedSize, VOID
 		}
 	}
 	*uncompressedSize														= dstBuffer - dstStart;
+	return EFI_SUCCESS;
+}
+
+//
+// uncompress LZSS
+//
+EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, VOID* uncompressedBuffer, UINTN uncompressedBufferSize, UINTN* uncompressedSize)
+{
 	return EFI_SUCCESS;
 }
