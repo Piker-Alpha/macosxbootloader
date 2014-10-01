@@ -643,7 +643,7 @@ EFI_STATUS BlProcessOptions(CHAR8 CONST* bootCommandLine, CHAR8** kernelCommandL
 		BOOLEAN keyFound													= FALSE;
 		if(!EFI_ERROR(BlpSetupPathFromCommandLine(&kernelFilePath, &kernelPathName, *kernelCommandLine, CHAR8_CONST_STRING("Kernel"), bootFilePath, &keyFound)) && keyFound)
 		{
-			if(strcmp(kernelPathName[0] == '/' || kernelPathName[0] == '\\' ? kernelPathName + 1 : kernelPathName, CHAR8_CONST_STRING("mach_kernel")))
+			if(strcmp(kernelPathName[0] == '/' || kernelPathName[0] == '\\' ? kernelPathName + 1 : kernelPathName, CHAR8_CONST_STRING("kernel")))
 				BlSetBootMode(BOOT_MODE_ALT_KERNEL, 0);
 		}
 
@@ -720,7 +720,7 @@ EFI_STATUS BlProcessOptions(CHAR8 CONST* bootCommandLine, CHAR8** kernelCommandL
 		if(!IoBootingFromNet())
 		{
 			if(!kernelPathName)
-				kernelPathName												= BlAllocateString(CHAR8_CONST_STRING("mach_kernel"));
+				kernelPathName												= BlAllocateString(CHAR8_CONST_STRING("\\System\\Library\\Kernels\\kernel"));
 		}
 
 		//

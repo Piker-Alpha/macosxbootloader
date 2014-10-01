@@ -308,7 +308,7 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 		bootArgs->Version													= 2;
 		bootArgs->EfiMode													= ArchNeedEFI64Mode() ? 64 : 32;
 		bootArgs->DebugMode													= 0;
-		bootArgs->Flags														= 1;	// kBootArgsFlagRebootOnPanic
+		bootArgs->Flags														= 65;	// kBootArgsFlagRebootOnPanic + kBootArgsFlagBlackTheme
 		bootArgs->PhysicalMemorySize										= BlGetMemorySize();
 		bootArgs->ASLRDisplacement											= static_cast<UINT32>(LdrGetASLRDisplacement());
 

@@ -21,7 +21,7 @@ STATIC EFI_STATUS IopFindBootDevice(EFI_HANDLE* bootDeviceHandle, EFI_DEVICE_PAT
 	STATIC CHAR16* checkFileName[] = 
 	{
 		CHAR16_STRING(L"\\OS X Install Data"),
-		CHAR16_STRING(L"\\mach_kernel"),
+		CHAR16_STRING(L"\\System\\Library\\Kernels\\kernel"),
 		CHAR16_STRING(L"\\com.apple.boot.R"),
 		CHAR16_STRING(L"\\com.apple.boot.P"),
 		CHAR16_STRING(L"\\com.apple.boot.S"),
@@ -189,7 +189,7 @@ STATIC EFI_STATUS IopDetectRoot(EFI_HANDLE deviceHandle, EFI_DEVICE_PATH_PROTOCO
 		//
 		// check kernel in root directory
 		//
-		if(!EFI_ERROR(status = IopRootFile->Open(IopRootFile, &kernelFile, CHAR16_STRING(L"mach_kernel"), EFI_FILE_MODE_READ, 0)))
+		if(!EFI_ERROR(status = IopRootFile->Open(IopRootFile, &kernelFile, CHAR16_STRING(L"\\System\\Library\\Kernels\\kernel"), EFI_FILE_MODE_READ, 0)))
 			try_leave(NOTHING);
 
 		//
