@@ -4,11 +4,34 @@ OS X 10.10 Yosemite TODO list:
 
 1) add efi:/chosen/random-seed
 
-2) implement LZVN decompression routine.
+- Something like this should work (for now):
+
+static EFI_UINT8 const seedBuffer[] =
+{
+	0x40, 0x00, 0x50, 0x00, 0x5c, 0x00, 0x53, 0x00, 0x79, 0x00, 0x73, 0x00, 0x74, 0x00, 0x65, 0x00,
+	0x6d, 0x00, 0x5c, 0x00, 0x4c, 0x00, 0x69, 0x00, 0x62, 0x00, 0x72, 0x00, 0x61, 0x00, 0x72, 0x00,
+	0x79, 0x00, 0x5c, 0x00, 0x43, 0x00, 0x6f, 0x00, 0x72, 0x00, 0x65, 0x00, 0x53, 0x00, 0x65, 0x00,
+	0x72, 0x00, 0x76, 0x00, 0x69, 0x00, 0x63, 0x00, 0x65, 0x00, 0x73, 0x00, 0x5c, 0x00, 0x62, 0x00
+};
+
+DevTreeAddProperty(chosenNode, CHAR8_CONST_STRING("random-seed"), static_cast<UINT8*>(seedBuffer), static_cast<UINT32>(strlen(seedBuffer) + 1), FALSE);
+
+That is. Until the random seed generator from boot.efi is implemented. It should stop the reboot in Yosemite, 
+and you should be able to boot with -f (skip kernelcache).
+
+
+2) implement LZVN decompression routine from:
+
+- https://github.com/Piker-Alpha/LZVN/blob/master/lzvn.c
+
 
 3) read Apple logo from: /usr/standalone/i386/EfiLoginUI/appleLogo.efires
 
+- I have this working for RevoBoot already.
+
+
 4) Update PictData with new images.
+
 
 Bugs (issues) can be filed here: https://github.com/Piker-Alpha/macosxbootloader/issues
 
