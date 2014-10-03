@@ -815,7 +815,7 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 	
 	UINTN length				= 0;												// xor	%rax,%rax
 
-	UINT64 compBuffer			= (INT64)compressedBuffer;
+	UINT64 compBuffer			= (UINT64)compressedBuffer;
 	UINT64 compBufferPointer	= 0;
 
 	UINT64 caseTableIndex		= 0;
