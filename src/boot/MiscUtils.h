@@ -131,3 +131,28 @@ EFI_STATUS BlDecompressLZSS(VOID CONST* compressedBuffer, UINTN compressedSize, 
 // uncompress LZVN
 //
 EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, VOID* uncompressedBuffer, UINTN uncompressedBufferSize, UINTN* uncompressedSize);
+
+#define LZVN_0		0
+#define LZVN_1		1
+#define LZVN_2		2
+#define LZVN_3		3
+#define LZVN_4		4
+#define LZVN_5		5
+#define LZVN_6		6
+#define LZVN_7		7
+#define LZVN_8		8
+#define LZVN_9		9
+#define LZVN_10		10
+#define LZVN_11		11
+
+#define CASE_TABLE	127
+
+#define OSSwapInt64(x) \
+((UINT64)((((UINT64)(x) & 0xff00000000000000ULL) >> 56) | \
+(((UINT64)(x) & 0x00ff000000000000ULL) >> 40) | \
+(((UINT64)(x) & 0x0000ff0000000000ULL) >> 24) | \
+(((UINT64)(x) & 0x000000ff00000000ULL) >>  8) | \
+(((UINT64)(x) & 0x00000000ff000000ULL) <<  8) | \
+(((UINT64)(x) & 0x0000000000ff0000ULL) << 24) | \
+(((UINT64)(x) & 0x000000000000ff00ULL) << 40) | \
+(((UINT64)(x) & 0x00000000000000ffULL) << 56)))

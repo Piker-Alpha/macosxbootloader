@@ -807,9 +807,456 @@ EFI_STATUS BlDecompressLZSS(VOID CONST* compressedBuffer, UINTN compressedSize, 
 }
 
 //
-// uncompress LZSS
+// uncompress LZVN
 //
 EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, VOID* uncompressedBuffer, UINTN uncompressedBufferSize, UINTN* uncompressedSize)
 {
-	return EFI_SUCCESS;
+	const UINT64 decompBuffer	= (const UINT64)uncompressedBuffer;
+	
+	UINTN length				= 0;												// xor	%rax,%rax
+
+	UINT64 compBuffer			= (INT64)compressedBuffer;
+	UINT64 compBufferPointer	= 0;
+
+	UINT64 caseTableIndex		= 0;
+	UINT64 r10					= 0;
+	UINTN currentLength			= 0;												// xor	%r12,%r12
+	UINT64 r12					= 0;
+
+	UINTN address				= 0;												// ((UINT64)compBuffer + compBufferPointer)
+
+	UINT8 jmpTo					= CASE_TABLE;
+
+	CHAR8 byte_data				= 0;
+
+	// Jump table developed by 'MinusZwei'
+	static short caseTable[ 256 ] =
+	{
+		1,  1,  1,  1,    1,  1,  2,  3,    1,  1,  1,  1,    1,  1,  4,  3,
+		1,  1,  1,  1,    1,  1,  4,  3,    1,  1,  1,  1,    1,  1,  5,  3,
+		1,  1,  1,  1,    1,  1,  5,  3,    1,  1,  1,  1,    1,  1,  5,  3,
+		1,  1,  1,  1,    1,  1,  5,  3,    1,  1,  1,  1,    1,  1,  5,  3,
+		1,  1,  1,  1,    1,  1,  0,  3,    1,  1,  1,  1,    1,  1,  0,  3,
+		1,  1,  1,  1,    1,  1,  0,  3,    1,  1,  1,  1,    1,  1,  0,  3,
+		1,  1,  1,  1,    1,  1,  0,  3,    1,  1,  1,  1,    1,  1,  0,  3,
+		5,  5,  5,  5,    5,  5,  5,  5,    5,  5,  5,  5,    5,  5,  5,  5,
+		1,  1,  1,  1,    1,  1,  0,  3,    1,  1,  1,  1,    1,  1,  0,  3,
+		1,  1,  1,  1,    1,  1,  0,  3,    1,  1,  1,  1,    1,  1,  0,  3,
+		6,  6,  6,  6,    6,  6,  6,  6,    6,  6,  6,  6,    6,  6,  6,  6,
+		6,  6,  6,  6,    6,  6,  6,  6,    6,  6,  6,  6,    6,  6,  6,  6,
+		1,  1,  1,  1,    1,  1,  0,  3,    1,  1,  1,  1,    1,  1,  0,  3,
+		5,  5,  5,  5,    5,  5,  5,  5,    5,  5,  5,  5,    5,  5,  5,  5,
+		7,  8,  8,  8,    8,  8,  8,  8,    8,  8,  8,  8,    8,  8,  8,  8,
+		9, 10, 10, 10,   10, 10, 10, 10,   10, 10, 10, 10,   10, 10, 10, 10
+	};
+	
+	uncompressedBufferSize -= 8;													// sub	$0x8,%rsi
+	
+	if (uncompressedBufferSize < 8)													// jb	Llzvn_exit
+	{
+		return EFI_LOAD_ERROR;
+	}
+	
+	compressedSize = (compBuffer + compressedSize - 8);								// lea	-0x8(%rdx,%rcx,1),%rcx
+	
+	if (compBuffer > compressedSize)												// cmp	%rcx,%rdx
+	{
+		return EFI_LOAD_ERROR;														// ja	Llzvn_exit
+	}
+	
+	compBufferPointer = *(UINT64 *)compBuffer;										// mov	(%rdx),%r8
+	caseTableIndex = (compBufferPointer & 255);										// movzbq	(%rdx),%r9
+	
+	do																				// jmpq	*(%rbx,%r9,8)
+	{
+		switch (jmpTo)																// our jump table
+		{
+			case CASE_TABLE: /******************************************************/
+				
+				switch (caseTable[(UINT8)caseTableIndex])
+				{
+					case 0:
+						caseTableIndex >>= 6;										// shr	$0x6,%r9
+						compBuffer = (compBuffer + caseTableIndex + 1);				// lea	0x1(%rdx,%r9,1),%rdx
+						
+						if (compBuffer > compressedSize)							// cmp	%rcx,%rdx
+						{
+							return EFI_LOAD_ERROR;									// ja	Llzvn_exit
+						}
+						
+						r10 = 56;													// mov	$0x38,%r10
+						r10 &= compBufferPointer;									// and	%r8,%r10
+						compBufferPointer >>= 8;									// shr	$0x8,%r8
+						r10 >>= 3;													// shr	$0x3,%r10
+						r10 += 3;													// add	$0x3,%r10
+						
+						jmpTo = LZVN_10;											// jmp	Llzvn_l10
+						break;
+						
+					case 1:
+						caseTableIndex >>= 6;										// shr	$0x6,%r9
+						compBuffer = (compBuffer + caseTableIndex + 2);				// lea	0x2(%rdx,%r9,1),%rdx
+						
+						if (compBuffer > compressedSize)							// cmp	%rcx,%rdx
+						{
+							return EFI_LOAD_ERROR;									// ja	Llzvn_exit
+						}
+						
+						r12 = compBufferPointer;									// mov	%r8,%r12
+						r12 = OSSwapInt64(r12);										// bswap	%r12
+						r10 = r12;													// mov	%r12,%r10
+						r12 <<= 5;													// shl	$0x5,%r12
+						r10 <<= 2;													// shl	$0x2,%r10
+						r12 >>= 53;													// shr	$0x35,%r12
+						r10 >>= 61;													// shr	$0x3d,%r10
+						compBufferPointer >>= 16;									// shr	$0x10,%r8
+						r10 += 3;													// add	$0x3,%r10
+						
+						jmpTo = LZVN_10;											// jmp	Llzvn_l10
+						break;
+						
+					case 2:
+						*uncompressedSize = length;
+						return EFI_SUCCESS;
+					
+					case 3:
+						caseTableIndex >>= 6;										// shr	$0x6,%r9
+						compBuffer = (compBuffer + caseTableIndex + 3);				// lea	0x3(%rdx,%r9,1),%rdx
+						
+						if (compBuffer > compressedSize)							// cmp	%rcx,%rdx
+						{
+							return EFI_LOAD_ERROR;									// ja	Llzvn_exit
+						}
+						
+						r10 = 56;													// mov	$0x38,%r10
+						r12 = 65535;												// mov	$0xffff,%r12
+						r10 &= compBufferPointer;									// and	%r8,%r10
+						compBufferPointer >>= 8;									// shr	$0x8,%r8
+						r10 >>= 3;													// shr	$0x3,%r10
+						r12 &= compBufferPointer;									// and	%r8,%r12
+						compBufferPointer >>= 16;									// shr	$0x10,%r8
+						r10 += 3;													// add	$0x3,%r10
+						
+						jmpTo = LZVN_10;											// jmp	Llzvn_l10
+						break;
+						
+					case 4:
+						compBuffer += 1;											// add	$0x1,%rdx
+						
+						if (compBuffer > compressedSize)							// cmp	%rcx,%rdx
+						{
+							return EFI_LOAD_ERROR;									// ja	Llzvn_exit
+						}
+						
+						compBufferPointer = *(UINT64 *)compBuffer;					// mov	(%rdx),%r8
+						caseTableIndex = (compBufferPointer & 255);					// movzbq (%rdx),%r9
+						
+						jmpTo = CASE_TABLE;											// continue;
+						break;														// jmpq	*(%rbx,%r9,8)
+						
+					case 5:
+						return EFI_LOAD_ERROR;										// Llzvn_table5;
+						
+					case 6:
+						caseTableIndex >>= 3;										// shr	$0x3,%r9
+						caseTableIndex &= 3;										// and	$0x3,%r9
+						compBuffer = (compBuffer + caseTableIndex + 3);				// lea	0x3(%rdx,%r9,1),%rdx
+						
+						if (compBuffer > compressedSize)							// cmp	%rcx,%rdx
+						{
+							return EFI_LOAD_ERROR;									// ja	Llzvn_exit
+						}
+						
+						r10 = compBufferPointer;									// mov	%r8,%r10
+						r10 &= 775;													// and	$0x307,%r10
+						compBufferPointer >>= 10;									// shr	$0xa,%r8
+						r12 = (r10 & 255);											// movzbq %r10b,%r12
+						r10 >>= 8;													// shr	$0x8,%r10
+						r12 <<= 2;													// shl	$0x2,%r12
+						r10 |= r12;													// or	%r12,%r10
+						r12 = 16383;												// mov	$0x3fff,%r12
+						r10 += 3;													// add	$0x3,%r10
+						r12 &= compBufferPointer;									// and	%r8,%r12
+						compBufferPointer >>= 14;									// shr	$0xe,%r8
+						
+						jmpTo = LZVN_10;											// jmp	Llzvn_l10
+						break;
+					
+					case 7:
+						compBufferPointer >>= 8;									// shr	$0x8,%r8
+						compBufferPointer &= 255;									// and	$0xff,%r8
+						compBufferPointer += 16;									// add	$0x10,%r8
+						compBuffer = (compBuffer + compBufferPointer + 2);			// lea	0x2(%rdx,%r8,1),%rdx
+						
+						jmpTo = LZVN_0;												// jmp	Llzvn_l0
+						break;
+						
+					case 8: compBufferPointer &= 15;								// and	$0xf,%r8
+						compBuffer = (compBuffer + compBufferPointer + 1);			// lea	0x1(%rdx,%r8,1),%rdx
+						
+						jmpTo = LZVN_0;												// jmp	Llzvn_l0
+						break;
+						
+					case 9:
+						compBuffer += 2;											// add	$0x2,%rdx
+						
+						if (compBuffer > compressedSize)							// cmp	%rcx,%rdx
+						{
+							return EFI_LOAD_ERROR;									// ja	Llzvn_exit
+						}
+						
+						r10 = compBufferPointer;									// mov	%r8,%r10
+						r10 >>= 8;													// shr	$0x8,%r10
+						r10 &= 255;													// and	$0xff,%r10
+						r10 += 16;													// add	$0x10,%r10
+						
+						jmpTo = LZVN_11;											// jmp	Llzvn_l11
+						break;
+						
+					case 10:
+						compBuffer += 1;											// add	$0x1,%rdx
+						
+						if (compBuffer > compressedSize)							// cmp	%rcx,%rdx
+						{
+							return EFI_LOAD_ERROR;									// ja	Llzvn_exit
+						}
+						
+						r10 = compBufferPointer;									// mov	%r8,%r10
+						r10 &= 15;													// and	$0xf,%r10
+						
+						jmpTo = LZVN_11;											// jmp	Llzvn_l11
+						break;
+						
+					default:return EFI_LOAD_ERROR;
+						
+				}																	// switch (caseTable[caseTableIndex])
+				
+				break;
+				
+			case LZVN_0: /**********************************************************/
+				
+				if (compBuffer > compressedSize)									// cmp	%rcx,%rdx
+				{
+					return EFI_LOAD_ERROR;											// ja	Llzvn_exit
+				}
+				
+				currentLength = (length + compBufferPointer);						// lea	(%rax,%r8,1),%r11
+				compBufferPointer = (0 - compBufferPointer);						// neg	%r8
+				
+				if (currentLength > uncompressedBufferSize)							// cmp	%rsi,%r11
+				{
+					jmpTo = LZVN_2;													// ja	Llzvn_l2
+					break;
+				}
+				
+				currentLength = (decompBuffer + currentLength);						// lea	(%rdi,%r11,1),%r11
+				
+			case LZVN_1: /**********************************************************/
+				
+				do																	// Llzvn_l1:
+				{
+					caseTableIndex = *(UINT64 *)((UINT64)compBuffer + compBufferPointer);
+					*(UINT64 *)((UINT64)currentLength + compBufferPointer) = caseTableIndex;
+					
+					compBufferPointer += 8;											// add	$0x8,%r8
+					
+				} while ((EFI_MAX_ADDRESS - (compBufferPointer - 8)) >= 8);			// jae	Llzvn_l1
+				
+				length = currentLength;												// mov	%r11,%rax
+				length -= decompBuffer;												// sub	%rdi,%rax
+				
+				compBufferPointer = *(UINT64 *)compBuffer;							// mov	(%rdx),%r8
+				caseTableIndex = (compBufferPointer & 255);							// movzbq (%rdx),%r9
+				
+				jmpTo = CASE_TABLE;
+				break;																// jmpq	*(%rbx,%r9,8)
+				
+			case LZVN_2: /**********************************************************/
+				
+				currentLength = (uncompressedBufferSize + 8);						// lea	0x8(%rsi),%r11
+				
+			case LZVN_3: /***********************************************************/
+				
+				do																	// Llzvn_l3:
+				{
+					address = (compBuffer + compBufferPointer);						// movzbq (%rdx,%r8,1),%r9
+					caseTableIndex = *((UINT64 *)address);
+					caseTableIndex &= 255;
+					
+					address = (decompBuffer + length);								// mov	%r9b,(%rdi,%rax,1)
+					byte_data = (CHAR8)caseTableIndex;
+					memcpy((void *)address, &byte_data, sizeof(byte_data));
+					
+					length += 1;													// add	$0x1,%rax
+					
+					if (currentLength == length)									// cmp	%rax,%r11
+					{
+						*uncompressedSize = length;
+						return EFI_SUCCESS;											// je	Llzvn_exit2
+					}
+					
+					compBufferPointer += 1;											// add	$0x1,%r8
+					
+				} while ((int64_t)compBufferPointer != 0);							// jne	Llzvn_l3
+				
+				compBufferPointer = *(UINT64 *)compBuffer;							// mov	(%rdx),%r8
+				caseTableIndex = (compBufferPointer & 255);							// movzbq	(%rdx),%r9
+				
+				jmpTo = CASE_TABLE;
+				break;																// jmpq	*(%rbx,%r9,8)
+				
+			case LZVN_4: /**********************************************************/
+				
+				currentLength = (uncompressedBufferSize + 8);						// lea	0x8(%rsi),%r11
+				
+			case LZVN_9: /**********************************************************/
+				
+				do																	// Llzvn_l9:
+				{
+					address = (decompBuffer + compBufferPointer);					// movzbq (%rdi,%r8,1),%r9
+					byte_data = *((CHAR8 *)address);
+					caseTableIndex = byte_data;
+					caseTableIndex &= 255;
+					compBufferPointer += 1;											// add	$0x1,%r8
+					
+					address = (decompBuffer + length);								// mov	%r9,(%rdi,%rax,1)
+					byte_data = (CHAR8)caseTableIndex;
+					memcpy((void *)address, &byte_data, sizeof(byte_data));
+					
+					length += 1;													// add	$0x1,%rax
+					
+					if (length == currentLength)									// cmp	%rax,%r11
+					{
+						*uncompressedSize = length;
+						return EFI_SUCCESS;											// je	Llzvn_exit2
+					}
+					
+					r10 -= 1;														// sub	$0x1,%r10
+					
+				} while (r10);														// jne	Llzvn_l9
+				
+				compBufferPointer = *(UINT64 *)compBuffer;							// mov	(%rdx),%r8
+				caseTableIndex = (compBufferPointer & 255);							// movzbq	(%rdx),%r9
+				
+				jmpTo = CASE_TABLE;
+				break;																// jmpq	*(%rbx,%r9,8)
+				
+			case LZVN_5: /**********************************************************/
+				
+				do
+				{
+					address = (decompBuffer + compBufferPointer);					// mov	(%rdi,%r8,1),%r9
+					caseTableIndex = *((UINT64 *)address);
+					compBufferPointer += 8;											// add	$0x8,%r8
+					
+					address = (decompBuffer + length);								// mov	%r9,(%rdi,%rax,1)
+					memcpy((void *)address, &caseTableIndex, sizeof(caseTableIndex));
+					
+					length += 8;													// add	$0x8,%rax
+					r10 -= 8;														// sub	$0x8,%r10
+					
+				} while ((r10 + 8) > 8);											// ja	Llzvn_l5
+				
+				length += r10;														// add	%r10,%rax
+				compBufferPointer = *(UINT64 *)compBuffer;							// mov	(%rdx),%r8
+				caseTableIndex = (compBufferPointer & 255);							// movzbq	(%rdx),%r9
+				
+				jmpTo = CASE_TABLE;
+				break;																// jmpq	*(%rbx,%r9,8)
+				
+			case LZVN_10: /*********************************************************/
+				
+				currentLength = (length + caseTableIndex);							// lea	(%rax,%r9,1),%r11
+				currentLength += r10;												// add	%r10,%r11
+				
+				if (currentLength < uncompressedBufferSize)							// cmp	%rsi,%r11 (block_end: jae	Llzvn_l8)
+				{
+					address = decompBuffer + length;								// mov	%r8,(%rdi,%rax,1)
+					memcpy((void *)address, &compBufferPointer, sizeof(compBufferPointer));
+					
+					length += caseTableIndex;										// add	%r9,%rax
+					compBufferPointer = length;										// mov	%rax,%r8
+					
+					if (compBufferPointer < r12)									// jb	Llzvn_exit
+					{
+						return EFI_LOAD_ERROR;
+					}
+					
+					compBufferPointer -= r12;										// sub	%r12,%r8
+					
+					if (r12 < 8)													// cmp	$0x8,%r12
+					{
+						jmpTo = LZVN_4;												// jb	Llzvn_l4
+						break;
+					}
+					
+					jmpTo = LZVN_5;													// jmpq	*(%rbx,%r9,8)
+					break;
+				}
+				
+			case LZVN_8: /**********************************************************/
+				
+				if (caseTableIndex == 0)											// test	%r9,%r9
+				{
+					jmpTo = LZVN_7;													// jmpq	*(%rbx,%r9,8)
+					break;
+				}
+				
+				currentLength = (uncompressedBufferSize + 8);						// lea	0x8(%rsi),%r11
+				
+			case LZVN_6: /**********************************************************/
+				
+				do
+				{
+					address = (decompBuffer + length);								// mov	%r8b,(%rdi,%rax,1)
+					byte_data = (CHAR8)(compBufferPointer & 255);
+					memcpy((void *)address, &byte_data, sizeof(byte_data));
+					length += 1;													// add	$0x1,%rax
+					
+					if (length == currentLength)									// cmp	%rax,%r11
+					{
+						*uncompressedSize = length;
+						return EFI_SUCCESS;											// je	Llzvn_exit2
+					}
+					
+					compBufferPointer >>= 8;										// shr	$0x8,%r8
+					caseTableIndex -= 1;											// sub	$0x1,%r9
+					
+				} while (caseTableIndex != 1);										// jne	Llzvn_l6
+				
+			case LZVN_7: /**********************************************************/
+				
+				compBufferPointer = length;											// mov	%rax,%r8
+				compBufferPointer -= r12;											// sub	%r12,%r8
+				
+				if (compBufferPointer < r12)										// jb	Llzvn_exit
+				{
+					return EFI_LOAD_ERROR;
+				}
+				
+				jmpTo = LZVN_4;
+				break;																// jmpq	*(%rbx,%r9,8)
+				
+			case LZVN_11: /*********************************************************/
+				
+				compBufferPointer = length;											// mov	%rax,%r8
+				compBufferPointer -= r12;											// sub	%r12,%r8
+				currentLength = (length + r10);										// lea	(%rax,%r10,1),%r11
+				
+				if (currentLength < uncompressedBufferSize)							// cmp	%rsi,%r11
+				{
+					if (r12 >= 8)													// cmp	$0x8,%r12
+					{
+						jmpTo = LZVN_5;												// jae	Llzvn_l5
+						break;
+					}
+				}
+				
+				jmpTo = LZVN_4;														// jmp	Llzvn_l4
+				break;
+		}																			// switch (jmpq)
+		
+	} while (1);
+	
+	return EFI_LOAD_ERROR;
 }
