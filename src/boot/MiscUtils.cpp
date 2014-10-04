@@ -811,13 +811,13 @@ EFI_STATUS BlDecompressLZSS(VOID CONST* compressedBuffer, UINTN compressedSize, 
 //
 // uncompress LZVN
 //
-EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, VOID* uncompressedBuffer, UINTN uncompressedBufferSize, UINTN* uncompressedSize)
+EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN aCompressedSize, VOID* uncompressedBuffer, UINTN uncompressedBufferSize, UINTN* uncompressedSize)
 {
 	const UINT64 decompBuffer	= (const UINT64)uncompressedBuffer;
 	
 	UINT64 length				= 0;												// xor	%rax,%rax
-	UINT64 decompressedSize		= uncompressedBufferSize;
-
+	UINT64 decompressedSize		= (UINT64)uncompressedBufferSize;
+	UINT64 compressedSize		= (UINT64)aCompressedSize;
 	UINT64 compBuffer			= (UINT64)compressedBuffer;
 	UINT64 compBufferPointer	= 0;
 
