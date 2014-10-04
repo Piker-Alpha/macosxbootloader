@@ -444,14 +444,10 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 
 					if(EFI_ERROR(status = LdrpKernelCacheValid(kernelCachePathName, &kernelCacheValid)))
 						try_leave(NOTHING);
+				}
 
-					/* if(kernelCacheValid)
-						break; */
-				}
-				else
-				{
+				if(!kernelCacheValid)
 					status													= EFI_NOT_FOUND;
-				}
 			// }
 		}
 
