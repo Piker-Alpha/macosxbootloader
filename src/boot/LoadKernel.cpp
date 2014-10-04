@@ -438,6 +438,7 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 				//
 				if(kernelCachePathName[0])
 				{
+					CsPrintf(CHAR8_CONST_STRING("TIANO: Kernel cache located.\n"));
 					//
 					// check valid
 					//
@@ -544,11 +545,15 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 			//
 			if(fileHeader.CompressType == SWAP_BE32_TO_HOST(KERNEL_CACHE_LZSS))
 			{
+				CsPrintf(CHAR8_CONST_STRING("TIANO: Calling BlDecompressLZSS().\n"));
+
 				if(EFI_ERROR(status = BlDecompressLZSS(compressedBuffer, compressedSize, uncompressedBuffer, uncompressedSize, &readLength)))
 					try_leave(NOTHING);
 			}
 			else if(fileHeader.CompressType == SWAP_BE32_TO_HOST(KERNEL_CACHE_LZVN))
 			{
+				CsPrintf(CHAR8_CONST_STRING("TIANO: Calling BlDecompressLZVN().\n"));
+
 				if(EFI_ERROR(status = BlDecompressLZVN(compressedBuffer, compressedSize, uncompressedBuffer, uncompressedSize, &readLength)))
 					try_leave(NOTHING);
 			}
@@ -586,6 +591,7 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 			IoSetFilePosition(&fileHandle, 0);
 		}
 
+		CsPrintf(CHAR8_CONST_STRING("TIANO: Calling MachLoadMachO().\n"));
 		//
 		// load mach-o
 		//
@@ -606,6 +612,8 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 
 		IoCloseFile(&fileHandle);
 	}
+
+	CsPrintf(CHAR8_CONST_STRING("TIANO: Returning from LdrLoadKernelCache().\n"));
 
 	return status;
 }
