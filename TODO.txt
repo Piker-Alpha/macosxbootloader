@@ -2,27 +2,10 @@
 OS X 10.10 Yosemite TODO list:
 ------------------------------
 
-1) add efi:/chosen/random-seed
-
-- Something like this should work (for now):
-
-UINT32 seedBuffer[16] =
-{
-	0x40005000, 0x5c005300, 0x79007300, 0x74006500,
-	0x6d005c00, 0x4c006900, 0x62007200, 0x61007200,
-	0x79005c00, 0x43006f00, 0x72006500, 0x53006500,
-	0x72007600, 0x69006300, 0x65007300, 0x5c006200
-};
-
-DevTreeAddProperty(chosenNode, CHAR8_CONST_STRING("random-seed"), seedBuffer, sizeof(seedBuffer), TRUE);
-
-That is. Until the random seed generator from boot.efi is implemented. It should stop the reboot in Yosemite, 
-and you should be able to boot with -f (skip kernelcache).
+1) make efi:/chosen/random-seed really random
 
 
-2) implement LZVN decompression routine from:
-
-- https://github.com/Piker-Alpha/LZVN/blob/master/lzvn.c
+2) test/verify the LZVN decompression routine.
 
 
 3) read Apple logo from: /usr/standalone/i386/EfiLoginUI/appleLogo.efires
