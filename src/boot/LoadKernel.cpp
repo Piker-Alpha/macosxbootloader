@@ -449,7 +449,7 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 						break;
 				}
 				status														= EFI_NOT_FOUND;
-			}
+			// }
 		}
 
 		//
