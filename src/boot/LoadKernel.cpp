@@ -392,6 +392,7 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 		//
 		BOOLEAN netBoot														= IoBootingFromNet();
 		STATIC CHAR8 kernelCachePathName[1024]								= {0};
+
 		if(netBoot)
 		{
 			if(LdrpKernelCachePathName)
@@ -399,9 +400,11 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 		}
 		else
 		{
+			strcpy(kernelCachePathName, "System\\Library\\Caches\\com.apple.kext.caches\\Startup\\kernelcache");
+
 			//
 			// build kernel cache search path
-			//
+			/*
 			STATIC CHAR8 CONST* pathFormat[] =
 			{
 				CHAR8_CONST_STRING("%a"),
@@ -427,7 +430,7 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 				else if(i == 4)
 					snprintf(kernelCachePathName, ARRAYSIZE(kernelCachePathName) - 1, pathFormat[4], "x86_64");
 				else
-					kernelCachePathName[0]									= 0;
+					kernelCachePathName[0]									= 0; */
 
 				//
 				// check name
@@ -438,6 +441,7 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 					// check valid
 					//
 					BOOLEAN kernelCacheValid								= FALSE;
+
 					if(EFI_ERROR(status = LdrpKernelCacheValid(kernelCachePathName, &kernelCacheValid)))
 						try_leave(NOTHING);
 
