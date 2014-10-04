@@ -859,9 +859,9 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 		return EFI_LOAD_ERROR;
 	}
 	
-	decompressedSize = (compBuffer + decompressedSize - 8);							// lea	-0x8(%rdx,%rcx,1),%rcx
+	compressedSize = (compBuffer + compressedSize - 8);								// lea	-0x8(%rdx,%rcx,1),%rcx
 	
-	if (compBuffer > decompressedSize)												// cmp	%rcx,%rdx
+	if (compBuffer > compressedSize)												// cmp	%rcx,%rdx
 	{
 		return EFI_LOAD_ERROR;														// ja	Llzvn_exit
 	}
@@ -881,7 +881,7 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 						caseTableIndex >>= 6;										// shr	$0x6,%r9
 						compBuffer = (compBuffer + caseTableIndex + 1);				// lea	0x1(%rdx,%r9,1),%rdx
 						
-						if (compBuffer > decompressedSize)							// cmp	%rcx,%rdx
+						if (compBuffer > compressedSize)							// cmp	%rcx,%rdx
 						{
 							return EFI_LOAD_ERROR;									// ja	Llzvn_exit
 						}
@@ -899,7 +899,7 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 						caseTableIndex >>= 6;										// shr	$0x6,%r9
 						compBuffer = (compBuffer + caseTableIndex + 2);				// lea	0x2(%rdx,%r9,1),%rdx
 						
-						if (compBuffer > decompressedSize)							// cmp	%rcx,%rdx
+						if (compBuffer > compressedSize)							// cmp	%rcx,%rdx
 						{
 							return EFI_LOAD_ERROR;									// ja	Llzvn_exit
 						}
@@ -926,7 +926,7 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 						caseTableIndex >>= 6;										// shr	$0x6,%r9
 						compBuffer = (compBuffer + caseTableIndex + 3);				// lea	0x3(%rdx,%r9,1),%rdx
 						
-						if (compBuffer > decompressedSize)							// cmp	%rcx,%rdx
+						if (compBuffer > compressedSize)							// cmp	%rcx,%rdx
 						{
 							return EFI_LOAD_ERROR;									// ja	Llzvn_exit
 						}
@@ -946,7 +946,7 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 					case 4:
 						compBuffer += 1;											// add	$0x1,%rdx
 						
-						if (compBuffer > decompressedSize)							// cmp	%rcx,%rdx
+						if (compBuffer > compressedSize)							// cmp	%rcx,%rdx
 						{
 							return EFI_LOAD_ERROR;									// ja	Llzvn_exit
 						}
@@ -965,7 +965,7 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 						caseTableIndex &= 3;										// and	$0x3,%r9
 						compBuffer = (compBuffer + caseTableIndex + 3);				// lea	0x3(%rdx,%r9,1),%rdx
 						
-						if (compBuffer > decompressedSize)							// cmp	%rcx,%rdx
+						if (compBuffer > compressedSize)							// cmp	%rcx,%rdx
 						{
 							return EFI_LOAD_ERROR;									// ja	Llzvn_exit
 						}
@@ -1004,7 +1004,7 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 					case 9:
 						compBuffer += 2;											// add	$0x2,%rdx
 						
-						if (compBuffer > decompressedSize)							// cmp	%rcx,%rdx
+						if (compBuffer > compressedSize)							// cmp	%rcx,%rdx
 						{
 							return EFI_LOAD_ERROR;									// ja	Llzvn_exit
 						}
@@ -1021,7 +1021,7 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 					case 10:
 						compBuffer += 1;											// add	$0x1,%rdx
 						
-						if (compBuffer > decompressedSize)							// cmp	%rcx,%rdx
+						if (compBuffer > compressedSize)							// cmp	%rcx,%rdx
 						{
 							return EFI_LOAD_ERROR;									// ja	Llzvn_exit
 						}
@@ -1040,7 +1040,7 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 				
 			case LZVN_0: /**********************************************************/
 				
-				if (compBuffer > decompressedSize)									// cmp	%rcx,%rdx
+				if (compBuffer > compressedSize)									// cmp	%rcx,%rdx
 				{
 					return EFI_LOAD_ERROR;											// ja	Llzvn_exit
 				}
