@@ -816,15 +816,15 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 	const UINT64 decompBuffer	= (const UINT64)uncompressedBuffer;
 	
 	UINT64 length				= 0;												// xor	%rax,%rax
+	UINT64 decompressedSize		= uncompressedBufferSize;
 
 	UINT64 compBuffer			= (UINT64)compressedBuffer;
 	UINT64 compBufferPointer	= 0;
 
 	UINT64 caseTableIndex		= 0;
-	UINT64 r10					= 0;
-	UINT64 currentLength			= 0;											// xor	%r12,%r12
-	UINT64 r12					= 0;
-
+	UINT64 byteCount			= 0;
+	UINT64 currentLength		= 0;												// xor	%r12,%r12
+	UINT64 negativeOffset		= 0;
 	UINT64 address				= 0;												// ((UINT64)compBuffer + compBufferPointer)
 
 	UINT8 jmpTo					= CASE_TABLE;
@@ -852,16 +852,16 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 		9, 10, 10, 10,   10, 10, 10, 10,   10, 10, 10, 10,   10, 10, 10, 10
 	};
 	
-	uncompressedBufferSize -= 8;													// sub	$0x8,%rsi
+	decompressedSize -= 8;															// sub	$0x8,%rsi
 	
-	if (uncompressedBufferSize < 8)													// jb	Llzvn_exit
+	if (decompressedSize < 8)														// jb	Llzvn_exit
 	{
 		return EFI_LOAD_ERROR;
 	}
 	
-	compressedSize = (compBuffer + compressedSize - 8);								// lea	-0x8(%rdx,%rcx,1),%rcx
+	decompressedSize = (compBuffer + decompressedSize - 8);							// lea	-0x8(%rdx,%rcx,1),%rcx
 	
-	if (compBuffer > compressedSize)												// cmp	%rcx,%rdx
+	if (compBuffer > decompressedSize)												// cmp	%rcx,%rdx
 	{
 		return EFI_LOAD_ERROR;														// ja	Llzvn_exit
 	}
@@ -881,16 +881,16 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 						caseTableIndex >>= 6;										// shr	$0x6,%r9
 						compBuffer = (compBuffer + caseTableIndex + 1);				// lea	0x1(%rdx,%r9,1),%rdx
 						
-						if (compBuffer > compressedSize)							// cmp	%rcx,%rdx
+						if (compBuffer > decompressedSize)							// cmp	%rcx,%rdx
 						{
 							return EFI_LOAD_ERROR;									// ja	Llzvn_exit
 						}
 						
-						r10 = 56;													// mov	$0x38,%r10
-						r10 &= compBufferPointer;									// and	%r8,%r10
+						byteCount = 56;												// mov	$0x38,%r10
+						byteCount &= compBufferPointer;								// and	%r8,%r10
 						compBufferPointer >>= 8;									// shr	$0x8,%r8
-						r10 >>= 3;													// shr	$0x3,%r10
-						r10 += 3;													// add	$0x3,%r10
+						byteCount >>= 3;											// shr	$0x3,%r10
+						byteCount += 3;												// add	$0x3,%r10
 						
 						jmpTo = LZVN_10;											// jmp	Llzvn_l10
 						break;
@@ -899,20 +899,20 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 						caseTableIndex >>= 6;										// shr	$0x6,%r9
 						compBuffer = (compBuffer + caseTableIndex + 2);				// lea	0x2(%rdx,%r9,1),%rdx
 						
-						if (compBuffer > compressedSize)							// cmp	%rcx,%rdx
+						if (compBuffer > decompressedSize)							// cmp	%rcx,%rdx
 						{
 							return EFI_LOAD_ERROR;									// ja	Llzvn_exit
 						}
 						
-						r12 = compBufferPointer;									// mov	%r8,%r12
-						r12 = OSSwapInt64(r12);										// bswap	%r12
-						r10 = r12;													// mov	%r12,%r10
-						r12 <<= 5;													// shl	$0x5,%r12
-						r10 <<= 2;													// shl	$0x2,%r10
-						r12 >>= 53;													// shr	$0x35,%r12
-						r10 >>= 61;													// shr	$0x3d,%r10
+						negativeOffset = compBufferPointer;							// mov	%r8,%r12
+						negativeOffset = OSSwapInt64(negativeOffset);				// bswap	%r12
+						byteCount = negativeOffset;									// mov	%r12,%r10
+						negativeOffset <<= 5;										// shl	$0x5,%r12
+						byteCount <<= 2;											// shl	$0x2,%r10
+						negativeOffset >>= 53;										// shr	$0x35,%r12
+						byteCount >>= 61;											// shr	$0x3d,%r10
 						compBufferPointer >>= 16;									// shr	$0x10,%r8
-						r10 += 3;													// add	$0x3,%r10
+						byteCount += 3;												// add	$0x3,%r10
 						
 						jmpTo = LZVN_10;											// jmp	Llzvn_l10
 						break;
@@ -926,19 +926,19 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 						caseTableIndex >>= 6;										// shr	$0x6,%r9
 						compBuffer = (compBuffer + caseTableIndex + 3);				// lea	0x3(%rdx,%r9,1),%rdx
 						
-						if (compBuffer > compressedSize)							// cmp	%rcx,%rdx
+						if (compBuffer > decompressedSize)							// cmp	%rcx,%rdx
 						{
 							return EFI_LOAD_ERROR;									// ja	Llzvn_exit
 						}
 						
-						r10 = 56;													// mov	$0x38,%r10
-						r12 = 65535;												// mov	$0xffff,%r12
-						r10 &= compBufferPointer;									// and	%r8,%r10
+						byteCount = 56;												// mov	$0x38,%r10
+						negativeOffset = 65535;										// mov	$0xffff,%r12
+						byteCount &= compBufferPointer;								// and	%r8,%r10
 						compBufferPointer >>= 8;									// shr	$0x8,%r8
-						r10 >>= 3;													// shr	$0x3,%r10
-						r12 &= compBufferPointer;									// and	%r8,%r12
+						byteCount >>= 3;											// shr	$0x3,%r10
+						negativeOffset &= compBufferPointer;						// and	%r8,%r12
 						compBufferPointer >>= 16;									// shr	$0x10,%r8
-						r10 += 3;													// add	$0x3,%r10
+						byteCount += 3;												// add	$0x3,%r10
 						
 						jmpTo = LZVN_10;											// jmp	Llzvn_l10
 						break;
@@ -946,7 +946,7 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 					case 4:
 						compBuffer += 1;											// add	$0x1,%rdx
 						
-						if (compBuffer > compressedSize)							// cmp	%rcx,%rdx
+						if (compBuffer > decompressedSize)							// cmp	%rcx,%rdx
 						{
 							return EFI_LOAD_ERROR;									// ja	Llzvn_exit
 						}
@@ -965,21 +965,21 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 						caseTableIndex &= 3;										// and	$0x3,%r9
 						compBuffer = (compBuffer + caseTableIndex + 3);				// lea	0x3(%rdx,%r9,1),%rdx
 						
-						if (compBuffer > compressedSize)							// cmp	%rcx,%rdx
+						if (compBuffer > decompressedSize)							// cmp	%rcx,%rdx
 						{
 							return EFI_LOAD_ERROR;									// ja	Llzvn_exit
 						}
 						
-						r10 = compBufferPointer;									// mov	%r8,%r10
-						r10 &= 775;													// and	$0x307,%r10
+						byteCount = compBufferPointer;								// mov	%r8,%r10
+						byteCount &= 775;											// and	$0x307,%r10
 						compBufferPointer >>= 10;									// shr	$0xa,%r8
-						r12 = (r10 & 255);											// movzbq %r10b,%r12
-						r10 >>= 8;													// shr	$0x8,%r10
-						r12 <<= 2;													// shl	$0x2,%r12
-						r10 |= r12;													// or	%r12,%r10
-						r12 = 16383;												// mov	$0x3fff,%r12
-						r10 += 3;													// add	$0x3,%r10
-						r12 &= compBufferPointer;									// and	%r8,%r12
+						negativeOffset = (byteCount & 255);							// movzbq %r10b,%r12
+						byteCount >>= 8;											// shr	$0x8,%r10
+						negativeOffset <<= 2;										// shl	$0x2,%r12
+						byteCount |= negativeOffset;								// or	%r12,%r10
+						negativeOffset = 16383;										// mov	$0x3fff,%r12
+						byteCount += 3;												// add	$0x3,%r10
+						negativeOffset &= compBufferPointer;						// and	%r8,%r12
 						compBufferPointer >>= 14;									// shr	$0xe,%r8
 						
 						jmpTo = LZVN_10;											// jmp	Llzvn_l10
@@ -1004,15 +1004,16 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 					case 9:
 						compBuffer += 2;											// add	$0x2,%rdx
 						
-						if (compBuffer > compressedSize)							// cmp	%rcx,%rdx
+						if (compBuffer > decompressedSize)							// cmp	%rcx,%rdx
 						{
 							return EFI_LOAD_ERROR;									// ja	Llzvn_exit
 						}
 						
-						r10 = compBufferPointer;									// mov	%r8,%r10
-						r10 >>= 8;													// shr	$0x8,%r10
-						r10 &= 255;													// and	$0xff,%r10
-						r10 += 16;													// add	$0x10,%r10
+						// Up most significant byte (count) by 16 (0x10/16 - 0x10f/271).
+						byteCount = compBufferPointer;								// mov	%r8,%r10
+						byteCount >>= 8;											// shr	$0x8,%r10
+						byteCount &= 255;											// and	$0xff,%r10
+						byteCount += 16;											// add	$0x10,%r10
 						
 						jmpTo = LZVN_11;											// jmp	Llzvn_l11
 						break;
@@ -1020,13 +1021,13 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 					case 10:
 						compBuffer += 1;											// add	$0x1,%rdx
 						
-						if (compBuffer > compressedSize)							// cmp	%rcx,%rdx
+						if (compBuffer > decompressedSize)							// cmp	%rcx,%rdx
 						{
 							return EFI_LOAD_ERROR;									// ja	Llzvn_exit
 						}
 						
-						r10 = compBufferPointer;									// mov	%r8,%r10
-						r10 &= 15;													// and	$0xf,%r10
+						byteCount = compBufferPointer;								// mov	%r8,%r10
+						byteCount &= 15;											// and	$0xf,%r10
 						
 						jmpTo = LZVN_11;											// jmp	Llzvn_l11
 						break;
@@ -1039,7 +1040,7 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 				
 			case LZVN_0: /**********************************************************/
 				
-				if (compBuffer > compressedSize)									// cmp	%rcx,%rdx
+				if (compBuffer > decompressedSize)									// cmp	%rcx,%rdx
 				{
 					return EFI_LOAD_ERROR;											// ja	Llzvn_exit
 				}
@@ -1047,7 +1048,7 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 				currentLength = (length + compBufferPointer);						// lea	(%rax,%r8,1),%r11
 				compBufferPointer = (0 - compBufferPointer);						// neg	%r8
 				
-				if (currentLength > uncompressedBufferSize)							// cmp	%rsi,%r11
+				if (currentLength > decompressedSize)								// cmp	%rsi,%r11
 				{
 					jmpTo = LZVN_2;													// ja	Llzvn_l2
 					break;
@@ -1077,7 +1078,7 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 				
 			case LZVN_2: /**********************************************************/
 				
-				currentLength = (uncompressedBufferSize + 8);						// lea	0x8(%rsi),%r11
+				currentLength = (decompressedSize + 8);								// lea	0x8(%rsi),%r11
 				
 			case LZVN_3: /***********************************************************/
 				
@@ -1112,7 +1113,7 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 				
 			case LZVN_4: /**********************************************************/
 				
-				currentLength = (uncompressedBufferSize + 8);						// lea	0x8(%rsi),%r11
+				currentLength = (decompressedSize + 8);								// lea	0x8(%rsi),%r11
 				
 			case LZVN_9: /**********************************************************/
 				
@@ -1137,9 +1138,9 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 						return EFI_SUCCESS;											// je	Llzvn_exit2
 					}
 					
-					r10 -= 1;														// sub	$0x1,%r10
+					byteCount -= 1;													// sub	$0x1,%r10
 					
-				} while (r10);														// jne	Llzvn_l9
+				} while (byteCount);												// jne	Llzvn_l9
 				
 				compBufferPointer = *(UINT64 *)compBuffer;							// mov	(%rdx),%r8
 				caseTableIndex = (compBufferPointer & 255);							// movzbq	(%rdx),%r9
@@ -1159,11 +1160,11 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 					memcpy((void *)address, &caseTableIndex, sizeof(caseTableIndex));
 					
 					length += 8;													// add	$0x8,%rax
-					r10 -= 8;														// sub	$0x8,%r10
+					byteCount -= 8;													// sub	$0x8,%r10
 					
-				} while ((r10 + 8) > 8);											// ja	Llzvn_l5
+				} while ((byteCount + 8) > 8);										// ja	Llzvn_l5
 				
-				length += r10;														// add	%r10,%rax
+				length += byteCount;												// add	%r10,%rax
 				compBufferPointer = *(UINT64 *)compBuffer;							// mov	(%rdx),%r8
 				caseTableIndex = (compBufferPointer & 255);							// movzbq	(%rdx),%r9
 				
@@ -1173,9 +1174,9 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 			case LZVN_10: /*********************************************************/
 				
 				currentLength = (length + caseTableIndex);							// lea	(%rax,%r9,1),%r11
-				currentLength += r10;												// add	%r10,%r11
+				currentLength += byteCount;											// add	%r10,%r11
 				
-				if (currentLength < uncompressedBufferSize)							// cmp	%rsi,%r11 (block_end: jae	Llzvn_l8)
+				if (currentLength < decompressedSize)								// cmp	%rsi,%r11 (block_end: jae	Llzvn_l8)
 				{
 					address = decompBuffer + length;								// mov	%r8,(%rdi,%rax,1)
 					memcpy((void *)address, &compBufferPointer, sizeof(compBufferPointer));
@@ -1183,14 +1184,14 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 					length += caseTableIndex;										// add	%r9,%rax
 					compBufferPointer = length;										// mov	%rax,%r8
 					
-					if (compBufferPointer < r12)									// jb	Llzvn_exit
+					if (compBufferPointer < negativeOffset)							// jb	Llzvn_exit
 					{
 						return EFI_LOAD_ERROR;
 					}
 					
-					compBufferPointer -= r12;										// sub	%r12,%r8
+					compBufferPointer -= negativeOffset;							// sub	%r12,%r8
 					
-					if (r12 < 8)													// cmp	$0x8,%r12
+					if (negativeOffset < 8)											// cmp	$0x8,%r12
 					{
 						jmpTo = LZVN_4;												// jb	Llzvn_l4
 						break;
@@ -1208,7 +1209,7 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 					break;
 				}
 				
-				currentLength = (uncompressedBufferSize + 8);						// lea	0x8(%rsi),%r11
+				currentLength = (decompressedSize + 8);								// lea	0x8(%rsi),%r11
 				
 			case LZVN_6: /**********************************************************/
 				
@@ -1234,9 +1235,9 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 			case LZVN_7: /**********************************************************/
 				
 				compBufferPointer = length;											// mov	%rax,%r8
-				compBufferPointer -= r12;											// sub	%r12,%r8
+				compBufferPointer -= negativeOffset;								// sub	%r12,%r8
 				
-				if (compBufferPointer < r12)										// jb	Llzvn_exit
+				if (compBufferPointer < negativeOffset)								// jb	Llzvn_exit
 				{
 					return EFI_LOAD_ERROR;
 				}
@@ -1247,12 +1248,12 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN compressedSize, 
 			case LZVN_11: /*********************************************************/
 				
 				compBufferPointer = length;											// mov	%rax,%r8
-				compBufferPointer -= r12;											// sub	%r12,%r8
-				currentLength = (length + r10);										// lea	(%rax,%r10,1),%r11
+				compBufferPointer -= negativeOffset;								// sub	%r12,%r8
+				currentLength = (length + byteCount);								// lea	(%rax,%r10,1),%r11
 				
-				if (currentLength < uncompressedBufferSize)							// cmp	%rsi,%r11
+				if (currentLength < decompressedSize)								// cmp	%rsi,%r11
 				{
-					if (r12 >= 8)													// cmp	$0x8,%r12
+					if (negativeOffset >= 8)										// cmp	$0x8,%r12
 					{
 						jmpTo = LZVN_5;												// jae	Llzvn_l5
 						break;
