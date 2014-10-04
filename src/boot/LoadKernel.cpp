@@ -432,6 +432,7 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 				else
 					kernelCachePathName[0]									= 0; */
 
+				BOOLEAN kernelCacheValid									= FALSE;
 				//
 				// check name
 				//
@@ -440,8 +441,6 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 					//
 					// check valid
 					//
-					BOOLEAN kernelCacheValid								= FALSE;
-
 					if(EFI_ERROR(status = LdrpKernelCacheValid(kernelCachePathName, &kernelCacheValid)))
 						try_leave(NOTHING);
 				}
