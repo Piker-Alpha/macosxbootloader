@@ -36,7 +36,7 @@ EFI_STATUS PeInitialize()
 			break;
 
 		//
-		// SystemSerialNumber + FSBFrequency + Model+ DevicePathsSupported
+		// SystemSerialNumber + FSBFrequency + Model + DevicePathsSupported
 		//
 		if(!memcmp(&recordHeader->ProducerName, &AppleSystemInfoProducerNameGuid, sizeof(AppleSystemInfoProducerNameGuid)))
 		{
