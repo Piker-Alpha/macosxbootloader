@@ -454,10 +454,10 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 		//
 		// add random-seed property with a static data (for testing only)
 		//
-		UINT32 seedBuffer[16] =
+		UINT64 seedBuffer[8] =
 		{
-			0x40005000, 0x5c005300, 0x79007300, 0x74006500, 0x6d005c00, 0x4c006900, 0x62007200, 0x61007200,
-			0x79005c00, 0x43006f00, 0x72006500, 0x53006500, 0x72007600, 0x69006300, 0x65007300, 0x5c006200
+			0x400050005c005300, 0x7900730074006500, 0x6d005c004c006900, 0x6200720061007200,
+			0x79005c0043006f00, 0x7200650053006500, 0x7200760069006300, 0x650073005c006200
 		};
 
 		DevTreeAddProperty(chosenNode, CHAR8_CONST_STRING("random-seed"), seedBuffer, sizeof(seedBuffer), TRUE);
