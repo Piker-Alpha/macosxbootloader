@@ -11,6 +11,8 @@
 #define KERNEL_CACHE_LZSS													0x6c7a7373
 #define KERNEL_CACHE_LZVN													0x6c7a766e
 
+#define DEBUG_LDRP_CALL_CSPRINTF											0
+
 //
 // compressed header
 //
@@ -438,7 +440,9 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 				//
 				if(kernelCachePathName[0])
 				{
-					CsPrintf(CHAR8_CONST_STRING("TIANO: Kernel cache located.\n"));
+#if DEBUG_LDRP_CALL_CSPRINTF
+					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache located.\n"));
+#endif
 					//
 					// check valid
 					//
@@ -545,15 +549,17 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 			//
 			if(fileHeader.CompressType == SWAP_BE32_TO_HOST(KERNEL_CACHE_LZSS))
 			{
-				CsPrintf(CHAR8_CONST_STRING("TIANO: Calling BlDecompressLZSS().\n"));
-
+#if DEBUG_LDRP_CALL_CSPRINTF
+				CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlDecompressLZSS().\n"));
+#endif
 				if(EFI_ERROR(status = BlDecompressLZSS(compressedBuffer, compressedSize, uncompressedBuffer, uncompressedSize, &readLength)))
 					try_leave(NOTHING);
 			}
 			else if(fileHeader.CompressType == SWAP_BE32_TO_HOST(KERNEL_CACHE_LZVN))
 			{
-				CsPrintf(CHAR8_CONST_STRING("TIANO: Calling BlDecompressLZVN().\n"));
-
+#if DEBUG_LDRP_CALL_CSPRINTF
+				CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlDecompressLZVN().\n"));
+#endif
 				if(EFI_ERROR(status = BlDecompressLZVN(compressedBuffer, compressedSize, uncompressedBuffer, uncompressedSize, &readLength)))
 					try_leave(NOTHING);
 			}
@@ -590,8 +596,9 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 			//
 			IoSetFilePosition(&fileHandle, 0);
 		}
-
-		CsPrintf(CHAR8_CONST_STRING("TIANO: Calling MachLoadMachO().\n"));
+#if DEBUG_LDRP_CALL_CSPRINTF
+		CsPrintf(CHAR8_CONST_STRING("PIKE: Calling MachLoadMachO().\n"));
+#endif
 		//
 		// load mach-o
 		//
@@ -612,9 +619,9 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 
 		IoCloseFile(&fileHandle);
 	}
-
-	CsPrintf(CHAR8_CONST_STRING("TIANO: Returning from LdrLoadKernelCache().\n"));
-
+#if DEBUG_LDRP_CALL_CSPRINTF
+	CsPrintf(CHAR8_CONST_STRING("PIKE: Returning from LdrLoadKernelCache(%d).\n", status));
+#endif
 	return status;
 }
 
