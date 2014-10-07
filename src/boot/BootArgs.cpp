@@ -454,11 +454,50 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 		//
 		// add random-seed property with a static data (for testing only)
 		//
-		UINT64 seedBuffer[8] =
+		UINT8 index															= 0;
+		UINT16 PMTimerValue													= 0;
+		UINT32 ecx, esi, edi												= 0;
+		UINT64 rcx, rdx, rsi, rdi, cpuTick									= 0;
+
+		UINT8 seedBuffer[64]												= {0};
+
+		ecx																	0;					// xor		%ecx,	%ecx
+		rcx = rdx = rsi = rdi = 0;
+
+		do																						// 0x17e55:
 		{
-			0x400050005c005300, 0x7900730074006500, 0x6d005c004c006900, 0x6200720061007200,
-			0x79005c0043006f00, 0x7200650053006500, 0x7200760069006300, 0x650073005c006200
-		};
+			//
+			// The RDRAND instruction is part of the Intel Secure Key Technology, which is currently only available 
+			// on the Intel I5/I7 Ivy Bridge and Haswell processors. Not on processors used in the old MacPro models.
+			// This is why I had to disassemble Apple's boot.efi and port their assembler code to standard C.
+			//
+			PMTimerValue = ARCH_READ_PORT_UINT16(ArchConvertAddressToPointer(0x408, UINT16*));	// in		(%dx),	%ax
+			esi = PMTimerValue;																	// movzwl	%ax,	%esi
+			
+			if (esi < ecx)																		// cmp		%ecx,	%esi
+			{
+				continue;																		// jb		0x17e55		(retry)
+			}
+			
+			cpuTick = ArchGetCpuTick();															// callq	0x121a7
+			rcx = (cpuTick >> 8);																// mov		%rax,	%rcx
+																								// shr		$0x8,	%rcx
+			rdx = (cpuTick >> 10);																// mov		%rax,	%rdx
+																								// shr		$0x10,	%rdx
+			rdi = rsi;																			// mov		%rsi,	%rdi
+			rdi = (rdi ^ cpuTick);																// xor		%rax,	%rdi
+			rdi = (rdi ^ rcx);																	// xor		%rcx,	%rdi
+			rdi = (rdi ^ rdx);																	// xor		%rdx,	%rdi
+			
+			seedBuffer[index] = (rdi & 0xff);													// mov		%dil,	(%r15,%r12,1)
+			
+			edi = (edi & 0x2f);																	// and		$0x2f,	%edi
+			edi = (edi + esi);																	// add		%esi,	%edi
+			index++;																			// inc		r12
+			ecx = (edi & 0xffff);																// movzwl	%di,	%ecx
+			
+		} while (index < 64);																	// cmp		%r14d,	%r12d
+																								// jne		0x17e55		(next)
 
 		DevTreeAddProperty(chosenNode, CHAR8_CONST_STRING("random-seed"), seedBuffer, sizeof(seedBuffer), TRUE);
 
