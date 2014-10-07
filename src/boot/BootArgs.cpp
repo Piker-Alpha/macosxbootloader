@@ -461,7 +461,7 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 
 		UINT8 seedBuffer[64]												= {0};
 
-		ecx																	0;					// xor		%ecx,	%ecx
+		ecx																	= 0;				// xor		%ecx,	%ecx
 		rcx = rdx = rsi = rdi = 0;
 
 		do																						// 0x17e55:
