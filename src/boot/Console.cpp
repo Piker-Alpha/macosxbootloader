@@ -899,7 +899,7 @@ EFI_STATUS CsDrawBootImage(BOOLEAN normalLogo)
 		//
 		// draw it
 		//
-		CsClearScreen();
+//		CsClearScreen();
 		status																= CspDrawRect((CspHorzRes - imageWidth) / 2, (CspVertRes - imageHeight) / 2, imageWidth, imageHeight, logoImage);
 		MmFreePool(logoImage);
 
@@ -1190,6 +1190,7 @@ VOID CsDrawPreview(HIBERNATE_PREVIEW* previewBuffer, UINT32 imageIndex, UINT8 pr
 		}
 		else if(!colorMode)
 		{
+			CsClearScreen();
 			CsDrawBootImage(TRUE);
 			CspRestoreGraphConfig(0, nullptr, nullptr, nullptr);
 		}
