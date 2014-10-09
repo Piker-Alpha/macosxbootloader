@@ -8,6 +8,8 @@
 #include "stdafx.h"
 #include "PictData.h"
 
+#define DEBUG_LDRP_CALL_CSPRINTF											0
+
 //
 // global
 //
@@ -312,10 +314,10 @@ STATIC EFI_STATUS CspConvertLogoImage(BOOLEAN normalLogo, EFI_UGA_PIXEL** logoIm
 		//
 		STATIC builtin_image_info imageInfo[4] =
 		{
-			/* normal */		{ 84, 103, sizeof(CspNormalLogo), CspNormalLogo, CspNormalLogoLookupTable},
-			/* normal@2x */		{168, 206, sizeof(CspNormalLogo2x), CspNormalLogo2x, CspNormalLogoLookupTable2x},
-			/* failed */		{100, 100, sizeof(CspFailedLogo), CspFailedLogo, CspFailedLogoLookupTable},
-			/* failed@2x */		{200, 200, sizeof(CspFailedLogo2x), CspFailedLogo2x, CspFailedLogoLookupTable2x},
+			/* normal */		{ 84, 103, sizeof(AppleLogoBlackPacked),	AppleLogoBlackPacked,		AppleLogoBlackClut},
+			/* normal@2x */		{168, 206, sizeof(AppleLogoBlack2XPacked),	AppleLogoBlack2XPacked,		AppleLogoBlack2XClut},
+			/* failed */		{100, 100, sizeof(CspFailedLogo),			CspFailedLogo,				CspFailedLogoLookupTable},
+			/* failed@2x */		{200, 200, sizeof(CspFailedLogo2x),			CspFailedLogo2x,			CspFailedLogoLookupTable2x},
 		};
 
 		//
@@ -329,8 +331,22 @@ STATIC EFI_STATUS CspConvertLogoImage(BOOLEAN normalLogo, EFI_UGA_PIXEL** logoIm
 		if(!imageData)
 			try_leave(status = EFI_OUT_OF_RESOURCES);
 
-		if(EFI_ERROR(status = BlDecompressLZSS(imageInfo[index].Buffer, imageInfo[index].BufferSize, imageData, imageSize, &imageSize)))
-			try_leave(NOTHING);
+		if (index < 2)
+		{
+#if DEBUG_LDRP_CALL_CSPRINTF
+			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlDecompressLZVN().\n"));
+#endif
+			if(EFI_ERROR(status = BlDecompressLZVN(imageInfo[index].Buffer, imageInfo[index].BufferSize, imageData, imageSize, &imageSize)))
+				try_leave(NOTHING);
+		}
+		else
+		{
+#if DEBUG_LDRP_CALL_CSPRINTF
+			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlDecompressLZSS().\n"));
+#endif
+			if(EFI_ERROR(status = BlDecompressLZSS(imageInfo[index].Buffer, imageInfo[index].BufferSize, imageData, imageSize, &imageSize)))
+				try_leave(NOTHING);
+		}
 
 		//
 		// convert it
