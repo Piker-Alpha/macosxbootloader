@@ -187,7 +187,7 @@ STATIC EFI_STATUS IopDetectRoot(EFI_HANDLE deviceHandle, EFI_DEVICE_PATH_PROTOCO
 			try_leave(NOTHING);
 
 		//
-		// check kernel in root directory
+		// check kernel in Kernels directory
 		//
 		if(!EFI_ERROR(status = IopRootFile->Open(IopRootFile, &kernelFile, CHAR16_STRING(L"\\System\\Library\\Kernels\\kernel"), EFI_FILE_MODE_READ, 0)))
 			try_leave(NOTHING);

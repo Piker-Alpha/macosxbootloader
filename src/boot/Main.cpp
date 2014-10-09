@@ -549,7 +549,7 @@ EFI_STATUS EFIAPI EfiMain(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable)
 			FvLookupUnlockCoreVolumeKey(bootDevicePath, resumeFromCoreStorage);
 
 		//
-		// restore gragh config
+		// restore graph config
 		//
 		if(!BlTestBootMode(BOOT_MODE_HAS_FILE_VAULT2_CONFIG))
 			CsConnectDevice(FALSE, FALSE);
