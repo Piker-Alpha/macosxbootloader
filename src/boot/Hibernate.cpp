@@ -422,8 +422,8 @@ VOID HbpContinueResumeFromHibernate(UINT8 CONST* imageKey, UINTN imageKeyLength,
 		//
 		// allocate restore1 pages
 		//
-		UINT64 restore1Size													= EFI_PAGES_TO_SIZE(localHeader.Restore1PageCount);
-		UINT64 restore1PhysicalAddress										= EFI_PAGES_TO_SIZE(localHeader.Restore1CodePhysicalPage);
+		UINT64 restore1Size													= EFI_PAGES_TO_SIZE(static_cast<UINT64>(localHeader.Restore1PageCount));
+		UINT64 restore1PhysicalAddress										= EFI_PAGES_TO_SIZE(static_cast<UINT64>(localHeader.Restore1CodePhysicalPage));
 		VOID* restore1Code													= MmAllocatePages(AllocateAddress, EfiLoaderData, localHeader.Restore1PageCount, &restore1PhysicalAddress);
 		if(!restore1Code)
 			try_leave(NOTHING);
@@ -431,7 +431,7 @@ VOID HbpContinueResumeFromHibernate(UINT8 CONST* imageKey, UINTN imageKeyLength,
 		//
 		// allocate runtime pages
 		//
-		UINT64 runtimePagesPhysicalAddress									= EFI_PAGES_TO_SIZE(localHeader.RuntimePages);
+		UINT64 runtimePagesPhysicalAddress									= EFI_PAGES_TO_SIZE(static_cast<UINT64>(localHeader.RuntimePages));
 		VOID* runtimePages													= MmAllocatePages(AllocateAddress, EfiLoaderData, localHeader.RuntimePageCount, &runtimePagesPhysicalAddress);
 		if(!runtimePages)
 			try_leave(NOTHING);
