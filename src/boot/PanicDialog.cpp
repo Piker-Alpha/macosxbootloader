@@ -198,7 +198,7 @@ VOID BlShowPanicDialog(CHAR8** kernelCommandLine)
 		//
 		UINT8 systemVolume													= 0;
 		dataSize															= sizeof(systemVolume);
-		if(EFI_ERROR(EfiRuntimeServices->GetVariable(CHAR16_STRING("SystemAudioVolume"), &AppleNVRAMVariableGuid, nullptr, &dataSize, &systemVolume)) || !(systemVolume & 0x80))
+		if(EFI_ERROR(EfiRuntimeServices->GetVariable(CHAR16_STRING(L"SystemAudioVolume"), &AppleNVRAMVariableGuid, nullptr, &dataSize, &systemVolume)) || !(systemVolume & 0x80))
 			try_leave(NOTHING);
 
 		//
