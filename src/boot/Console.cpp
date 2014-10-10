@@ -887,6 +887,7 @@ EFI_STATUS CsDrawBootImage(BOOLEAN normalLogo)
 		if(!CspFrameBufferAddress || CspConsoleMode != EfiConsoleControlScreenGraphics)
 			try_leave(NOTHING);
 
+		CsClearScreen();
 		//
 		// convert logo image
 		//
@@ -899,7 +900,6 @@ EFI_STATUS CsDrawBootImage(BOOLEAN normalLogo)
 		//
 		// draw it
 		//
-//		CsClearScreen();
 		status																= CspDrawRect((CspHorzRes - imageWidth) / 2, (CspVertRes - imageHeight) / 2, imageWidth, imageHeight, logoImage);
 		MmFreePool(logoImage);
 
@@ -993,7 +993,6 @@ EFI_STATUS CsDrawPanicImage()
 		//
 		// draw it
 		//
-		CsClearScreen();
 		status																= CspDrawRect((CspHorzRes - imageWidth) / 2, (CspVertRes - imageHeight) / 2, imageWidth, imageHeight, panicImage);
 	}
 	__finally
@@ -1190,7 +1189,6 @@ VOID CsDrawPreview(HIBERNATE_PREVIEW* previewBuffer, UINT32 imageIndex, UINT8 pr
 		}
 		else if(!colorMode)
 		{
-			CsClearScreen();
 			CsDrawBootImage(TRUE);
 			CspRestoreGraphConfig(0, nullptr, nullptr, nullptr);
 		}
