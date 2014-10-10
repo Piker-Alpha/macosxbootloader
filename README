@@ -1,3 +1,50 @@
 
-This is a Github clone of: https://code.google.com/p/macosxbootloader/
-with additional patches for Yosemite (current state is unfinished).
+PROJECT
+
+This Github project is a fork of: https://code.google.com/p/macosxbootloader
+
+
+PROJECT GOALS
+
+The initial goal of this project was to fix the OS X 10.10 (Yosemite) incompatibility issues for the 2006/2007 MacPro models, 
+but it should work just as well with any other Mac models with a 32-bit only EFI implementation. 
+
+
+PROJECT DEVELOPMENT
+
+This project is maintained by Pike R. Alpha (https://pikeralpha.wordpress.com)
+
+Bugs can be reported here: https://github.com/Piker-Alpha/macosxbootloader/issues
+
+The current state is: Completed (OS X 10.10 Yosemite is now fully supported).
+
+
+PROJECT IDEAS
+
+There is a whole lot more that could be done, and here are some ideas:
+
+- Add a ACPI patcher.
+
+- Add a SMBIOS patcher.
+
+- Add Kernel/Kext patcher.
+
+- Add a GUI for FileVault.
+
+- Implement Internet Recovery.
+
+- Build project with Xcode.
+
+- Cleanup source code.
+
+- Fix boot time (too long now).
+
+
+LICENSE
+
+http://opensource.org/licenses/BSD-3-Clause
+
+
+DISCLAIMER
+
+All right reserved.
