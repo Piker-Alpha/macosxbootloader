@@ -2,9 +2,4 @@
 OS X 10.10 Yosemite TODO list:
 ------------------------------
 
-1) Verify new Apple logo
-
-
-Bugs (issues) can be filed here: https://github.com/Piker-Alpha/macosxbootloader/issues
-
-Other question/suggestions can be e-mailed to: pikeralpha@yahoo.com
+None. All issues related to full Yosemite compatibility have been completed.
