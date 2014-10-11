@@ -8,8 +8,6 @@
 #include "stdafx.h"
 #include "PictData.h"
 
-#define DEBUG_LDRP_CALL_CSPRINTF											0
-
 //
 // global
 //
@@ -314,8 +312,13 @@ STATIC EFI_STATUS CspConvertLogoImage(BOOLEAN normalLogo, EFI_UGA_PIXEL** logoIm
 		//
 		STATIC builtin_image_info imageInfo[4] =
 		{
+#if LEGACY_GREY_SUPPORT
+			/* normal */		{ 84, 103, sizeof(AppleLogoPacked),			AppleLogoPacked,			AppleLogoClut},
+			/* normal@2x */		{168, 206, sizeof(AppleLogo2XPacked),		AppleLogo2XPacked,			AppleLogo2XClut},
+#else
 			/* normal */		{ 84, 103, sizeof(AppleLogoBlackPacked),	AppleLogoBlackPacked,		AppleLogoBlackClut},
 			/* normal@2x */		{168, 206, sizeof(AppleLogoBlack2XPacked),	AppleLogoBlack2XPacked,		AppleLogoBlack2XClut},
+#endif
 			/* failed */		{100, 100, sizeof(CspFailedLogo),			CspFailedLogo,				CspFailedLogoLookupTable},
 			/* failed@2x */		{200, 200, sizeof(CspFailedLogo2x),			CspFailedLogo2x,			CspFailedLogoLookupTable2x},
 		};
@@ -333,17 +336,16 @@ STATIC EFI_STATUS CspConvertLogoImage(BOOLEAN normalLogo, EFI_UGA_PIXEL** logoIm
 
 		if (index < 2)
 		{
-#if DEBUG_LDRP_CALL_CSPRINTF
-			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlDecompressLZVN().\n"));
-#endif
+#if LEGACY_GREY_SUPPORT
+			if(EFI_ERROR(status = BlDecompressLZSS(imageInfo[index].Buffer, imageInfo[index].BufferSize, imageData, imageSize, &imageSize)))
+				try_leave(NOTHING);
+#else
 			if(EFI_ERROR(status = BlDecompressLZVN(imageInfo[index].Buffer, imageInfo[index].BufferSize, imageData, imageSize, &imageSize)))
 				try_leave(NOTHING);
+#endif
 		}
 		else
 		{
-#if DEBUG_LDRP_CALL_CSPRINTF
-			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlDecompressLZSS().\n"));
-#endif
 			if(EFI_ERROR(status = BlDecompressLZSS(imageInfo[index].Buffer, imageInfo[index].BufferSize, imageData, imageSize, &imageSize)))
 				try_leave(NOTHING);
 		}

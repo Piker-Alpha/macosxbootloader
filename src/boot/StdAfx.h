@@ -26,6 +26,13 @@
 #define SWAP32(V)															((((UINT32)(V) & 0xff) << 24) | (((UINT32)(V) & 0xff00) << 8) | (((UINT32)(V) & 0xff0000) >> 8) |  (((UINT32)(V) & 0xff000000) >> 24))
 #define SWAP_BE32_TO_HOST													SWAP32
 
+//
+// Use 1 for grey Apple logo/panic dialog.
+//
+#define LEGACY_GREY_SUPPORT													0
+
+#define DEBUG_LDRP_CALL_CSPRINTF											0
+
 #include "EfiCommon.h"
 #include "EfiApi.h"
 #include "EfiImage.h"
