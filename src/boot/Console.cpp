@@ -983,13 +983,13 @@ EFI_STATUS CsDrawPanicImage()
 		UINTN imageWidth													= CspHiDPIMode ? 920 : 460;;
 		UINTN imageHeight													= CspHiDPIMode ? 570 : 285;
 		UINTN imageSize														= imageWidth * imageHeight;
-		if(EFI_ERROR(status = BlDecompressLZSS(CspHiDPIMode ? CspPanicDialog2x : CspPanicDialog, CspHiDPIMode ? sizeof(CspPanicDialog2x) : sizeof(CspPanicDialog), imageData, imageSize, &imageSize)))
+		if(EFI_ERROR(status = BlDecompressLZSS(CspHiDPIMode ? ApplePanicDialog2X : ApplePanicDialog, CspHiDPIMode ? sizeof(ApplePanicDialog2X) : sizeof(ApplePanicDialog), imageData, imageSize, &imageSize)))
 			try_leave(NOTHING);
 
 		//
 		// convert it
 		//
-		if(EFI_ERROR(status = CspConvertImage(&panicImage, imageData, imageWidth, imageHeight, 1, CspHiDPIMode ? CspPanicDialogLookupTable2x : CspPanicDialogLookupTable)))
+		if(EFI_ERROR(status = CspConvertImage(&panicImage, imageData, imageWidth, imageHeight, 1, CspHiDPIMode ? ApplePanicDialog2XClut : ApplePanicDialogClut)))
 			try_leave(NOTHING);
 
 		//
