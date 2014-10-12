@@ -701,7 +701,11 @@ EFI_STATUS CsInitializeGraphMode()
 	}
 
 	BlSetBootMode(BOOT_MODE_GRAPH, 0);
+#if LEGACY_GREY_SUPPORT
+	INT64 clearColor														= 0xffbfbfbf;
+#else
 	INT64 clearColor														= 0xff030000;
+#endif
 	CmGetIntegerValueForKey(CHAR8_CONST_STRING("Background Color"), &clearColor);
 
 	EFI_UGA_PIXEL clearPixel;
