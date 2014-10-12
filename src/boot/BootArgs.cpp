@@ -309,7 +309,7 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 		bootArgs->EfiMode													= ArchNeedEFI64Mode() ? 64 : 32;
 		bootArgs->DebugMode													= 0;
 #if LEGACY_GREY_SUPPORT
-		bootArgs->Flags														= ff80;	// kBootArgsFlagRebootOnPanic
+		bootArgs->Flags														= 0xff80;	// kBootArgsFlagRebootOnPanic
 #else
 		bootArgs->Flags														= 65;	// kBootArgsFlagRebootOnPanic + kBootArgsFlagBlackTheme
 #endif
