@@ -336,13 +336,8 @@ STATIC EFI_STATUS CspConvertLogoImage(BOOLEAN normalLogo, EFI_UGA_PIXEL** logoIm
 
 		if (index < 2)
 		{
-#if LEGACY_GREY_SUPPORT
-			if(EFI_ERROR(status = BlDecompressLZSS(imageInfo[index].Buffer, imageInfo[index].BufferSize, imageData, imageSize, &imageSize)))
-				try_leave(NOTHING);
-#else
 			if(EFI_ERROR(status = BlDecompressLZVN(imageInfo[index].Buffer, imageInfo[index].BufferSize, imageData, imageSize, &imageSize)))
 				try_leave(NOTHING);
-#endif
 		}
 		else
 		{
