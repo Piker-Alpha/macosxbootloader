@@ -402,18 +402,13 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 		}
 		else
 		{
-			strcpy(kernelCachePathName, (CONST CHAR8*)"System\\Library\\Caches\\com.apple.kext.caches\\Startup\\kernelcache");
-
 			//
 			// build kernel cache search path
-			/*
+			//
 			STATIC CHAR8 CONST* pathFormat[] =
 			{
-				CHAR8_CONST_STRING("%a"),
 				CHAR8_CONST_STRING("System\\Library\\Caches\\com.apple.kext.caches\\Startup\\kernelcache"),
-				CHAR8_CONST_STRING("System\\Library\\Caches\\com.apple.kext.caches\\Startup\\kernelcache_%a.%08X"),		// arch, alder32_value
-				CHAR8_CONST_STRING("System\\Library\\Caches\\com.apple.kext.caches\\Startup\\kernelcache.%a"),			// model_name
-				CHAR8_CONST_STRING("System\\Library\\Caches\\com.apple.kext.caches\\Startup\\kernelcache.%a"),			// arch
+				CHAR8_CONST_STRING("com.apple.boot.S\\System\\Library\\Caches\\com.apple.kext.caches\\Startup\\kernelcache")
 			};
 
 			for(UINTN i = 0; i < ARRAYSIZE(pathFormat); i ++)
@@ -421,18 +416,12 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 				//
 				// build path
 				//
-				if(i == 0 && LdrpKernelCachePathName)
-					snprintf(kernelCachePathName, ARRAYSIZE(kernelCachePathName) - 1, pathFormat[0], LdrpKernelCachePathName);
+				if(i == 0)
+					snprintf(kernelCachePathName, ARRAYSIZE(kernelCachePathName) - 1, pathFormat[0]);
 				else if(i == 1)
-					snprintf(kernelCachePathName, ARRAYSIZE(kernelCachePathName) - 1, CHAR8_CONST_STRING("%a"), pathFormat[1]);
-				else if(i == 2)
-					snprintf(kernelCachePathName, ARRAYSIZE(kernelCachePathName) - 1, pathFormat[2], "x86_64", tempValue);
-				else if(i == 3)
-					snprintf(kernelCachePathName, ARRAYSIZE(kernelCachePathName) - 1, pathFormat[3], modelName);
-				else if(i == 4)
-					snprintf(kernelCachePathName, ARRAYSIZE(kernelCachePathName) - 1, pathFormat[4], "x86_64");
+					snprintf(kernelCachePathName, ARRAYSIZE(kernelCachePathName) - 1, pathFormat[1]);
 				else
-					kernelCachePathName[0]									= 0; */
+					kernelCachePathName[0]									= 0;
 
 				BOOLEAN kernelCacheValid									= FALSE;
 				//
