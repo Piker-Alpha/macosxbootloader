@@ -439,11 +439,11 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 				if(kernelCachePathName[0])
 				{
 // #if DEBUG_LDRP_CALL_CSPRINTF
-					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache located!\n"));
-					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache located!\n"));
-					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache located!\n"));
-					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache located!\n"));
-					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache located!\n"));
+					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache located: %d !\n"), i);
+					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache located: %d !\n"), i);
+					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache located: %d !\n"), i);
+					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache located: %d !\n"), i);
+					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache located: %d !\n"), i);
 // #endif
 					//
 					// check valid
