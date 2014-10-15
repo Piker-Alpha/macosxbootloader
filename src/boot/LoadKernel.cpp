@@ -410,9 +410,15 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 				if(i == 0)
 					strcpy(kernelCachePathName, (CONST CHAR8*)"System\\Library\\Caches\\com.apple.kext.caches\\Startup\\kernelcache");
 				else if(i == 1)
+				{
+					LdrpKernelCacheOverride									= TRUE;
 					strcpy(kernelCachePathName, (CONST CHAR8*)"com.apple.boot.S\\System\\Library\\Caches\\com.apple.kext.caches\\Startup\\kernelcache");
+				}
 				else
+				{
+					LdrpKernelCacheOverride									= FALSE;
 					kernelCachePathName[0]									= 0;
+				}
 
 				BOOLEAN kernelCacheValid									= FALSE;
 				//
