@@ -393,7 +393,7 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 		// build cache path
 		//
 		BOOLEAN netBoot														= IoBootingFromNet();
-		STATIC CHAR8 kernelCachePathName[1024]								= {0};
+		CHAR8 kernelCachePathName[1024]										= {0};
 
 		if(netBoot)
 		{
@@ -402,24 +402,15 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 		}
 		else
 		{
-			//
-			// build kernel cache search path
-			//
-			STATIC CHAR8 CONST* pathFormat[] =
-			{
-				CHAR8_CONST_STRING("System\\Library\\Caches\\com.apple.kext.caches\\Startup\\kernelcache"),
-				CHAR8_CONST_STRING("com.apple.boot.S\\System\\Library\\Caches\\com.apple.kext.caches\\Startup\\kernelcache")
-			};
-
-			for(UINTN i = 0; i < ARRAYSIZE(pathFormat); i ++)
+			for(UINTN i = 0; i < 3; i ++)
 			{
 				//
 				// build path
 				//
 				if(i == 0)
-					snprintf(kernelCachePathName, ARRAYSIZE(kernelCachePathName) - 1, pathFormat[0]);
+					strcpy(kernelCachePathName, (CONST CHAR8*)"System\\Library\\Caches\\com.apple.kext.caches\\Startup\\kernelcache");
 				else if(i == 1)
-					snprintf(kernelCachePathName, ARRAYSIZE(kernelCachePathName) - 1, pathFormat[1]);
+					strcpy(kernelCachePathName, (CONST CHAR8*)"com.apple.boot.S\\System\\Library\\Caches\\com.apple.kext.caches\\Startup\\kernelcache");
 				else
 					kernelCachePathName[0]									= 0;
 
@@ -429,9 +420,13 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 				//
 				if(kernelCachePathName[0])
 				{
-#if DEBUG_LDRP_CALL_CSPRINTF
-					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache located.\n"));
-#endif
+// #if DEBUG_LDRP_CALL_CSPRINTF
+					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache located!\n"));
+					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache located!\n"));
+					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache located!\n"));
+					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache located!\n"));
+					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache located!\n"));
+// #endif
 					//
 					// check valid
 					//
