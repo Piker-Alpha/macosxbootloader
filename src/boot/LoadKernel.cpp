@@ -157,25 +157,37 @@ STATIC EFI_STATUS LdrpKernelCacheValid(CHAR8 CONST* cachePathName, BOOLEAN* kern
 		// open cache file
 		//
 		if(EFI_ERROR(IoOpenFile(cachePathName, nullptr, &cacheFile, IO_OPEN_MODE_NORMAL)))
+		{
+			CsPrintf(CHAR8_CONST_STRING("PIKE: LdrpKernelCacheValid(1)\n"));
 			try_leave(LdrpKernelCachePathName ? status = EFI_NOT_FOUND : EFI_SUCCESS);
+		}
 
 		//
 		// get cache file info
 		//
 		if(EFI_ERROR(status = IoGetFileInfo(&cacheFile, &cacheInfo)))
+		{
+			CsPrintf(CHAR8_CONST_STRING("PIKE: LdrpKernelCacheValid(2)\n"));
 			try_leave(NOTHING);
+		}
 
 		//
 		// check cache file info
 		//
 		if(!cacheInfo || (cacheInfo->Attribute & EFI_FILE_DIRECTORY))
+		{
+			CsPrintf(CHAR8_CONST_STRING("PIKE: LdrpKernelCacheValid(3)\n"));
 			try_leave(status = EFI_NOT_FOUND);
+		}
 
 		//
 		// kernel cache override
 		//
 		if(LdrpKernelCacheOverride)
+		{
+			CsPrintf(CHAR8_CONST_STRING("PIKE: LdrpKernelCacheValid(4)\n"));
 			try_leave(*kernelCacheValid = TRUE);
+		}
 
 		//
 		// open kernel file
