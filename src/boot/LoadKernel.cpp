@@ -435,7 +435,22 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 				}
 
 				if(!kernelCacheValid)
+				{
 					status													= EFI_NOT_FOUND;
+					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache NOT valid!\n"));
+					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache NOT valid!\n"));
+					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache NOT valid!\n"));
+					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache NOT valid!\n"));
+					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache NOT valid!\n"));
+				}
+				else
+				{
+					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache is valid!\n"));
+					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache is valid!\n"));
+					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache is valid!\n"));
+					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache is valid!\n"));
+					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache is valid!\n"));
+				}
 			}
 		}
 
