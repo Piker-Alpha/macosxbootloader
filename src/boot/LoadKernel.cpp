@@ -138,7 +138,7 @@ STATIC UINT8 LdrpRandom()
 
 //
 // check cache valid
-//
+/*
 STATIC EFI_STATUS LdrpKernelCacheValid(CHAR8 CONST* cachePathName, BOOLEAN* kernelCacheValid)
 {
 	EFI_STATUS status														= EFI_SUCCESS;
@@ -270,7 +270,7 @@ STATIC EFI_STATUS LdrpKernelCacheValid(CHAR8 CONST* cachePathName, BOOLEAN* kern
 	}
 
 	return status;
-}
+} */
 
 //
 // setup ASLR
@@ -432,7 +432,7 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 					kernelCachePathName[0]									= 0;
 				}
 
-				BOOLEAN kernelCacheValid									= FALSE;
+				// BOOLEAN kernelCacheValid									= FALSE;
 				//
 				// check name
 				//
