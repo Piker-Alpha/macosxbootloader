@@ -440,19 +440,16 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 				{
 // #if DEBUG_LDRP_CALL_CSPRINTF
 					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache located: %d !\n"), i);
-					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache located: %d !\n"), i);
-					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache located: %d !\n"), i);
-					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache located: %d !\n"), i);
-					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache located: %d !\n"), i);
+					status													= TRUE;
 // #endif
 					//
 					// check valid
 					//
-					if(EFI_ERROR(status = LdrpKernelCacheValid(kernelCachePathName, &kernelCacheValid)))
-						try_leave(NOTHING);
+//					if(EFI_ERROR(status = LdrpKernelCacheValid(kernelCachePathName, &kernelCacheValid)))
+//						try_leave(NOTHING);
 				}
 
-				if(!kernelCacheValid)
+/* 				if(!kernelCacheValid)
 				{
 					status													= EFI_NOT_FOUND;
 					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache NOT valid!\n"));
@@ -468,7 +465,7 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache is valid!\n"));
 					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache is valid!\n"));
 					CsPrintf(CHAR8_CONST_STRING("PIKE: Kernel cache is valid!\n"));
-				}
+				} */
 			}
 		}
 
