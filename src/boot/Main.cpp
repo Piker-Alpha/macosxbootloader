@@ -178,6 +178,8 @@ STATIC EFI_STATUS BlpRunRecoveryEfi(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EF
 	EFI_STATUS status														= EFI_SUCCESS;
 	EFI_DEVICE_PATH_PROTOCOL* recoveryFilePath								= nullptr;
 
+	CsPrintf(CHAR8_CONST_STRING("PIKE: in BlpRunRecoveryEfi(1)\n"));
+
 	__try
 	{
 		//
@@ -187,11 +189,15 @@ STATIC EFI_STATUS BlpRunRecoveryEfi(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EF
 		if(partitionNumber == -1)
 			try_leave(status = EFI_NOT_FOUND);
 
+		CsPrintf(CHAR8_CONST_STRING("PIKE: in BlpRunRecoveryEfi(2)\n"));
+
 		//
 		// root partition is followed by recovery partition
 		//
 		if(!BlTestBootMode(BOOT_MODE_BOOT_IS_NOT_ROOT))
 			partitionNumber													+= 1;
+
+		CsPrintf(CHAR8_CONST_STRING("PIKE: in BlpRunRecoveryEfi(3)\n"));
 
 		//
 		// get recovery partition handle
@@ -200,12 +206,16 @@ STATIC EFI_STATUS BlpRunRecoveryEfi(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EF
 		if(!recoveryPartitionHandle)
 			try_leave(status = EFI_NOT_FOUND);
 
+		CsPrintf(CHAR8_CONST_STRING("PIKE: in BlpRunRecoveryEfi(4)\n"));
+
 		//
 		// get recovery partition device path
 		//
 		EFI_DEVICE_PATH_PROTOCOL* recoveryPartitionDevicePath				= DevPathGetDevicePathProtocol(recoveryPartitionHandle);
 		if(!recoveryPartitionDevicePath)
 			try_leave(status = EFI_NOT_FOUND);
+
+		CsPrintf(CHAR8_CONST_STRING("PIKE: in BlpRunRecoveryEfi(5)\n"));
 
 		//
 		// get recovery file path
@@ -214,15 +224,20 @@ STATIC EFI_STATUS BlpRunRecoveryEfi(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EF
 		if(!recoveryFilePath)
 			try_leave(status = EFI_NOT_FOUND);
 
+		CsPrintf(CHAR8_CONST_STRING("PIKE: in BlpRunRecoveryEfi(6)\n"));
+
 		//
 		// load image
 		//
 		EFI_HANDLE imageHandle												= nullptr;
 		if(EFI_ERROR(status = EfiBootServices->LoadImage(FALSE, EfiImageHandle, recoveryFilePath, nullptr, 0, &imageHandle)))
 		{
+			CsPrintf(CHAR8_CONST_STRING("PIKE: in BlpRunRecoveryEfi(7)\n"));
+
 			if(!BlTestBootMode(BOOT_MODE_BOOT_IS_NOT_ROOT))
 				try_leave(NOTHING);
 
+			CsPrintf(CHAR8_CONST_STRING("PIKE: in BlpRunRecoveryEfi(8)\n"));
 			//
 			// get root UUID
 			//
@@ -230,11 +245,14 @@ STATIC EFI_STATUS BlpRunRecoveryEfi(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EF
 			if(!rootUUID)
 				try_leave(status = EFI_NOT_FOUND);
 
+			CsPrintf(CHAR8_CONST_STRING("PIKE: in BlpRunRecoveryEfi(9)\n"));
 			//
 			// load booter
 			//
 			if(EFI_ERROR(status = IoLoadBooterWithRootUUID(bootFilePath, rootUUID, &imageHandle)))
 				try_leave(NOTHING);
+
+			CsPrintf(CHAR8_CONST_STRING("PIKE: in BlpRunRecoveryEfi(10)\n"));
 		}
 
 		//
@@ -244,9 +262,13 @@ STATIC EFI_STATUS BlpRunRecoveryEfi(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EF
 	}
 	__finally
 	{
+		CsPrintf(CHAR8_CONST_STRING("PIKE: in BlpRunRecoveryEfi(11)\n"));
+
 		if(recoveryFilePath)
 			MmFreePool(recoveryFilePath);
 	}
+
+	CsPrintf(CHAR8_CONST_STRING("PIKE: in BlpRunRecoveryEfi(12)\n"));
 
 	return status;
 }
@@ -540,7 +562,25 @@ EFI_STATUS EFIAPI EfiMain(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable)
 		// run recovery.efi
 		//
 		if(BlTestBootMode(BOOT_MODE_EFI_NVRAM_RECOVERY_BOOT_MODE))
+		{
+			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
+			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
+			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
+			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
+			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
+			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
+			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
+			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
+			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
+			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
+			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
+			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
+			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
+			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
+			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
+			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
 			BlpRunRecoveryEfi(bootDevicePath, bootFilePath);
+		}
 
 		//
 		// check FileVault2
