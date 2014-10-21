@@ -540,15 +540,26 @@ EFI_STATUS EFIAPI EfiMain(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable)
 		if(!BlTestBootMode(BOOT_MODE_SKIP_BOARD_ID_CHECK) && EFI_ERROR(status = BlpCheckBoardId(BlGetBoardId(), bootFilePath)))
 			try_leave(NOTHING);
 
+		CsConnectDevice(FALSE, FALSE);
+		CsSetConsoleMode(TRUE, FALSE);
+
 		//
 		// check recovery
 		//
 		CHAR8* filePath														= DevPathExtractFilePathName(bootFilePath, TRUE);
 		if(filePath)
 		{
-			if(strstr(filePath, CHAR8_CONST_STRING("com.apple.recovery.boot")))
-				BlSetBootMode(BOOT_MODE_FROM_RECOVER_BOOT_DIRECTORY, BOOT_MODE_EFI_NVRAM_RECOVERY_BOOT_MODE | BOOT_MODE_BOOT_IS_NOT_ROOT);
 
+			if(strstr(filePath, CHAR8_CONST_STRING("com.apple.recovery.boot")))
+			{
+				BlSetBootMode(BOOT_MODE_FROM_RECOVER_BOOT_DIRECTORY, BOOT_MODE_EFI_NVRAM_RECOVERY_BOOT_MODE | BOOT_MODE_BOOT_IS_NOT_ROOT);
+				CsPrintf("PIKE: setting BOOT_MODE_EFI_NVRAM_RECOVERY_BOOT_MODE\n", filePath);
+			}
+
+		
+			CsPrintf("PIKE: filePath = %s\n", filePath);
+			CsPrintf("PIKE: filePath = %s\n", filePath);
+			CsPrintf("PIKE: filePath = %s\n", filePath);
 			MmFreePool(filePath);
 		}
 
@@ -562,25 +573,7 @@ EFI_STATUS EFIAPI EfiMain(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable)
 		// run recovery.efi
 		//
 		if(BlTestBootMode(BOOT_MODE_EFI_NVRAM_RECOVERY_BOOT_MODE))
-		{
-			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
-			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
-			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
-			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
-			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
-			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
-			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
-			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
-			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
-			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
-			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
-			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
-			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
-			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
-			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
-			CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlpRunRecoveryEfi()\n"));
 			BlpRunRecoveryEfi(bootDevicePath, bootFilePath);
-		}
 
 		//
 		// check FileVault2
@@ -591,13 +584,13 @@ EFI_STATUS EFIAPI EfiMain(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable)
 		//
 		// restore graph config
 		//
-		if(!BlTestBootMode(BOOT_MODE_HAS_FILE_VAULT2_CONFIG))
-			CsConnectDevice(FALSE, FALSE);
+		// if(!BlTestBootMode(BOOT_MODE_HAS_FILE_VAULT2_CONFIG))
+			// CsConnectDevice(FALSE, FALSE);
 
 		//
 		// setup console mode
 		//
-		if(BlTestBootMode(BOOT_MODE_VERBOSE))
+		if(!BlTestBootMode(BOOT_MODE_VERBOSE))
 		{
 			CsSetConsoleMode(TRUE, FALSE);
 		}
