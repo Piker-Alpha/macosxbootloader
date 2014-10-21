@@ -422,26 +422,16 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 		}
 		else
 		{
-			if(BlTestBootMode(BOOT_MODE_EFI_NVRAM_RECOVERY_BOOT_MODE))
-			{
-				CsPrintf(CHAR8_CONST_STRING("PIKE: Recovery boot mode!\n"));
-				CsPrintf(CHAR8_CONST_STRING("PIKE: Recovery boot mode!\n"));
-				CsPrintf(CHAR8_CONST_STRING("PIKE: Recovery boot mode!\n"));
-			}
-			else
-			{
-				CsPrintf(CHAR8_CONST_STRING("PIKE: NO recovery boot mode!\n"));
-				CsPrintf(CHAR8_CONST_STRING("PIKE: NO recovery boot mode!\n"));
-				CsPrintf(CHAR8_CONST_STRING("PIKE: NO recovery boot mode!\n"));
-			}
-
 			for(UINTN i = 0; i < 3; i ++)
 			{
 				//
 				// build path
 				//
 				if(i == 0 && LdrpKernelCachePathName)
+				{
 					strcpy(kernelCachePathName, LdrpKernelCachePathName);
+					CsPrintf(CHAR8_CONST_STRING("PIKE: %s\n", LdrpKernelCachePathName));
+				}
 				else if(i == 1)
 					strcpy(kernelCachePathName, (CONST CHAR8*)"System\\Library\\Caches\\com.apple.kext.caches\\Startup\\kernelcache");
 				else
