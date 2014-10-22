@@ -557,8 +557,6 @@ EFI_STATUS EFIAPI EfiMain(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable)
 			}
 
 			CsPrintf(CHAR8_CONST_STRING("PIKE: filePath = %s\n"), filePath);
-			CsPrintf(CHAR8_CONST_STRING("PIKE: filePath = %s\n"), filePath);
-			CsPrintf(CHAR8_CONST_STRING("PIKE: filePath = %s\n"), filePath);
 			MmFreePool(filePath);
 		}
 
@@ -572,7 +570,14 @@ EFI_STATUS EFIAPI EfiMain(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable)
 		// run recovery.efi
 		//
 		if(BlTestBootMode(BOOT_MODE_EFI_NVRAM_RECOVERY_BOOT_MODE))
+		{
+			CsPrintf(CHAR8_CONST_STRING("PIKE: calling BlTestBootMode(NORMAL)\n"));
 			BlpRunRecoveryEfi(bootDevicePath, bootFilePath);
+		}
+		else
+		{
+			CsPrintf(CHAR8_CONST_STRING("PIKE: calling BlTestBootMode(FORCED)\n"));
+		}
 
 		//
 		// check FileVault2
