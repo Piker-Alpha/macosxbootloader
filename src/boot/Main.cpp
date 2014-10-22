@@ -556,9 +556,9 @@ EFI_STATUS EFIAPI EfiMain(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable)
 				CsPrintf(CHAR8_CONST_STRING("PIKE: setting BOOT_MODE_EFI_NVRAM_RECOVERY_BOOT_MODE\n"));
 			}
 
-			CsPrintf(CHAR8_CONST_STRING("PIKE: filePath = %s\n",) filePath);
-			CsPrintf(CHAR8_CONST_STRING("PIKE: filePath = %s\n",) filePath);
-			CsPrintf(CHAR8_CONST_STRING("PIKE: filePath = %s\n",) filePath);
+			CsPrintf(CHAR8_CONST_STRING("PIKE: filePath = %s\n"), filePath);
+			CsPrintf(CHAR8_CONST_STRING("PIKE: filePath = %s\n"), filePath);
+			CsPrintf(CHAR8_CONST_STRING("PIKE: filePath = %s\n"), filePath);
 			MmFreePool(filePath);
 		}
 
