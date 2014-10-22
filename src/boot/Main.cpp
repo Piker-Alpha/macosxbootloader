@@ -577,6 +577,7 @@ EFI_STATUS EFIAPI EfiMain(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable)
 		else
 		{
 			CsPrintf(CHAR8_CONST_STRING("PIKE: calling BlTestBootMode(FORCED)\n"));
+			BlpRunRecoveryEfi(bootDevicePath, bootFilePath);
 		}
 
 		//
