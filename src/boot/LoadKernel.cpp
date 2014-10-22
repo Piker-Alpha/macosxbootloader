@@ -430,7 +430,7 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 				if(i == 0 && LdrpKernelCachePathName)
 				{
 					strcpy(kernelCachePathName, LdrpKernelCachePathName);
-					CsPrintf(CHAR8_CONST_STRING("PIKE: %s\n", LdrpKernelCachePathName));
+					CsPrintf(CHAR8_CONST_STRING("PIKE: %s\n"), LdrpKernelCachePathName);
 				}
 				else if(i == 1)
 					strcpy(kernelCachePathName, (CONST CHAR8*)"System\\Library\\Caches\\com.apple.kext.caches\\Startup\\kernelcache");
