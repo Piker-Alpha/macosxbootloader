@@ -151,71 +151,51 @@ STATIC EFI_STATUS LdrpKernelCacheValid(CHAR8 CONST* cachePathName, BOOLEAN* kern
 	EFI_FILE_INFO* checkerInfo												= nullptr;
 	*kernelCacheValid														= FALSE;
 
-	CsPrintf(CHAR8_CONST_STRING("PIKE: LdrpKernelCacheValid(0)\n"));
-
 	__try
 	{
 		//
 		// open cache file
 		//
 		if(EFI_ERROR(IoOpenFile(cachePathName, nullptr, &cacheFile, IO_OPEN_MODE_NORMAL)))
-		{
-			CsPrintf(CHAR8_CONST_STRING("PIKE: LdrpKernelCacheValid(1)\n"));
 			try_leave(LdrpKernelCachePathName ? status = EFI_NOT_FOUND : EFI_SUCCESS);
-		}
 
 		//
 		// get cache file info
 		//
 		if(EFI_ERROR(status = IoGetFileInfo(&cacheFile, &cacheInfo)))
-		{
-			CsPrintf(CHAR8_CONST_STRING("PIKE: LdrpKernelCacheValid(2)\n"));
 			try_leave(NOTHING);
-		}
 
 		//
 		// check cache file info
 		//
 		if(!cacheInfo || (cacheInfo->Attribute & EFI_FILE_DIRECTORY))
-		{
-			CsPrintf(CHAR8_CONST_STRING("PIKE: LdrpKernelCacheValid(3)\n"));
 			try_leave(status = EFI_NOT_FOUND);
-		}
 
 		//
 		// kernel cache override
 		//
 		if(LdrpKernelCacheOverride)
-		{
-			CsPrintf(CHAR8_CONST_STRING("PIKE: LdrpKernelCacheValid(4)\n"));
 			try_leave(*kernelCacheValid = TRUE);
-		}
 
 		//
 		// open kernel file
 		//
 		if(!EFI_ERROR(IoOpenFile(LdrpKernelPathName, nullptr, &kernelFile, IO_OPEN_MODE_NORMAL)))
 		{
-			CsPrintf(CHAR8_CONST_STRING("PIKE: LdrpKernelCacheValid(5)\n"));
 			//
 			// get kernel file info
 			//
 			if(EFI_ERROR(status = IoGetFileInfo(&kernelFile, &kernelInfo)))
 				try_leave(NOTHING);
 
-			CsPrintf(CHAR8_CONST_STRING("PIKE: LdrpKernelCacheValid(6)\n"));
 			//
 			// check kernel file info
 			//
 			if(!kernelInfo || (kernelInfo->Attribute & EFI_FILE_DIRECTORY))
 				try_leave(status = EFI_NOT_FOUND);
 
-			CsPrintf(CHAR8_CONST_STRING("PIKE: LdrpKernelCacheValid(7)\n"));
-
 			checkerInfo														= kernelInfo;
 		}
-
-		CsPrintf(CHAR8_CONST_STRING("PIKE: LdrpKernelCacheValid(8)\n"));
 
 		//
 		// open extensions
@@ -428,10 +408,7 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 				// build path
 				//
 				if(i == 0 && LdrpKernelCachePathName)
-				{
 					strcpy(kernelCachePathName, LdrpKernelCachePathName);
-					CsPrintf(CHAR8_CONST_STRING("PIKE: %s\n"), LdrpKernelCachePathName);
-				}
 				else if(i == 1)
 					strcpy(kernelCachePathName, (CONST CHAR8*)"System\\Library\\Caches\\com.apple.kext.caches\\Startup\\kernelcache");
 				else
@@ -446,7 +423,6 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 					// check valid
 					//
 					BOOLEAN kernelCacheValid									= FALSE;
-					CsPrintf(CHAR8_CONST_STRING("PIKE: Calling LdrpKernelCacheValid()\n"));
 					if(EFI_ERROR(status = LdrpKernelCacheValid(kernelCachePathName, &kernelCacheValid)))
 						try_leave(NOTHING);
 
@@ -455,7 +431,6 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 				}
 				status														= EFI_NOT_FOUND;
 			}
-			CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrLoadKernelCache(x)\n"));
 		}
 
 		//
