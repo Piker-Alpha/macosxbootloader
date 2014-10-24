@@ -21,21 +21,21 @@ STATIC EFI_STATUS IopFindBootDevice(EFI_HANDLE* bootDeviceHandle, EFI_DEVICE_PAT
 	STATIC CHAR16* checkFileName[] = 
 	{
 		CHAR16_STRING(L"\\OS X Install Data"),
+		CHAR16_STRING(L"\\com.apple.recovery.boot"),
 		CHAR16_STRING(L"\\System\\Library\\Kernels\\kernel"),
 		CHAR16_STRING(L"\\com.apple.boot.R"),
 		CHAR16_STRING(L"\\com.apple.boot.P"),
-		CHAR16_STRING(L"\\com.apple.boot.S"),
-		CHAR16_STRING(L"\\com.apple.recovery.boot"),
+		CHAR16_STRING(L"\\com.apple.boot.S")
 	};
 
 	STATIC CHAR16* booterName[] = 
 	{
 		CHAR16_STRING(L"\\OS X Install Data\\boot.efi"),
-		CHAR16_STRING(L"\\System\\Library\\CoreServices\\boot.efi"),
-		CHAR16_STRING(L"\\System\\Library\\CoreServices\\boot.efi"),
-		CHAR16_STRING(L"\\System\\Library\\CoreServices\\boot.efi"),
-		CHAR16_STRING(L"\\System\\Library\\CoreServices\\boot.efi"),
 		CHAR16_STRING(L"\\com.apple.recovery.boot\\boot.efi"),
+		CHAR16_STRING(L"\\System\\Library\\CoreServices\\boot.efi"),
+		CHAR16_STRING(L"\\System\\Library\\CoreServices\\boot.efi"),
+		CHAR16_STRING(L"\\System\\Library\\CoreServices\\boot.efi"),
+		CHAR16_STRING(L"\\System\\Library\\CoreServices\\boot.efi")
 	};
 
 	STATIC UINT8 bootFilePathBuffer[256]									= {0};
