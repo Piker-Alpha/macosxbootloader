@@ -573,26 +573,7 @@ EFI_STATUS BlProcessOptions(CHAR8 CONST* bootCommandLine, CHAR8** kernelCommandL
 			UINTN dataSize													= sizeof(dataBuffer);
 			UINT32 attribute												= 0;
 			status															= EfiRuntimeServices->GetVariable(CHAR16_STRING(L"recovery-boot-mode"), &AppleNVRAMVariableGuid, &attribute, &dataSize, dataBuffer);
-			if (status == EFI_BUFFER_TOO_SMALL)
-			{
-				CsPrintf(CHAR8_CONST_STRING("PIKE: EFI_BUFFER_TOO_SMALL\n"));
-				CsPrintf(CHAR8_CONST_STRING("PIKE: EFI_BUFFER_TOO_SMALL\n"));
-				CsPrintf(CHAR8_CONST_STRING("PIKE: EFI_BUFFER_TOO_SMALL\n"));
-				CsPrintf(CHAR8_CONST_STRING("PIKE: EFI_BUFFER_TOO_SMALL\n"));
-				CsPrintf(CHAR8_CONST_STRING("PIKE: EFI_BUFFER_TOO_SMALL\n"));
-				CsPrintf(CHAR8_CONST_STRING("PIKE: EFI_BUFFER_TOO_SMALL\n"));
-				CsPrintf(CHAR8_CONST_STRING("PIKE: EFI_BUFFER_TOO_SMALL\n"));
-				CsPrintf(CHAR8_CONST_STRING("PIKE: EFI_BUFFER_TOO_SMALL\n"));
-				CsPrintf(CHAR8_CONST_STRING("PIKE: EFI_BUFFER_TOO_SMALL\n"));
-				CsPrintf(CHAR8_CONST_STRING("PIKE: EFI_BUFFER_TOO_SMALL\n"));
-				CsPrintf(CHAR8_CONST_STRING("PIKE: EFI_BUFFER_TOO_SMALL\n"));
-				CsPrintf(CHAR8_CONST_STRING("PIKE: EFI_BUFFER_TOO_SMALL\n"));
-				CsPrintf(CHAR8_CONST_STRING("PIKE: EFI_BUFFER_TOO_SMALL\n"));
-				CsPrintf(CHAR8_CONST_STRING("PIKE: EFI_BUFFER_TOO_SMALL\n"));
-			}
 			if(!EFI_ERROR(status) || status == EFI_BUFFER_TOO_SMALL)
-				BlSetBootMode(BOOT_MODE_EFI_NVRAM_RECOVERY_BOOT_MODE, 0);
-			else
 				BlSetBootMode(BOOT_MODE_EFI_NVRAM_RECOVERY_BOOT_MODE, 0);
 
 			status															= EFI_SUCCESS;
