@@ -707,9 +707,9 @@ UINT32 BlGetCurrentUnixTime()
 }
 
 //
-// alder32
+// adler32
 //
-UINT32 BlAlder32(VOID CONST* inputBuffer, UINTN bufferLength)
+UINT32 BlAdler32(VOID CONST* inputBuffer, UINTN bufferLength)
 {
 	UINT32 lowHalf															= 1;
 	UINT32 highHalf															= 0;

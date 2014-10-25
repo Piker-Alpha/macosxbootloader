@@ -384,7 +384,7 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 		//
 		// alder32
 		//
-		UINT32 tempValue													= BlAlder32(tempBuffer, sizeof(tempBuffer));
+		UINT32 tempValue													= BlAdler32(tempBuffer, sizeof(tempBuffer));
 		tempValue															= SWAP32(tempValue);
 
 		//
@@ -544,15 +544,23 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 			// length check
 			//
 			if(readLength != uncompressedSize)
+			{
+#if DEBUG_LDRP_CALL_CSPRINTF
+				CsPrintf(CHAR8_CONST_STRING("PIKE: readLength(%d) != uncompressedSize(%d).\n"), readLength, uncompressedSize);
+#endif
 				try_leave(status = EFI_NOT_FOUND);
-
+			}
 			//
-			// check aldr32
+			// check adler32
 			//
-			tempValue														= BlAlder32(uncompressedBuffer, uncompressedSize);
+			tempValue														= BlAdler32(uncompressedBuffer, uncompressedSize);
 			if(tempValue != SWAP_BE32_TO_HOST(fileHeader.Adler32Value))
+			{
+#if DEBUG_LDRP_CALL_CSPRINTF
+				CsPrintf(CHAR8_CONST_STRING("PIKE: adler32(%d) != %d!\n"), SWAP_BE32_TO_HOST(fileHeader.Adler32Value), temp);
+#endif
 				try_leave(status = EFI_NOT_FOUND);
-
+			}
 			//
 			// hack file handle
 			//
