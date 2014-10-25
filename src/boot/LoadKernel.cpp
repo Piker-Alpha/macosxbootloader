@@ -537,7 +537,12 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 				CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlDecompressLZVN().\n"));
 #endif
 				if(EFI_ERROR(status = BlDecompressLZVN(compressedBuffer, compressedSize, uncompressedBuffer, uncompressedSize, &readLength)))
+				{
+#if DEBUG_LDRP_CALL_CSPRINTF
+					CsPrintf(CHAR8_CONST_STRING("PIKE: BlDecompressLZVN() returned: %d!\n"), status);
+#endif
 					try_leave(NOTHING);
+				}
 			}
 
 			//
