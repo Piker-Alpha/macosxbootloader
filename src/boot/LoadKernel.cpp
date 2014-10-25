@@ -557,7 +557,7 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 			if(tempValue != SWAP_BE32_TO_HOST(fileHeader.Adler32Value))
 			{
 #if DEBUG_LDRP_CALL_CSPRINTF
-				CsPrintf(CHAR8_CONST_STRING("PIKE: adler32(%d) != %d!\n"), SWAP_BE32_TO_HOST(fileHeader.Adler32Value), temp);
+				CsPrintf(CHAR8_CONST_STRING("PIKE: adler32(%d) != %d!\n"), SWAP_BE32_TO_HOST(fileHeader.Adler32Value), tempValue);
 #endif
 				try_leave(status = EFI_NOT_FOUND);
 			}
