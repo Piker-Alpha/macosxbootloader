@@ -596,7 +596,7 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 		IoCloseFile(&fileHandle);
 	}
 #if DEBUG_LDRP_CALL_CSPRINTF
-	CsPrintf(CHAR8_CONST_STRING("PIKE: Returning from LdrLoadKernelCache(%d).\n", status));
+	CsPrintf(CHAR8_CONST_STRING("PIKE: Returning from LdrLoadKernelCache(%d).\n"), status);
 #endif
 	return status;
 }
