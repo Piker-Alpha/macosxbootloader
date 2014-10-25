@@ -11,8 +11,6 @@
 #define KERNEL_CACHE_LZSS													0x6c7a7373
 #define KERNEL_CACHE_LZVN													0x6c7a766e
 
-#define DEBUG_LDRP_CALL_CSPRINTF											0
-
 //
 // compressed header
 //

@@ -720,7 +720,7 @@ EFI_STATUS BlProcessOptions(CHAR8 CONST* bootCommandLine, CHAR8** kernelCommandL
 		if(!IoBootingFromNet())
 		{
 			if(!kernelPathName)
-				kernelPathName												= BlAllocateString(CHAR8_CONST_STRING("\\System\\Library\\Kernels\\kernel"));
+				kernelPathName												= BlAllocateString(CHAR8_CONST_STRING("System\\Library\\Kernels\\kernel"));
 		}
 
 		//
