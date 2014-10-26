@@ -16,6 +16,9 @@
 #define MH_MAGIC_64															0xfeedfacf
 #define MH_CIGAM															0xcefaedfe
 #define MH_CIGAM_64															0xcffaedfe
+
+#define KERNEL_CACHE_MAGIC													0x636f6d70
+
 #define MACH_O_COMMAND_SEGMENT32											0x01
 #define MACH_O_COMMAND_SYMTAB												0x02
 #define	MACH_O_COMMAND_UNIX_THREAD											0x05
@@ -841,6 +844,12 @@ EFI_STATUS MachLoadThinFatFile(IO_FILE_HANDLE* fileHandle, UINT64* offsetInFile,
 		//
 		if(readLength < sizeof(fatHeader))
 			try_leave(status = EFI_DEVICE_ERROR);
+
+		//
+		// check for kernelcache magic (comp)
+		//
+		if(fatHeader.Magic == SWAP_BE32_TO_HOST(KERNEL_CACHE_MAGIC))
+			try_leave(status = IoSetFilePosition(fileHandle, 0);
 
 		//
 		// check fat header
