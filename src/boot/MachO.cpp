@@ -848,7 +848,7 @@ EFI_STATUS MachLoadThinFatFile(IO_FILE_HANDLE* fileHandle, UINT64* offsetInFile,
 		//
 		// check for kernelcache magic (comp)
 		//
-		if(fatHeader.Magic == SWAP_BE32_TO_HOST(KERNEL_CACHE_MAGIC))
+		if(fatHeader.Magic == KERNEL_CACHE_MAGIC)
 			try_leave(status = IoSetFilePosition(fileHandle, 0));
 
 		//
