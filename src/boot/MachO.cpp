@@ -848,16 +848,14 @@ EFI_STATUS MachLoadThinFatFile(IO_FILE_HANDLE* fileHandle, UINT64* offsetInFile,
 		//
 		// check for kernelcache magic (comp)
 		//
-		if(fatHeader.Magic == KERNEL_CACHE_MAGIC)
+		if(fatHeader.Magic == SWAP_BE32_TO_HOST(KERNEL_CACHE_MAGIC))
 		{
-			CsPrintf(CHAR8_CONST_STRING("PIKE: KERNEL_CACHE_MAGIC found!\n"));
-			try_leave(status = IoSetFilePosition(fileHandle, 0));
-		}
-		else if(fatHeader.Magic == SWAP_BE32_TO_HOST(KERNEL_CACHE_MAGIC))
-		{
+#if DEBUG_LDRP_CALL_CSPRINTF
 			CsPrintf(CHAR8_CONST_STRING("PIKE: SWAP_BE32_TO_HOST(KERNEL_CACHE_MAGIC) found!\n"));
+#endif
 			try_leave(status = IoSetFilePosition(fileHandle, 0));
 		}
+
 		//
 		// check fat header
 		//
