@@ -979,10 +979,10 @@ EFI_STATUS CsDrawPanicImage()
 		//
 		// decompress data
 		//
-		UINTN imageWidth													= CspHiDPIMode ? 920 : 460;;
+		UINTN imageWidth													= CspHiDPIMode ? 920 : 460;
 		UINTN imageHeight													= CspHiDPIMode ? 570 : 285;
 		UINTN imageSize														= imageWidth * imageHeight;
-		if(EFI_ERROR(status = BlDecompressLZSS(CspHiDPIMode ? ApplePanicDialog2X : ApplePanicDialog, CspHiDPIMode ? sizeof(ApplePanicDialog2X) : sizeof(ApplePanicDialog), imageData, imageSize, &imageSize)))
+		if(EFI_ERROR(status = BlDecompressLZVN(CspHiDPIMode ? ApplePanicDialog2X : ApplePanicDialog, CspHiDPIMode ? sizeof(ApplePanicDialog2X) : sizeof(ApplePanicDialog), imageData, imageSize, &imageSize)))
 			try_leave(NOTHING);
 
 		//
