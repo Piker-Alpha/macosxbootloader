@@ -11,9 +11,9 @@ Phase 2: Status - Work In Progress…
 
 1.) Fix Recovery HD boot support for Yosemite (status: testing).
 
-2.) Add missing Panic Dialog data for black mode (status: work in progress).
+2.) Add missing Panic Dialog data for black mode (status: testing).
 
-3.) Convert all Panic Dialog data from LZSS to LZVN (status: work in progress).
+3.) Convert all Panic Dialog data from LZSS to LZVN (status: testing).
 
 
 Phase 3: Status - TBD
