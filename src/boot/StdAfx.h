@@ -31,7 +31,7 @@
 //
 #define LEGACY_GREY_SUPPORT													0
 
-#define DEBUG_LDRP_CALL_CSPRINTF											1
+#define DEBUG_LDRP_CALL_CSPRINTF											0
 
 #include "EfiCommon.h"
 #include "EfiApi.h"
