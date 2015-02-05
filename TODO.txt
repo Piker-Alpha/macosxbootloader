@@ -16,6 +16,6 @@ Phase 2: Status - Completed!
 3.) Convert all Panic Dialog data from LZSS to LZVN (status: Done).
 
 
-Phase 3: Status - TBD
+Phase 3: Status - Work In Progress
 
 1.) Add Xcode compiler support.
