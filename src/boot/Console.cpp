@@ -32,7 +32,6 @@ STATIC UINTN CspIndicatorFrameCount											= 0;
 STATIC UINTN CspIndicatorOffsetY											= 0;
 STATIC UINTN CspIndicatorCurrentFrame										= 0;
 STATIC EFI_UGA_PIXEL* CspIndicatorImage										= nullptr;
-STATIC UINTN CspNetIndicatorCurrentFrame									= 0;
 STATIC EFI_EVENT CspIndicatorRefreshTimerEvent								= nullptr;
 STATIC BOOLEAN CspHiDPIMode													= FALSE;
 STATIC INT32 CspGfxSavedConfigRestoreStatus									= -1;
