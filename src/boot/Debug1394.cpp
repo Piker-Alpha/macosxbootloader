@@ -308,6 +308,7 @@ STATIC UINT64 Bd1394pDataPhysicalAddress									= 0;
 // stall
 //
 #pragma optimize("", off)
+
 STATIC VOID Bd1394pStallExecution(UINT32 microseconds)
 {
 	for(UINT32 k = 0,b = 1; k < microseconds; k ++)
@@ -316,6 +317,7 @@ STATIC VOID Bd1394pStallExecution(UINT32 microseconds)
 			b																= b * (i >> k);
 	}
 }
+
 #pragma optimize("", on)
 
 //
@@ -1026,6 +1028,7 @@ EFI_STATUS Bd1394ConfigureDebuggerDevice(CHAR8 CONST* loaderOptions)
 		//
 		EFI_PCI_IO_PROTOCOL* pciIoProtocol									= nullptr;
 		EFI_HANDLE controllerHandle											= nullptr;
+
 		if(EFI_ERROR(status = BlFindPciDevice(segment, bus, device, func, PCI_CLASS_SERIAL, PCI_CLASS_SERIAL_FIREWIRE, 0x10, &pciIoProtocol, &controllerHandle)))
 			try_leave(NOTHING);
 
