@@ -5,7 +5,7 @@
 //	purpose:	boot debugger
 //********************************************************************
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "BootDebuggerPrivate.h"
 #include "Debug1394.h"
 #include "DebugUsb.h"

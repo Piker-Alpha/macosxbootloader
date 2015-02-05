@@ -5,7 +5,7 @@
 //	purpose:	64bits thunk
 //********************************************************************
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 //
 // 64 bits configuration table

@@ -5,7 +5,7 @@
 //	purpose:	device tree
 //********************************************************************
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 //
 // flatten property

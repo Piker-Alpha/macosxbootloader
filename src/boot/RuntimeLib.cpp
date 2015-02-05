@@ -5,7 +5,7 @@
 //	purpose:	runtime lib
 //********************************************************************
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 //
 // memcpy

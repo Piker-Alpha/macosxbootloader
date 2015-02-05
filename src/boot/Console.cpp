@@ -5,7 +5,7 @@
 //	purpose:	Console
 //********************************************************************
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "PictData.h"
 
 //

@@ -5,7 +5,7 @@
 //	purpose:	debugger routine
 //********************************************************************
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "BootDebuggerPrivate.h"
 
 KPCR* BdPcr																	= nullptr;

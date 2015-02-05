@@ -5,7 +5,7 @@
 //	purpose:	debug over 1394
 //********************************************************************
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "Debug1394.h"
 
 //

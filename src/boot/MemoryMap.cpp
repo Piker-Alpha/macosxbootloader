@@ -5,7 +5,7 @@
 //	purpose:	memory map
 //********************************************************************
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 //
 // get memory map

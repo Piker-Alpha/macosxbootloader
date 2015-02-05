@@ -5,7 +5,7 @@
 //	purpose:	load kernel
 //********************************************************************
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 #define KERNEL_CACHE_MAGIC													0x636f6d70
 #define KERNEL_CACHE_LZSS													0x6c7a7373

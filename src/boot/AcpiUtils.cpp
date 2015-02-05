@@ -5,7 +5,7 @@
 //	purpose:	acpi utils
 //********************************************************************
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 //
 // global

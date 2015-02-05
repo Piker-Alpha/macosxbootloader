@@ -5,7 +5,7 @@
 //	purpose:	mach-o
 //********************************************************************
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 //
 // define

@@ -5,7 +5,7 @@
 //	purpose:	process option
 //********************************************************************
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 //
 // global
