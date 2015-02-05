@@ -5,7 +5,7 @@
 //	purpose:	arch utils
 //********************************************************************
 
-#include "stdafx.h"
+#include "../StdAfx.h"
 #include "ArchDefine.h"
 
 //
@@ -35,7 +35,7 @@ EFI_STATUS ArchInitialize1()
 	if(!transferRoutineBuffer)
 		return EFI_OUT_OF_RESOURCES;
 
-	memcpy(transferRoutineBuffer, &ArchTransferRoutineBegin, bytesCount);
+	memcpy(transferRoutineBuffer, (VOID CONST *)&ArchTransferRoutineBegin, bytesCount);
 	ArchpTransferRoutine													= reinterpret_cast<ArchTransferRoutine>(transferRoutineBuffer);
 	return EFI_SUCCESS;
 }
