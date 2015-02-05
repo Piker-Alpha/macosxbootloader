@@ -5,7 +5,7 @@
 //	purpose:	memory map
 //********************************************************************
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 //
 // get memory map
@@ -106,7 +106,7 @@ EFI_STATUS MmRemoveNonRuntimeDescriptors(EFI_MEMORY_DESCRIPTOR* memoryMap, UINTN
 //
 VOID MmSortMemoryMap(EFI_MEMORY_DESCRIPTOR* memoryMap, UINTN memoryMapSize, UINTN descriptorSize)
 {
-	EFI_MEMORY_DESCRIPTOR* localDescriptor									= static_cast<EFI_MEMORY_DESCRIPTOR*>(_alloca(descriptorSize));
+    EFI_MEMORY_DESCRIPTOR* localDescriptor									= static_cast<EFI_MEMORY_DESCRIPTOR*>(_alloca(descriptorSize));
 	EFI_MEMORY_DESCRIPTOR* curDescriptor									= NextMemoryDescriptor(memoryMap, descriptorSize);
 	for(UINTN i = descriptorSize; i < memoryMapSize; i += descriptorSize, curDescriptor = NextMemoryDescriptor(curDescriptor, descriptorSize))
 	{
