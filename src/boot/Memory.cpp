@@ -5,7 +5,7 @@
 //	purpose:	memory
 //********************************************************************
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 //
 // memory tag

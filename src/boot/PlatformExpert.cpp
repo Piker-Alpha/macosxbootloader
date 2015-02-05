@@ -5,7 +5,7 @@
 //	purpose:	platform expert
 //********************************************************************
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 //
 // global

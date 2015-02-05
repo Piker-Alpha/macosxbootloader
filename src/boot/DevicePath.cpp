@@ -5,7 +5,7 @@
 //	purpose:	device path
 //********************************************************************
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 //
 // get device path size

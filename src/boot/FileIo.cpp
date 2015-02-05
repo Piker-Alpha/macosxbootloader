@@ -5,7 +5,7 @@
 //	purpose:	file io
 //********************************************************************
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 //
 // booting from net

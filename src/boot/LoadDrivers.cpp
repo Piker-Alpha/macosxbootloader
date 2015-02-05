@@ -5,7 +5,7 @@
 //	purpose:	load drivers
 //********************************************************************
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 #define MKEXT_MAGIC															0x4d4b5854
 #define MKEXT_SIGN															0x4d4f5358

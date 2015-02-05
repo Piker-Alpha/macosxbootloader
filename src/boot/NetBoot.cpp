@@ -5,7 +5,7 @@
 //	purpose:	net boot
 //********************************************************************
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 //
 // get root match dict

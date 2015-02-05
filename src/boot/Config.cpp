@@ -5,7 +5,7 @@
 //	purpose:	config
 //********************************************************************
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 //
 // symbol

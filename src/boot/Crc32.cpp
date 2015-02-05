@@ -5,7 +5,7 @@
 //	purpose:	crc32
 //********************************************************************
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 STATIC UINT32 CONST BlpCrc32Table[] =
 {

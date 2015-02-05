@@ -5,7 +5,7 @@
 //	purpose:	pe image
 //********************************************************************
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 //
 // get image nt header
