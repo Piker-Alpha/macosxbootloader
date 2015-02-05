@@ -870,7 +870,7 @@ STATIC VOID FvpReadInput(CHAR8** inputBuffer, UINTN* inputLength, UINTN maxLengt
 			inputBuffer16[inputLength16]									= inputKey.UnicodeChar;
 			inputLength16													+= 1;
 
-			CHAR16 outputString[2]											= {echoInput ? inputKey.UnicodeChar : L'*', 0};
+			CHAR16 outputString[2]											= {echoInput ? inputKey.UnicodeChar : (CHAR16)L'*', 0};
 			EfiSystemTable->ConOut->OutputString(EfiSystemTable->ConOut, outputString);
 		}
 	}

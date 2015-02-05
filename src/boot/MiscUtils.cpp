@@ -263,8 +263,8 @@ UINT8* BlpGetStringFromSMBIOSTable(UINT8* startOfStringTable, UINT8 index)
 	for(UINT8 i = 1; i < index && *startOfStringTable; i ++)
 		startOfStringTable													+= strlen(reinterpret_cast<CHAR8*>(startOfStringTable)) + 1;
 
-	STATIC UINT8 BadIndex[]													= "BadIndex";
-	return *startOfStringTable ? startOfStringTable : BadIndex;
+	STATIC UINT8 BadIndex[]                                                 = "BadIndex";
+	return *startOfStringTable ? startOfStringTable : (UINT8 *)BadIndex;
 }
 
 //
