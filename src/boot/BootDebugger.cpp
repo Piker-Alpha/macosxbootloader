@@ -5,7 +5,7 @@
 //	purpose:	boot debugger
 //********************************************************************
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "BootDebuggerPrivate.h"
 #include "Debug1394.h"
 #include "DebugUsb.h"
@@ -203,7 +203,7 @@ STATIC VOID BdpExceptionRecord32To64(EXCEPTION_RECORD* exceptionRecord, EXCEPTIO
 	exceptionRecord64->ExceptionAddress										= static_cast<UINT64>(reinterpret_cast<INTN>(exceptionRecord->ExceptionAddress));
 	exceptionRecord64->ExceptionCode										= exceptionRecord->ExceptionCode;
 	exceptionRecord64->ExceptionFlags										= exceptionRecord->ExceptionFlags;
-	exceptionRecord64->ExceptionRecord										= reinterpret_cast<UINT32>(exceptionRecord->ExceptionRecord);
+	exceptionRecord64->ExceptionRecord										= reinterpret_cast<UINT64>(exceptionRecord->ExceptionRecord);
 	exceptionRecord64->NumberParameters										= exceptionRecord->NumberParameters;
 	for(UINT32 i = 0; i < ARRAYSIZE(exceptionRecord->ExceptionInformation); i ++)
 		exceptionRecord64->ExceptionInformation[i]							= static_cast<UINT64>(static_cast<INTN>(exceptionRecord->ExceptionInformation[i]));
