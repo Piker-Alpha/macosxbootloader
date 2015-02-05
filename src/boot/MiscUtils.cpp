@@ -5,7 +5,7 @@
 //	purpose:	utils
 //********************************************************************
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 //
 // global
@@ -264,7 +264,7 @@ UINT8* BlpGetStringFromSMBIOSTable(UINT8* startOfStringTable, UINT8 index)
 		startOfStringTable													+= strlen(reinterpret_cast<CHAR8*>(startOfStringTable)) + 1;
 
 	STATIC UINT8 BadIndex[]													= "BadIndex";
-	return *startOfStringTable ? startOfStringTable : BadIndex;
+	return *startOfStringTable ? startOfStringTable : (UINT8 *)BadIndex;
 }
 
 //
