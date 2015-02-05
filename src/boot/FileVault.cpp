@@ -6,10 +6,11 @@
 //********************************************************************
 
 #include "StdAfx.h"
-#include "rijndael/aes.h"
-#include "rijndael/aesxts.h"
+#include "../rijndael/aes.h"
+#include "../rijndael/aesxts.h"
 
 #include <pshpack1.h>
+
 typedef struct _CORE_STORAGE_VOLUME_HEADER
 {
 	//
@@ -870,7 +871,7 @@ STATIC VOID FvpReadInput(CHAR8** inputBuffer, UINTN* inputLength, UINTN maxLengt
 			inputBuffer16[inputLength16]									= inputKey.UnicodeChar;
 			inputLength16													+= 1;
 
-			CHAR16 outputString[2]											= {echoInput ? inputKey.UnicodeChar : L'*', 0};
+			CHAR16 outputString[2]											= {echoInput ? inputKey.UnicodeChar : (CHAR16)L'*', 0};
 			EfiSystemTable->ConOut->OutputString(EfiSystemTable->ConOut, outputString);
 		}
 	}
