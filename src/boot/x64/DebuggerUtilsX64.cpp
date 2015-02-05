@@ -5,8 +5,8 @@
 //	purpose:	debugger utils
 //********************************************************************
 
-#include "stdafx.h"
-#include "BootDebuggerPrivate.h"
+#include "../StdAfx.h"
+#include "../BootDebuggerPrivate.h"
 
 KPCR* BdPcr																	= nullptr;
 KPRCB* BdPrcb																= nullptr;
@@ -335,11 +335,11 @@ EFI_STATUS BdArchInitialize()
 	extern VOID BdTrap0e();
 	extern VOID BdTrap2d();
 	UINT32 segCs															= ArchGetSegCs();
-	ArchSetIdtEntry(idtr.Base, 0x01, segCs, &BdTrap01, 0x8e00);
-	ArchSetIdtEntry(idtr.Base, 0x03, segCs, &BdTrap03, 0x8e00);
-	ArchSetIdtEntry(idtr.Base, 0x0d, segCs, &BdTrap0d, 0x8e00);
-	ArchSetIdtEntry(idtr.Base, 0x0e, segCs, &BdTrap0e, 0x8e00);
-	ArchSetIdtEntry(idtr.Base, 0x2d, segCs, &BdTrap2d, 0x8e00);
+	ArchSetIdtEntry(idtr.Base, 0x01, segCs, (VOID*)&BdTrap01, 0x8e00);
+	ArchSetIdtEntry(idtr.Base, 0x03, segCs, (VOID*)&BdTrap03, 0x8e00);
+	ArchSetIdtEntry(idtr.Base, 0x0d, segCs, (VOID*)&BdTrap0d, 0x8e00);
+	ArchSetIdtEntry(idtr.Base, 0x0e, segCs, (VOID*)&BdTrap0e, 0x8e00);
+	ArchSetIdtEntry(idtr.Base, 0x2d, segCs, (VOID*)&BdTrap2d, 0x8e00);
 	ArchSetIdtRegister(&idtr);
 
 	BdArchBlockDebuggerOperation											= FALSE;
