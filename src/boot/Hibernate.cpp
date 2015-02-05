@@ -7,7 +7,7 @@
 
 #include "StdAfx.h"
 #include "Hibernate.h"
-#include "rijndael/aes.h"
+#include "../rijndael/aes.h"
 
 #define HIBERNATE_HEADER_SIGNATURE											0x73696d65
 #define HIBERNATE_HANDOFF_TYPE_END											0x686f0000
