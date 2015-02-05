@@ -425,7 +425,7 @@ VOID* BdUsbpLocateDebugPortRegister(DEBUG_USB_GLOBAL_DATA* globalData, EFI_PCI_I
 		return nullptr;
 
 	UINT8 pciCaps[2]														= {0};
-	while(capsOffset && !(capsOffset & 0x03) && capsOffset < 0x100)
+	while(capsOffset && !(capsOffset & 0x03) && (UINT16)capsOffset < 0x100)
 	{
 		if(EFI_ERROR(pciIoProtocol->Pci.Read(pciIoProtocol, EfiPciIoWidthUint16, capsOffset, sizeof(pciCaps), pciCaps)))
 			return nullptr;
@@ -1855,7 +1855,7 @@ STATIC UINT32 BdUsbpReadDebuggerPacket(DEBUG_USB_GLOBAL_DATA* globalData, UINT32
 			if(receiveLength == 5 && !memcmp(&globalData->PacketHeader, "NAME?", 5))
 			{
 				DEBUG_USB_SEND_BUFFER sendBuffer[2];
-				sendBuffer[0].Buffer										= "NAME=";
+				sendBuffer[0].Buffer										= (VOID*)"NAME=";
 				sendBuffer[0].Length										= 5;
 				sendBuffer[1].Buffer										= globalData->TargetName;
 				sendBuffer[1].Length										= globalData->NameLength + 1;
