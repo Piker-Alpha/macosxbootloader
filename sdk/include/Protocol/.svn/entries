@@ -1,112 +1,0 @@
-10
-
-dir
-1
-https://macosxbootloader.googlecode.com/svn/sdk/include/Protocol
-https://macosxbootloader.googlecode.com/svn
-
-
-
-2013-11-23T07:22:04.508330Z
-1
-tiamo@live.com
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-77e3e3b4-2d2d-10aa-ff73-3d8148760a43
-
-LoadFile
-dir
-
-GraphicsOutput
-dir
-
-AppleFirmwarePassword
-dir
-
-AppleDeviceControl
-dir
-
-DiskIO
-dir
-
-AppleSystemInfo
-dir
-
-BlockIO
-dir
-
-FirmwareVolumeDispatch
-dir
-
-SimpleTextIn
-dir
-
-SimpleTextOut
-dir
-
-AppleDeviceProperty
-dir
-
-UgaDraw
-dir
-
-SimplePointer
-dir
-
-FileInfo
-dir
-
-LoadedImage
-dir
-
-AppleNetBoot
-dir
-
-SimpleFileSystem
-dir
-
-AppleGraphInfo
-dir
-
-AppleImageCodec
-dir
-
-ConsoleControl
-dir
-
-PciIo
-dir
-
-AppleSMC
-dir
-
-FirmwareVolume
-dir
-
-AppleDiskIo
-dir
-
-DataHub
-dir
-
-AppleGraphConfig
-dir
-
-AppleKeyState
-dir
-
-DevicePath
-dir
-
