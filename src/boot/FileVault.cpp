@@ -408,7 +408,7 @@ STATIC EFI_STATUS FvpLoadCoreStorageConfig(EFI_HANDLE coreStoragePartitionHandle
 		//
 		// decrypt with aes-xts
 		//
-		symmetric_xts xtsContext											= {0};
+		symmetric_xts xtsContext											= {};
 		UINT8 initVector[0x10]												= {0};
 		xts_start(0, initVector, localHeader.EncryptedRootKey1, localHeader.KeyLength, initVector, 0x10, 0, 0, &xtsContext);
 		xts_decrypt(fileBuffer, static_cast<unsigned long>(fileSize), fileBuffer, initVector, &xtsContext);
@@ -497,7 +497,7 @@ STATIC BOOLEAN FvpAESUnwrap(VOID CONST* kekBuffer, UINTN kekLength, UINT64 initV
 	UINT8* R																= static_cast<UINT8*>(plaintext);
 	memcpy(R, Add2Ptr(ciphertext, sizeof(A), VOID CONST*), sizeof(UINT64) * n);
 
-	aes_decrypt_ctx aesContext												= {0};
+	aes_decrypt_ctx aesContext												= {};
 	aes_decrypt_key(static_cast<UINT8 CONST*>(kekBuffer), static_cast<INT32>(kekLength), &aesContext);
 	
 	for(INT32 j = 5; j >= 0; j --)
@@ -605,7 +605,7 @@ STATIC EFI_STATUS FvpDecryptVolumeKEKWithMasterKeyUser()
 //
 STATIC VOID FvpHMACSHA256(VOID CONST* messageBuffer, UINTN messageLength, VOID CONST* keyBuffer, UINTN keyLength, UINT8* resultBuffer)
 {
-	SHA256_CONTEXT sha256Context											= {0};
+	SHA256_CONTEXT sha256Context											= {};
 	UINT8 kPad[0x40]														= {0};
 	UINT8 tk[0x20]															= {0};
 	if(keyLength > sizeof(kPad))
