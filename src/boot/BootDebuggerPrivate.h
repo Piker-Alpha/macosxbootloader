@@ -10,12 +10,12 @@
 //
 // arch define
 //
-#include "ArchDefine.h"
+#include "x64/ArchDefine.h"
 
 //
 // typedef
 //
-typedef INT32																NTSTATUS;
+typedef INT32                                                               NTSTATUS;
 typedef BOOLEAN (*BdDebugRoutine)(struct _EXCEPTION_RECORD* exceptionRecord, struct _KEXCEPTION_FRAME* exceptionFrame, struct _KTRAP_FRAME* trapFrame);
 typedef UINT32 (*BdReceivePacketRoutine)(UINT32 packetType, struct _STRING* header, struct _STRING* data, UINT32* dataLength);
 typedef VOID (*BdSendPacketRoutine)(UINT32 packetType, struct _STRING* messageHeader, struct _STRING* messageData);
@@ -297,6 +297,19 @@ typedef struct _EXCEPTION_RECORD64
 	UINT64																	ExceptionInformation[EXCEPTION_MAXIMUM_PARAMETERS];
 }EXCEPTION_RECORD64;
 
+typedef struct _SECTION_CHECKSUM
+{
+    //
+    // section pointer
+    //
+    VOID*															SectionPointer;
+    
+    //
+    // checksum
+    //
+    UINT32															CheckSum;
+}SECTION_CHECKSUM;
+
 //
 // loader data table entry
 //
@@ -368,18 +381,7 @@ typedef struct _LDR_DATA_TABLE_ENTRY
 		//
 		// section and checksum
 		//
-		struct _SECTION_CHECKSUM
-		{
-			//
-			// section pointer
-			//
-			VOID*															SectionPointer;
-
-			//
-			// checksum
-			//
-			UINT32															CheckSum;
-		}SectionAndCheckSum;
+		SECTION_CHECKSUM SectionAndCheckSum;
 	};
 
 	union
