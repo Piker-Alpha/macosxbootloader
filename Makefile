@@ -23,7 +23,7 @@ RANLIB = ranlib
 
 STRIP = strip
 
-WFLAGS = -Wall -Werror -Wno-unknown-pragmas -Wno-missing-braces
+WFLAGS = -Wall -Werror -Wno-unknown-pragmas
 
 CFLAGS = "$(WFLAGS) $(DEBUGFLAGS) $(ARCHFLAGS) -fborland-extensions $(ARCHCFLAGS) -fpie -std=gnu11 -Oz -DEFI_SPECIFICATION_VERSION=0x0001000a -DTIANO_RELEASE_VERSION=1 $(INCLUDES) -D_MSC_EXTENSIONS=1 -fno-exceptions" 
 
