@@ -10,8 +10,19 @@
 									%1:
 %endmacro
 
+%ifdef __APPLE__
+section .data
+%else
 section .rdata
+%endif
+
 									align				16
-PUBLIC_SYMBOL ?ArchThunk64BufferStart@@3PAEA
 									incbin				"ThunkCode64.dat"
+
+%ifdef __APPLE__ __ARCH32__
+PUBLIC_SYMBOL _ArchThunk64BufferStart
+PUBLIC_SYMBOL _ArchThunk64BufferEnd
+%else
+PUBLIC_SYMBOL ?ArchThunk64BufferStart@@3PAEA
 PUBLIC_SYMBOL ?ArchThunk64BufferEnd@@3PAEA
+%endif
