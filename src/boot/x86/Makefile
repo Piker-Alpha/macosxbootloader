@@ -22,8 +22,7 @@ libx86.a: \
 	ArchUtilsX86.o		\
 	CompilerX86.o		\
 	Thunk64.o		\
-	DebuggerUtilsX86.o	\
-	StartKernel.o
+	DebuggerUtilsX86.o
 
 	@echo "\t[ar]\t$@";
 	@$(AR) cru $@		\
@@ -31,8 +30,7 @@ libx86.a: \
 	ArchUtilsX86.o		\
 	CompilerX86.o		\
 	Thunk64.o		\
-	DebuggerUtilsX86.o	\
-	StartKernel.o
+	DebuggerUtilsX86.o
 
 	@echo "\t[ranlib]\t$@";
 	@$(RANLIB) $@
