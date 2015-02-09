@@ -5,7 +5,7 @@
 //	purpose:	compiler stub
 //********************************************************************
 
-#include "stdafx.h"
+#include "../StdAfx.h"
 
 //
 // 64bit right shift
