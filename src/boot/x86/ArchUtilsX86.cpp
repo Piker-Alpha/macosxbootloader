@@ -5,7 +5,7 @@
 //	purpose:	arch utils
 //********************************************************************
 
-#include "stdafx.h"
+#include "../StdAfx.h"
 #include "ArchDefine.h"
 
 //
@@ -39,7 +39,8 @@ EFI_STATUS ArchCheck64BitCpu()
 //
 VOID __declspec(naked) ArchCpuId(UINT32 command, UINT32* eaxValue, UINT32* ebxValue, UINT32* ecxValue, UINT32* edxValue)
 {
-	__asm
+#ifdef _MSC_VER
+    __asm
 	{
 		push		ebx
 		push		edi
@@ -57,6 +58,35 @@ VOID __declspec(naked) ArchCpuId(UINT32 command, UINT32* eaxValue, UINT32* ebxVa
 		pop			ebx
 		retn
 	}
+#else
+#ifdef __x86_64__
+    __asm("push %%rbx\n\t"
+          "push %%rdi\n\t"
+          "mov %4, %%eax\n\t"
+          "cpuid\n\t"
+          "mov %%eax, %0\n\t"
+          "mov %%ebx, %1\n\t"
+          "mov %%ecx, %2\n\t"
+          "mov %%edx, %3\n\t"
+          "pop %%rdi\n\t"
+          "pop %%rbx\n\t"
+          : "=&m" (eaxValue), "=&m" (ebxValue), "=&m" (ecxValue), "=&m" (edxValue)
+          : "m" (command));
+#else
+    __asm("push %%ebx\n\t"
+          "push %%edi\n\t"
+          "mov %4, %%eax\n\t"
+          "cpuid\n\t"
+          "mov %%eax, %0\n\t"
+          "mov %%ebx, %1\n\t"
+          "mov %%ecx, %2\n\t"
+          "mov %%edx, %3\n\t"
+          "pop %%edi\n\t"
+          "pop %%ebx\n\t"
+          : "=&m" (eaxValue), "=&m" (ebxValue), "=&m" (ecxValue), "=&m" (edxValue)
+          : "m" (command));
+#endif
+#endif
 }
 
 //
@@ -64,6 +94,7 @@ VOID __declspec(naked) ArchCpuId(UINT32 command, UINT32* eaxValue, UINT32* ebxVa
 //
 UINTN __declspec(naked) ArchHardwareRandom()
 {
+#ifdef _MSC_VER
 	__asm
 	{
 		mov			edx, 10
@@ -84,6 +115,28 @@ UINTN __declspec(naked) ArchHardwareRandom()
 		xor			eax, eax
 		retn
 	}
+#else
+    UINTN ret;
+
+    __asm("mov 10, %%edx\n\n"
+          "LHARDWARE_RND:\n\t"
+          ".byte 0x0F\n\t"
+          ".byte 0xC7\n\t"
+          ".byte 0xF0\n\t"
+          "jnb LRETRY\n"
+          "movl %%eax, %0\n"
+          "jmp LEND\n\t"
+          "LRETRY:\n\t"
+          "dec %%edx\n\t"
+          "pause\n\t"
+          "jnz LHARDWARE_RND\n\t"
+          "xor %%eax, %%eax\n\t"
+          "mov %%eax, %0\n\n"
+          "LEND:\n\t"
+          : "=&m" (ret));
+
+    return ret;
+#endif
 }
 
 //
@@ -91,6 +144,7 @@ UINTN __declspec(naked) ArchHardwareRandom()
 //
 UINT64 __declspec(naked) ArchGetCpuTick()
 {
+#ifdef _MSC_VER
 	__asm
 	{
 		lfence
@@ -98,6 +152,17 @@ UINT64 __declspec(naked) ArchGetCpuTick()
 		lfence
 		retn
 	}
+#else
+    UINT64 ret;
+
+    __asm("lfence\n\t"
+          "rdtsc\n\t"
+          "lfence\n"
+          "movl %%eax, %0"
+          : "=&m" (ret));
+
+    return ret;
+#endif
 }
 
 //
@@ -105,6 +170,7 @@ UINT64 __declspec(naked) ArchGetCpuTick()
 //
 VOID __declspec(naked) ArchStartKernel(VOID* kernelEntry, VOID* bootArgs)
 {
+#ifdef _MSC_VER
 	__asm
 	{
 		cli
@@ -113,6 +179,20 @@ VOID __declspec(naked) ArchStartKernel(VOID* kernelEntry, VOID* bootArgs)
 		call		edx
 		retn
 	}
+#else
+	__asm("cli\n"
+	#ifdef __clang__
+		  "movl %%edx, %0\n"
+		  "movl %%eax, %1\n"
+		  "call *(%%edx)\n"
+	#else
+		  "movl %0, %%edx\n"
+		  "movl %1, %%eax\n"
+		  "call %%edx\n"
+	#endif
+		  "ret\n"
+		  :: "m" (kernelEntry), "m" (bootArgs));
+#endif
 }
 
 //
@@ -131,12 +211,22 @@ BOOLEAN MmTranslateVirtualAddress(VOID* virtualAddress, UINT64* physicalAddress)
 //
 UINT32 __declspec(naked) ArchGetSegCs()
 {
+#ifdef _MSC_VER
 	__asm
 	{
 		mov		ax,cs
 		movzx	eax,ax
 		retn
 	}
+#else
+    UINT32 ret;
+
+    __asm("mov %%cs, %%ax\n"
+          "movzx %%ax, %0"
+          : "=&r" (ret));
+
+    return ret;
+#endif
 }
 
 //
@@ -144,12 +234,19 @@ UINT32 __declspec(naked) ArchGetSegCs()
 //
 VOID __declspec(naked) ArchGetIdtRegister(KDESCRIPTOR* idtr)
 {
+#ifdef _MSC_VER
 	__asm
 	{
 		mov			eax,[esp + 4]
 		sidt		fword ptr[eax + KDESCRIPTOR.Limit]
 		retn
 	}
+#else
+    __asm("mov %0, %%eax\n\t"
+          "sidt 2(%%eax)\n\t"
+          "ret\n\t"
+          :: "m" (idtr));
+#endif
 }
 
 //
@@ -157,12 +254,19 @@ VOID __declspec(naked) ArchGetIdtRegister(KDESCRIPTOR* idtr)
 //
 VOID __declspec(naked) ArchSetIdtRegister(KDESCRIPTOR* idtr)
 {
+#ifdef _MSC_VER
 	__asm
 	{
 		mov			eax,[esp + 4]
 		lidt		fword ptr[eax + KDESCRIPTOR.Limit]
 		retn
 	}
+#else
+    __asm("mov %0, %%eax\n\t"
+          "lidt 2(%%eax)\n\t"
+          "ret\n\t"
+          :: "m" (idtr));
+#endif
 }
 
 //
@@ -189,12 +293,24 @@ VOID ArchSweepIcacheRange(VOID* startAddress, UINT32 bytesCount)
 //
 UINT8 __declspec(naked) ARCH_READ_PORT_UINT8(UINT8* port)
 {
+#ifdef _MSC_VER
 	__asm
 	{
 		mov			dx, [esp + 4]
 		in			al, dx
 		retn
 	}
+#else
+    UINT8 ret;
+
+    __asm("movw %1, %%dx\n"
+          "inb %%dx, %%al\n\t"
+          "movb %%al, %0"
+          : "=&r" (ret)
+          : "m" (*port));
+
+    return ret;
+#endif
 }
 
 //
@@ -202,12 +318,24 @@ UINT8 __declspec(naked) ARCH_READ_PORT_UINT8(UINT8* port)
 //
 UINT16 __declspec(naked) ARCH_READ_PORT_UINT16(UINT16* port)
 {
+#ifdef _MSC_VER
 	__asm
 	{
 		mov			dx, [esp + 4]
 		in			ax, dx
 		retn
 	}
+#else
+    UINT16 ret;
+    
+    __asm("movw %1, %%dx\n"
+          "inw %%dx, %%ax\n\t"
+          "movw %%ax, %0"
+          : "=&r" (ret)
+          : "m" (*port));
+    
+    return ret;
+#endif
 }
 
 //
@@ -215,12 +343,24 @@ UINT16 __declspec(naked) ARCH_READ_PORT_UINT16(UINT16* port)
 //
 UINT32 __declspec(naked) ARCH_READ_PORT_UINT32(UINT32* port)
 {
+#ifdef _MSC_VER
 	__asm
 	{
 		mov			dx,  [esp + 4]
 		in			eax, dx
 		retn
 	}
+#else
+    UINT32 ret;
+    
+    __asm("movw %1, %%dx\n\t"
+          "inl %%dx, %%eax\n\t"
+          "movl %%eax, %0"
+          : "=&r" (ret)
+          : "m" (*port));
+
+    return ret;
+#endif
 }
 
 //
@@ -228,6 +368,7 @@ UINT32 __declspec(naked) ARCH_READ_PORT_UINT32(UINT32* port)
 //
 VOID __declspec(naked) ARCH_WRITE_PORT_UINT8(UINT8* port, UINT8 value)
 {
+#ifdef _MSC_VER
 	__asm
 	{
 		mov			dx, [esp + 4]
@@ -235,6 +376,13 @@ VOID __declspec(naked) ARCH_WRITE_PORT_UINT8(UINT8* port, UINT8 value)
 		out			dx, al
 		retn
 	}
+#else
+    __asm("movw %0, %%dx\n\t"
+          "movb %1, %%al\n"
+          "outb %%al, %%dx\n\t"
+          "ret\n\t"
+          :: "m" (*port), "m" (value));
+#endif
 }
 
 //
@@ -242,6 +390,7 @@ VOID __declspec(naked) ARCH_WRITE_PORT_UINT8(UINT8* port, UINT8 value)
 //
 VOID __declspec(naked) ARCH_WRITE_PORT_UINT16(UINT16* port, UINT16 value)
 {
+#ifdef _MSC_VER
 	__asm
 	{
 		mov			dx, [esp + 4]
@@ -249,6 +398,13 @@ VOID __declspec(naked) ARCH_WRITE_PORT_UINT16(UINT16* port, UINT16 value)
 		out			dx, ax
 		retn
 	}
+#else
+    __asm("movw %0, %%dx\n\t"
+          "movw %1, %%ax\n\t"
+          "outw %%ax, %%dx\n\t"
+          "ret\n\t"
+          :: "m" (*port), "m" (value));
+#endif
 }
 
 //
@@ -256,6 +412,7 @@ VOID __declspec(naked) ARCH_WRITE_PORT_UINT16(UINT16* port, UINT16 value)
 //
 VOID __declspec(naked) ARCH_WRITE_PORT_UINT32(UINT32* port, UINT32 value)
 {
+#ifdef _MSC_VER
 	__asm
 	{
 		mov			dx, [esp + 4]
@@ -263,6 +420,13 @@ VOID __declspec(naked) ARCH_WRITE_PORT_UINT32(UINT32* port, UINT32 value)
 		out			dx, eax
 		retn
 	}
+#else
+    __asm("movw %0, %%dx\n\t"
+          "movl %1, %%eax\n\t"
+          "outl %%eax, %%dx\n\t"
+          "ret\n\t"
+          :: "m" (*port), "m" (value));
+#endif
 }
 
 //
@@ -270,12 +434,24 @@ VOID __declspec(naked) ARCH_WRITE_PORT_UINT32(UINT32* port, UINT32 value)
 //
 UINT8 __declspec(naked) ARCH_READ_REGISTER_UINT8(UINT8* port)
 {
+#ifdef _MSC_VER
 	__asm
 	{
 		mov			edx, [esp + 4]
 		mov			al,  [edx]
 		retn
 	}
+#else
+    UINT8 ret;
+
+    __asm("mov %1, %%edx\n\t"
+          "mov (%%edx), %%al\n\t"
+          "mov %%al, %0\n\t"
+          : "=&r" (ret)
+          : "m" (*port));
+
+    return ret;
+#endif
 }
 
 //
@@ -283,12 +459,24 @@ UINT8 __declspec(naked) ARCH_READ_REGISTER_UINT8(UINT8* port)
 //
 UINT16 __declspec(naked) ARCH_READ_REGISTER_UINT16(UINT16* port)
 {
+#ifdef _MSC_VER
 	__asm
 	{
 		mov			edx, [esp + 4]
 		mov			ax,  [edx]
 		retn
 	}
+#else
+    UINT16 ret;
+    
+    __asm("mov %1, %%edx\n\t"
+          "mov (%%edx), %%ax\n\t"
+          "mov %%ax, %0\n\t"
+          : "=&r" (ret)
+          : "m" (*port));
+    
+    return ret;
+#endif
 }
 
 //
@@ -296,12 +484,24 @@ UINT16 __declspec(naked) ARCH_READ_REGISTER_UINT16(UINT16* port)
 //
 UINT32 __declspec(naked) ARCH_READ_REGISTER_UINT32(UINT32* port)
 {
+#ifdef _MSC_VER
 	__asm
 	{
 		mov			edx, [esp + 4]
 		mov			eax, [edx]
 		retn
 	}
+#else
+    UINT32 ret;
+    
+    __asm("mov %1, %%edx\n\t"
+          "mov (%%edx), %%eax\n\t"
+          "mov %%eax, %0\n\t"
+          : "=&r" (ret)
+          : "m" (*port));
+    
+    return ret;
+#endif
 }
 
 //
@@ -309,6 +509,7 @@ UINT32 __declspec(naked) ARCH_READ_REGISTER_UINT32(UINT32* port)
 //
 VOID __declspec(naked) ARCH_WRITE_REGISTER_UINT8(UINT8* port, UINT8 value)
 {
+#ifdef _MSC_VER
 	__asm
 	{
 		mov			edx, [esp + 4]
@@ -317,6 +518,21 @@ VOID __declspec(naked) ARCH_WRITE_REGISTER_UINT8(UINT8* port, UINT8 value)
 		lock or		[esp + 4], edx
 		retn
 	}
+#else
+#ifndef GNU
+    __asm("mov %0, %%edx\n\t"
+          "mov %1, %%al\n\t"
+          "mov %%al, (%%edx)\n\t"
+          "lock or %0, %%edx\n\t"
+          :: "m" (*port), "m" (value));
+#else
+    __asm("mov %0, %%edx\n\t"
+          "mov %1, %%al\n\t"
+          "mov %%al, (%%edx)\n\t"
+          "or %0, %%edx\n\t"
+          :: "m" (*port), "m" (value));
+#endif
+#endif
 }
 
 //
@@ -324,6 +540,7 @@ VOID __declspec(naked) ARCH_WRITE_REGISTER_UINT8(UINT8* port, UINT8 value)
 //
 VOID __declspec(naked) ARCH_WRITE_REGISTER_UINT16(UINT16* port, UINT16 value)
 {
+#ifdef _MSC_VER
 	__asm
 	{
 		mov			edx, [esp + 4]
@@ -332,6 +549,21 @@ VOID __declspec(naked) ARCH_WRITE_REGISTER_UINT16(UINT16* port, UINT16 value)
 		lock or		[esp + 4], edx
 		retn
 	}
+#else
+#ifndef GNU
+    __asm("mov %0, %%edx\n\t"
+          "mov %1, %%ax\n\t"
+          "mov %%ax, (%%edx)\n\t"
+          "lock or %0, %%edx\n\t"
+          :: "m" (*port), "m" (value));
+#else
+    __asm("mov %0, %%edx\n\t"
+          "mov %1, %%ax\n\t"
+          "mov %%ax, (%%edx)\n\t"
+          "or %0, %%edx\n\t"
+          :: "m" (*port), "m" (value));
+#endif
+#endif
 }
 
 //
@@ -339,6 +571,7 @@ VOID __declspec(naked) ARCH_WRITE_REGISTER_UINT16(UINT16* port, UINT16 value)
 //
 VOID __declspec(naked) ARCH_WRITE_REGISTER_UINT32(UINT32* port, UINT32 value)
 {
+#ifdef _MSC_VER
 	__asm
 	{
 		mov			edx, [esp + 4]
@@ -347,4 +580,19 @@ VOID __declspec(naked) ARCH_WRITE_REGISTER_UINT32(UINT32* port, UINT32 value)
 		lock or		[esp + 4], edx
 		retn
 	}
+#else
+#ifndef GNU
+    __asm("mov %0, %%edx\n\t"
+          "mov %1, %%eax\n\t"
+          "mov %%eax, (%%edx)\n\t"
+          "lock or %0, %%edx\n\t"
+          :: "m" (*port), "m" (value));
+#else
+    __asm("mov %0, %%edx\n\t"
+          "mov %1, %%eax\n\t"
+          "mov %%eax, (%%edx)\n\t"
+          "or %0, %%edx\n\t"
+          :: "m" (*port), "m" (value));
+#endif
+#endif
 }
