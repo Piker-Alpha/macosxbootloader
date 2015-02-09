@@ -3,4 +3,7 @@
 *.a
 *.o
 *.svn
-
+*.dat
+*.efi
+*.map
+*.log
