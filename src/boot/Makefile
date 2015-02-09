@@ -3,11 +3,11 @@
 #
 
 %.o: %.c
-	@echo "\t[$(CC)]\t$@";
+	@echo "\t[$(CC)]\t$<";
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 %.o: %.cpp
-	@echo "\t[$(CXX)]\t$@";
+	@echo "\t[$(CXX)]\t$<";
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 ifeq ("$(ARCH)", "i386")

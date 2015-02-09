@@ -3,11 +3,11 @@
 #
 
 %.o: %.c
-	@echo "\t[$(CC)]\t$@";
+	@echo "\t[$(CC)]\t$<";
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 %.o: %.asm
-	@echo "\t[nasm]\t$@";
+	@echo "\t[nasm]\t$<";
 	@$(NASM) $(NASMFLAGS) $(NASMCOMPFLAGS) -o $@ $<
 
 librijndael.a: \

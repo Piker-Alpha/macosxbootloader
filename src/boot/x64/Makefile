@@ -3,11 +3,11 @@
 #
 
 %.o: %.asm
-	@echo "\t[nasm]\t$@";
+	@echo "\t[nasm]\t$@<";
 	@$(NASM) $(NASMFLAGS) -o $@ $<
 
 %.o: %.cpp
-	@echo "\t[$(CXX)]\t$@";
+	@echo "\t[$(CXX)]\t$<";
 	@$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 all: libx64.a
