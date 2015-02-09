@@ -10,7 +10,11 @@
 //
 // arch define
 //
-#include "x64/ArchDefine.h"
+#ifdef __x86_64__
+    #include "x64/ArchDefine.h"
+#else
+    #include "x86/ArchDefine.h"
+#endif
 
 //
 // typedef
