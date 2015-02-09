@@ -1,7 +1,8 @@
 #
 #
 #
-PROJECT_DIR = $(PWD)
+
+export PROJECT_DIR = $(PWD)
 
 AR = ar
 CC = gcc
@@ -60,6 +61,8 @@ NASMCOMPFLAGS =
 #
 endif
 
+export BINARY_DIR = bin/$(ARCHDIR)/Release
+
 INCLUDES = -I /usr/include -I $(PROJECT_DIR)/sdk/include -I $(PROJECT_DIR)/sdk/include/$(ARCHDIR) -I $(PROJECT_DIR)/src/include
 WFLAGS = -Wall -Werror -Wno-unknown-pragmas
 
@@ -89,6 +92,7 @@ boot:
 
 clean:
 	@clear
+	@rm -R $(PROJECT_DIR)/bin
 	@cd src/rijndael && make clean && cd ../..
 	@cd src/boot && make clean && cd ../..
 	@cd src/boot/x86 && make clean && cd ../../..

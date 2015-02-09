@@ -16,9 +16,9 @@ else
 ARCHDEP = x64/libx64.a
 endif
 
-all: boot.efi
+all: boot.sys
 
-boot.efi: \
+boot.sys: \
 	Base64.o		\
 	BootArgs.o		\
 	BootDebugger.o		\
@@ -55,9 +55,9 @@ boot.efi: \
 
 
 	@echo "------------------------------------------------------";
-	@echo "\t[ld]\t$@.tmp";
+	@echo "\t[ld]\t$@";
 	@$(LD) $(LDFLAGS) -o	\
-	$@.tmp			\
+	$@			\
 	Base64.o		\
 	BootArgs.o		\
 	BootDebugger.o		\
@@ -93,13 +93,19 @@ boot.efi: \
 	../rijndael/librijndael.a
 
 	@echo "------------------------------------------------------";
-	@echo "\t[strip]\t$@.tmp";
-	@$(STRIP) $@.tmp
-	@echo "\t[mtoc]\t$@.tmp";
-	@$(MTOC) $@.tmp $@
-	@rm -f $@.tmp
-	@echo "\t[rm]\t$@.tmp"
-	@echo "======================================================";
+	@echo "\t[strip]\t$@";
+	@$(STRIP) $@
 
+	@if [ ! -d $(PROJECT_DIR)/$(BINARY_DIR) ]; then \
+		echo "\t[mkdir] $(BINARY_DIR)"; \
+		/bin/mkdir -p $(PROJECT_DIR)/$(BINARY_DIR); \
+	fi;
+
+	@echo "\t[mtoc]\t$@ $(BINARY_DIR)/boot.efi";
+	@$(MTOC) $@ $(PROJECT_DIR)/$(BINARY_DIR)/boot.efi
+	@rm -f $@
+	@echo "\t[rm]\t$@"
+	@echo "======================================================";
+	@echo "Done";
 clean:
-	@rm -f *.o *.efi *.map
+	@rm -f *.o *.map *.sys
