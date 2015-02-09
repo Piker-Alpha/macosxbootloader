@@ -139,9 +139,18 @@ Abstract:
   //
  
   #if _MSC_EXTENSIONS 
-    
+    #ifdef __APPLE__
+        #define __int64 long long
+        #define __int32 int
+        //
+        // Let _int8_t.h know that we don't want it to define int8_t for us.
+        //
+        #ifndef _INT8_T
+            #define _INT8_T
+        #endif
+    #endif
     //
-    // use Microsoft* C complier dependent interger width types 
+    // use Microsoft* C complier dependent interger width types
     //
     typedef unsigned __int64    uint64_t;
     typedef __int64             int64_t;
