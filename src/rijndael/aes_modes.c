@@ -115,8 +115,8 @@ AES_RETURN aes_test_alignment_detection(unsigned int n)	/* 4 <= n <= 16 */
 
 	for(i = 0; i < n; ++i)
 	{
-		uint_8t *qf = ALIGN_FLOOR(p + i, n),
-				*qh =  ALIGN_CEIL(p + i, n);
+        uint_8t *qf = ALIGN_FLOOR(p + i, n);
+        uint_8t *qh = ALIGN_CEIL(p + i, n);
 		
 		if(qh == qf)
 			++count_eq;
@@ -162,7 +162,7 @@ AES_RETURN aes_ecb_encrypt(const unsigned char *ibuf, unsigned char *obuf,
             {
                 int m = (nb > BFR_BLOCKS ? BFR_BLOCKS : nb);
 
-                ip = (ALIGN_OFFSET( ibuf, 16 ) ? buf : ibuf);
+                ip = (ALIGN_OFFSET( ibuf, 16 ) ? buf : (uint_8t *)ibuf);
                 op = (ALIGN_OFFSET( obuf, 16 ) ? buf : obuf);
 
                 if(ip != ibuf)
@@ -224,7 +224,7 @@ AES_RETURN aes_ecb_decrypt(const unsigned char *ibuf, unsigned char *obuf,
             {
                 int m = (nb > BFR_BLOCKS ? BFR_BLOCKS : nb);
 
-                ip = (ALIGN_OFFSET( ibuf, 16 ) ? buf : ibuf);
+                ip = (ALIGN_OFFSET( ibuf, 16 ) ? buf : (uint_8t *)ibuf);
                 op = (ALIGN_OFFSET( obuf, 16 ) ? buf : obuf);
 
                 if(ip != ibuf)
@@ -293,7 +293,7 @@ AES_RETURN aes_cbc_encrypt(const unsigned char *ibuf, unsigned char *obuf,
             {
                 int m = (nb > BFR_BLOCKS ? BFR_BLOCKS : nb);
 
-                ip = (ALIGN_OFFSET( ibuf, 16 ) ? buf : ibuf);
+                ip = (ALIGN_OFFSET( ibuf, 16 ) ? buf : (uint_8t *)ibuf);
                 op = (ALIGN_OFFSET( obuf, 16 ) ? buf : obuf);
 
                 if(ip != ibuf)
@@ -391,7 +391,7 @@ AES_RETURN aes_cbc_decrypt(const unsigned char *ibuf, unsigned char *obuf,
             {
                 int m = (nb > BFR_BLOCKS ? BFR_BLOCKS : nb);
 
-                ip = (ALIGN_OFFSET( ibuf, 16 ) ? buf : ibuf);
+                ip = (ALIGN_OFFSET( ibuf, 16 ) ? buf : (uint_8t *)ibuf);
                 op = (ALIGN_OFFSET( obuf, 16 ) ? buf : obuf);
 
                 if(ip != ibuf)
@@ -503,7 +503,7 @@ AES_RETURN aes_cfb_encrypt(const unsigned char *ibuf, unsigned char *obuf,
                 {
                     m = (nb > BFR_BLOCKS ? BFR_BLOCKS : nb), nb -= m;
 
-                    ip = (ALIGN_OFFSET( ibuf, 16 ) ? buf : ibuf);
+                    ip = (ALIGN_OFFSET( ibuf, 16 ) ? buf : (uint_8t *)ibuf);
                     op = (ALIGN_OFFSET( obuf, 16 ) ? buf : obuf);
 
                     if(ip != ibuf)
@@ -631,7 +631,7 @@ AES_RETURN aes_cfb_decrypt(const unsigned char *ibuf, unsigned char *obuf,
                 {
                     m = (nb > BFR_BLOCKS ? BFR_BLOCKS : nb), nb -= m;
 
-                    ip = (ALIGN_OFFSET( ibuf, 16 ) ? buf : ibuf);
+                    ip = (ALIGN_OFFSET( ibuf, 16 ) ? buf : (uint_8t *)ibuf);
                     op = (ALIGN_OFFSET( obuf, 16 ) ? buf : obuf);
 
                     if(ip != ibuf)  /* input buffer is not aligned */
@@ -769,7 +769,7 @@ AES_RETURN aes_ofb_crypt(const unsigned char *ibuf, unsigned char *obuf,
                 {
                     m = (nb > BFR_BLOCKS ? BFR_BLOCKS : nb), nb -= m;
 
-                    ip = (ALIGN_OFFSET( ibuf, 16 ) ? buf : ibuf);
+                    ip = (ALIGN_OFFSET( ibuf, 16 ) ? buf : (uint_8t *)ibuf);
                     op = (ALIGN_OFFSET( obuf, 16 ) ? buf : obuf);
 
                     if(ip != ibuf)
