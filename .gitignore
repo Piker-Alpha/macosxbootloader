@@ -8,3 +8,6 @@
 *.map
 *.log
 *backup*
+*.s
+*.i
+*.ii
