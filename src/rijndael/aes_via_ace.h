@@ -489,7 +489,7 @@ INLINE int via_ace_test(void)
 }
 
 #define VIA_ACE_AVAILABLE   (((via_flags & NEH_ACE_FLAGS) == NEH_ACE_FLAGS)         \
-    || (via_flags & NEH_CPU_READ) && (via_flags & NEH_CPU_IS_VIA) || via_ace_test())
+    || ((via_flags & NEH_CPU_READ) && (via_flags & NEH_CPU_IS_VIA)) || via_ace_test())
 
 INLINE int via_rng_test(void)
 {
@@ -497,7 +497,7 @@ INLINE int via_rng_test(void)
 }
 
 #define VIA_RNG_AVAILABLE   (((via_flags & NEH_RNG_FLAGS) == NEH_RNG_FLAGS)         \
-    || (via_flags & NEH_CPU_READ) && (via_flags & NEH_CPU_IS_VIA) || via_rng_test())
+    || ((via_flags & NEH_CPU_READ) && (via_flags & NEH_CPU_IS_VIA)) || via_rng_test())
 
 INLINE int read_via_rng(void *buf, int count)
 {   int nbr, max_reads, lcnt = count;
