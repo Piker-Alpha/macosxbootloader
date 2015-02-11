@@ -7,3 +7,4 @@
 *.efi
 *.map
 *.log
+*backup*
