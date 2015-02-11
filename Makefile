@@ -69,7 +69,7 @@ ifdef DEBUG
 # Include debug info.
 #
 BUILD_TARGET_TYPE  = Debug
-DEBUGFLAGS = -gfull -fstandalone-debug -O0 -DDEBUG_LDRP_CALL_CSPRINTF
+DEBUGFLAGS = -gfull -fstandalone-debug -O0 -D_FORTIFY_SOURCE=0 -DDEBUG_LDRP_CALL_CSPRINTF
 else
 #
 # Debug disabled. Do not include debug info.
