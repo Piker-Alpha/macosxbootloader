@@ -56,8 +56,7 @@ boot.sys: \
 
 	@echo "------------------------------------------------------";
 	@echo "\t[ld]\t$@";
-	@$(LD) $(LDFLAGS) -o	\
-	$@			\
+	@$(LD) $(LDFLAGS) -o $@	\
 	Base64.o		\
 	BootArgs.o		\
 	BootDebugger.o		\
@@ -103,9 +102,9 @@ boot.sys: \
 
 	@echo "\t[mtoc]\t$@ $(BINARY_DIR)/boot.efi";
 	@$(MTOC) $@ $(PROJECT_DIR)/$(BINARY_DIR)/boot.efi
-	@rm -f $@
 	@echo "\t[rm]\t$@"
+	@rm -f $@
 	@echo "======================================================";
-	@echo "Done";
+	@echo "Done.";
 clean:
 	@rm -f *.o *.map *.sys
