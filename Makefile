@@ -74,7 +74,7 @@ else
 #
 # Debug disabled. Do not include debug info.
 #
-BUILD_TARGET_YPE = Release
+BUILD_TARGET_TYPE = Release
 DEBUGFLAGS = -g0 -fno-standalone-debug -OZ
 endif
 
@@ -90,7 +90,7 @@ CFLAGS = "$(ARCHFLAGS) $(DEBUGFLAGS) $(WFLAGS) -fborland-extensions $(ARCHCFLAGS
 
 CXXFLAGS = "$(ARCHFLAGS) $(DEBUGFLAGS) $(WFLAGS) -fborland-extensions $(ARCHCFLAGS) -fpie -DEFI_SPECIFICATION_VERSION=0x0001000a -DTIANO_RELEASE_VERSION=1 $(INCLUDES) -D_MSC_EXTENSIONS=1 -fno-exceptions -std=gnu++11"
 
-LDFLAGS = "$(ARCHFLAGS) -preload -segalign 0x20 $(ARCHLDFLAGS) -pie -all_load -dead_strip -image_base 0x240 -compatibility_version 1.0 -current_version 2.1 -flat_namespace -print_statistics -map boot.map -sectalign __TEXT __text 0x20  -sectalign __TEXT __eh_frame  0x20 -sectalign __TEXT __ustring 0x20 -sectalign __TEXT __const 0x20 -sectalign __TEXT __ustring 0x20 -sectalign __DATA __data 0x20  -sectalign __DATA __bss 0x20  -sectalign __DATA __common 0x20 -final_output boot.sys"
+LDFLAGS = "$(ARCHFLAGS) -preload -segalign 0x20 $(ARCHLDFLAGS) -pie -all_load -dead_strip -image_base 0x240 -compatibility_version 1.0 -current_version 2.1 -flat_namespace -print_statistics -map boot.map -sectalign __TEXT __text 0x20 -sectalign __TEXT __eh_frame  0x20 -sectalign __TEXT __ustring 0x20 -sectalign __TEXT __const 0x20 -sectalign __TEXT __ustring 0x20 -sectalign __DATA __data 0x20 -sectalign __DATA __bss 0x20 -sectalign __DATA __common 0x20 -final_output boot.sys"
 
 
 all: rijndael $(ARCHDIR) boot
