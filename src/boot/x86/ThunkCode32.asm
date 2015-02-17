@@ -12,12 +12,20 @@
 
 %ifdef __APPLE__
 section .data
+
+%ifdef __DEBUG__
+%define _ThunkCode64.dat				"../../../temp/x86/Debug/boot/ThunkCode64.dat"
+%else
+%define _ThunkCode64.dat				"../../../temp/x86/Release/boot/ThunkCode64.dat"
+%endif
+
 %else
 section .rdata
+%define _ThunkCode64.dat				"ThunkCode64.dat"
 %endif
 
 									align				16
-									incbin				"ThunkCode64.dat"
+									incbin				_ThunkCode64.dat
 
 %ifdef __APPLE__ __ARCH32__
 PUBLIC_SYMBOL _ArchThunk64BufferStart
