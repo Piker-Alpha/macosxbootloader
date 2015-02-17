@@ -16,6 +16,13 @@
 
   #define CHAR16_STRING(S)													static_cast<CHAR16*>((VOID*)(S))
   #define CHAR8_STRING(S)													static_cast<CHAR8*>((VOID*)(S))
+
+  #ifndef _INT8_T
+    //
+    // Let _int8_t.h know that we don't want it to define int8_t for us.
+    //
+    #define _INT8_T  1
+  #endif
 #else
   #define CHAR16_STRING(S)													static_cast<CHAR16*>(static_cast<VOID*>(S))
   #define CHAR8_STRING(S)													static_cast<CHAR8*>(static_cast<VOID*>(S))
