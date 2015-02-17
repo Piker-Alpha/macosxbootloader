@@ -1192,7 +1192,7 @@ STATIC BOOLEAN BdUsbpReinitializeDevice(DEBUG_USB_GLOBAL_DATA* globalData)
 			//
 			// read PORTSC
 			//
-			temp															= ARCH_READ_REGISTER_UINT32(Add2Ptr(globalData->OperationalRegister, 0x40 + globalData->DebugPortNumber * 4, UINT32*));
+			ARCH_READ_REGISTER_UINT32(Add2Ptr(globalData->OperationalRegister, 0x40 + globalData->DebugPortNumber * 4, UINT32*));
 
 			//
 			// read status
