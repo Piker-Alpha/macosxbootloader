@@ -4,15 +4,15 @@
 
 %.o: %.asm
 	@echo "\t[nasm]\t$<";
-	@$(NASM) $(NASMFLAGS) -o $@ $<
+	@$(NASM) $(NASMFLAGS) -o $(TMP_BOOT_DIR)/$@ $<
 
 %.o: %.cpp
 	@echo "\t[$(CXX)]\t$<";
-	@$(CXX) $(CXXFLAGS) -c $< -o $@
+	@$(CXX) $(CXXFLAGS) -c $< -o $(TMP_BOOT_DIR)/$@
 
 %.dat: %.asm
 	@echo "\t[nasm]\t$<";
-	@$(NASM) -f bin -o $@ $<
+	@$(NASM) -f bin -o $(TMP_BOOT_DIR)/$@ $<
 
 all: libx86.a
 
@@ -21,21 +21,21 @@ libx86.a: \
 	ThunkCode32.o		\
 	ArchUtilsX86.o		\
 	CompilerX86.o		\
-	Thunk64.o		\
+	Thunk64.o			\
 	DebuggerUtilsX86.o
 
-	@echo "\t[ar]\t$@";
-	@$(AR) cru $@		\
-	ThunkCode32.o		\
-	ArchUtilsX86.o		\
-	CompilerX86.o		\
-	Thunk64.o		\
-	DebuggerUtilsX86.o
+	@echo "\t[ar]\t$@"
+	@$(AR) cru $(TMP_BOOT_DIR)/$@		\
+	$(TMP_BOOT_DIR)/ThunkCode32.o		\
+	$(TMP_BOOT_DIR)/ArchUtilsX86.o		\
+	$(TMP_BOOT_DIR)/CompilerX86.o		\
+	$(TMP_BOOT_DIR)/Thunk64.o			\
+	$(TMP_BOOT_DIR)/DebuggerUtilsX86.o
 
 	@echo "\t[ranlib]\t$@";
-	@$(RANLIB) $@
+	@$(RANLIB) $(TMP_BOOT_DIR)/$@
 	@echo "------------------------------------------------------";
 
 clean:
-	rm -f *.dat *.o *.a
+	rm -f *.o *.a *.dat *.s *.ii
 
