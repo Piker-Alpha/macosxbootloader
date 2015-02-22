@@ -77,13 +77,10 @@ Abstract:
 #endif
 
 
-
-
-
 //
-// Make sure we are useing the correct packing rules per EFI specification
+// Make sure we are using the correct packing rules per EFI specification
 //
-#pragma pack(1)
+#pragma pack(8)
 
 #if _MSC_EXTENSIONS
 
