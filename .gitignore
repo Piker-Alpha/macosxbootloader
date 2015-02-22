@@ -11,3 +11,5 @@
 *.s
 *.i
 *.ii
+bin
+temp
