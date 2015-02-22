@@ -1,5 +1,5 @@
 #
-#
+# Main project makefile
 #
 
 export PROJECT_DIR = $(PWD)
@@ -52,7 +52,7 @@ ARCHFLAGS = -arch i386
 ARCHLDFLAGS = -u __Z7EfiMainPvP17_EFI_SYSTEM_TABLE -e __Z7EfiMainPvP17_EFI_SYSTEM_TABLE -read_only_relocs suppress
 ARCHCFLAGS = -target i386-pc-darwin-macho -funsigned-char -fno-ms-extensions -fno-stack-protector -fno-builtin -fshort-wchar -mno-implicit-float -mms-bitfields -ftrap-function=undefined_behavior_has_been_optimized_away_by_clang -Duint_8t=unsigned\ char -Duint_16t=unsigned\ short -Duint_32t=unsigned\ int -Duint_64t=unsigned\ long\ long -DBRG_UI8=1 -DBRG_UI16=1 -DBRG_UI32=1 -DBRG_UI64=1 -D__i386__=1
 
-NASMFLAGS = -f macho -D__APPLE__ -D__ARCH32__
+NASMFLAGS = -f macho32 -D__APPLE__ -D__ARCH32__
 NASMCOMPFLAGS =
 #
 # End of i386 target setup.
