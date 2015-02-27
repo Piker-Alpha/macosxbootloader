@@ -94,10 +94,12 @@ boot.sys: \
 
 	@echo "------------------------------------------------------";
 
-	@echo "\t[strip]\t$@"
+ifeq ("$(DEBUG)", "0")
+	@echo "\t[strip]\t$@";
 	@$(STRIP) $(TMP_BOOT_DIR)/$@
+endif
 
-	@echo "\t[mtoc]\t$@ $(BINARY_DIR)/boot.efi"
+	@echo "\t[mtoc]\ttemp/$(ARCHDIR)/$(BUILD_TARGET_TYPE)/$@ $(BINARY_DIR)/boot.efi"
 	@$(MTOC) $(TMP_BOOT_DIR)/$@ $(PROJECT_DIR)/$(BINARY_DIR)/boot.efi
 
 	@echo "======================================================";
