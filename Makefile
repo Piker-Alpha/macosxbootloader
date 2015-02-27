@@ -5,8 +5,8 @@
 export PROJECT_DIR = $(PWD)
 
 AR = ar
-CC = clang
-CXX = clang
+CC = $(PROJECT_DIR)/tools/clang -v
+CXX = $(PROJECT_DIR)/tools/clang -v
 LD = ld
 MTOC = $(PROJECT_DIR)/tools/mtoc -subsystem UEFI_APPLICATION -align 0x20
 NASM = $(PROJECT_DIR)/tools/nasm
@@ -33,7 +33,7 @@ ifeq ("$(ARCH)", "x86_64")
 #
 # Yes.
 #
-ARCHDIR = x64
+export ARCHDIR = x64
 ARCHFLAGS = -arch x86_64
 ARCHLDFLAGS = -u ?EfiMain@@YA_KPEAXPEAU_EFI_SYSTEM_TABLE@@@Z -e ?EfiMain@@YA_KPEAXPEAU_EFI_SYSTEM_TABLE@@@Z
 ARCHCFLAGS = -target x86_64-pc-win32-macho -funsigned-char -fno-ms-extensions -fno-stack-protector -fno-builtin -fshort-wchar -mno-implicit-float -msoft-float -mms-bitfields -ftrap-function=undefined_behavior_has_been_optimized_away_by_clang -D__x86_64__=1
@@ -47,12 +47,12 @@ else
 #
 # No. Compile a i386 only version of boot.efi
 #
-ARCHDIR = x86
+export ARCHDIR = x86
 ARCHFLAGS = -arch i386
-ARCHLDFLAGS = -u __Z7EfiMainPvP17_EFI_SYSTEM_TABLE -e __Z7EfiMainPvP17_EFI_SYSTEM_TABLE -read_only_relocs suppress
-ARCHCFLAGS = -target i386-pc-darwin-macho -funsigned-char -fno-ms-extensions -fno-stack-protector -fno-builtin -fshort-wchar -mno-implicit-float -mms-bitfields -ftrap-function=undefined_behavior_has_been_optimized_away_by_clang -Duint_8t=unsigned\ char -Duint_16t=unsigned\ short -Duint_32t=unsigned\ int -Duint_64t=unsigned\ long\ long -DBRG_UI8=1 -DBRG_UI16=1 -DBRG_UI32=1 -DBRG_UI64=1 -D__i386__=1
+ARCHLDFLAGS = -u ?EfiMain@@YAIPAXPAU_EFI_SYSTEM_TABLE@@@Z -e ?EfiMain@@YAIPAXPAU_EFI_SYSTEM_TABLE@@@Z -read_only_relocs suppress
+ARCHCFLAGS = -target i386-pc-win32-macho -funsigned-char -fno-ms-extensions -fno-stack-protector -fno-builtin -fshort-wchar -mno-implicit-float -mms-bitfields -ftrap-function=undefined_behavior_has_been_optimized_away_by_clang -Duint_8t=unsigned\ char -Duint_16t=unsigned\ short -Duint_32t=unsigned\ int -Duint_64t=unsigned\ long\ long -DBRG_UI8=1 -DBRG_UI16=1 -DBRG_UI32=1 -DBRG_UI64=1 -D__i386__=1 -D__APPLE__
 
-NASMFLAGS = -f macho32 -D__APPLE__ -D__ARCH32__
+NASMFLAGS = -f macho32 -D__APPLE__
 NASMCOMPFLAGS =
 #
 # End of i386 target setup.
@@ -62,7 +62,7 @@ endif
 #
 # Set to 0 by default. Use 1 to include debug info.
 #
-DEBUG = 0
+export DEBUG = 1
 
 ifeq ("$(DEBUG)", "1")
 #
@@ -92,11 +92,11 @@ INCLUDES = -I /usr/include -I $(PROJECT_DIR)/sdk/include -I $(PROJECT_DIR)/sdk/i
 
 WFLAGS = -Wall -Werror -Wno-unknown-pragmas
 
-CFLAGS = "$(ARCHFLAGS) $(DEBUGFLAGS) $(WFLAGS) $(ARCHCFLAGS) -fapple-pragma-pack -fpie -DEFI_SPECIFICATION_VERSION=0x0001000a -DTIANO_RELEASE_VERSION=1 -nostdinc $(INCLUDES) -fno-exceptions -std=gnu11 "
+CFLAGS = "$(ARCHFLAGS) $(DEBUGFLAGS) $(WFLAGS) $(ARCHCFLAGS) -fapple-pragma-pack -fpie -DEFI_SPECIFICATION_VERSION=0x0001000a -DTIANO_RELEASE_VERSION=1 -nostdinc $(INCLUDES) -fno-exceptions -std=gnu11"
 
 CXXFLAGS = "$(ARCHFLAGS) $(DEBUGFLAGS) $(WFLAGS) $(ARCHCFLAGS) -fapple-pragma-pack -fpie -DEFI_SPECIFICATION_VERSION=0x0001000a -DTIANO_RELEASE_VERSION=1 -nostdinc $(INCLUDES) -fno-exceptions -std=gnu++11"
 
-LDFLAGS = "$(ARCHFLAGS) -preload -segalign 0x20 $(ARCHLDFLAGS) -pie -all_load -dead_strip -image_base 0x240 -compatibility_version 1.0 -current_version 2.1 -flat_namespace -print_statistics -map $(PROJECT_DIR)/bin/$(ARCHDIR)/$(BUILD_TARGET_TYPE)/boot.map -sectalign __TEXT __text 0x20 -sectalign __TEXT __eh_frame  0x20 -sectalign __TEXT __ustring 0x20 -sectalign __TEXT __const 0x20 -sectalign __TEXT __ustring 0x20 -sectalign __DATA __data 0x20 -sectalign __DATA __bss 0x20 -sectalign __DATA __common 0x20 -final_output $(TEMP_DIR)/boot/boot.sys"
+LDFLAGS = "$(ARCHFLAGS) -preload -segalign 0x20 $(ARCHLDFLAGS) -pie -all_load -dead_strip -image_base 0x400 -compatibility_version 1.0 -current_version 2.1 -flat_namespace -print_statistics -map $(PROJECT_DIR)/bin/$(ARCHDIR)/$(BUILD_TARGET_TYPE)/boot.map -sectalign __TEXT __text 0x20 -sectalign __TEXT __eh_frame  0x20 -sectalign __TEXT __ustring 0x20 -sectalign __TEXT __const 0x20 -sectalign __TEXT __ustring 0x20 -sectalign __DATA __data 0x20 -sectalign __DATA __bss 0x20 -sectalign __DATA __common 0x20 -final_output $(TEMP_DIR)/boot/boot.sys"
 
 
 all: clean dirs rijndael $(ARCHDIR) boot
