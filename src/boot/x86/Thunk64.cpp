@@ -7,6 +7,9 @@
 
 #include "../StdAfx.h"
 
+extern UINT8* ArchThunk64BufferStart;
+extern UINT8* ArchThunk64BufferEnd;
+
 //
 // 64 bits configuration table
 //
@@ -207,8 +210,6 @@ EFI_STATUS ArchInitialize1()
 	//
 	// allocate thunk code pages
 	//
-	extern UINT8* ArchThunk64BufferStart;
-	extern UINT8* ArchThunk64BufferEnd;
 	UINTN thunkCodeSize														= ArchConvertPointerToAddress(&ArchThunk64BufferEnd) - ArchConvertPointerToAddress(&ArchThunk64BufferStart);
 	UINT64 physicalAddress													= 4 * 1024 * 1024 * 1024ULL - 1;
 	ArchpThunkCodeStart														= MmAllocatePages(AllocateMaxAddress, EfiRuntimeServicesCode, EFI_SIZE_TO_PAGES(thunkCodeSize), &physicalAddress);
