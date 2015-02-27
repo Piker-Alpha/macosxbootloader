@@ -14,23 +14,18 @@
 section .data
 
 %ifdef __DEBUG__
-%define _ThunkCode64.dat				"../../../temp/x86/Debug/boot/ThunkCode64.dat"
+%define									_ThunkCode64.dat	"../../../temp/x86/Debug/boot/ThunkCode64.dat"
 %else
-%define _ThunkCode64.dat				"../../../temp/x86/Release/boot/ThunkCode64.dat"
+%define									_ThunkCode64.dat	"../../../temp/x86/Release/boot/ThunkCode64.dat"
 %endif
 
 %else
 section .rdata
-%define _ThunkCode64.dat				"ThunkCode64.dat"
+%define									_ThunkCode64.dat	"ThunkCode64.dat"
 %endif
 
-									align				16
-									incbin				_ThunkCode64.dat
+										align 16
 
-%ifdef __APPLE__ __ARCH32__
-PUBLIC_SYMBOL _ArchThunk64BufferStart
-PUBLIC_SYMBOL _ArchThunk64BufferEnd
-%else
 PUBLIC_SYMBOL ?ArchThunk64BufferStart@@3PAEA
+										incbin _ThunkCode64.dat
 PUBLIC_SYMBOL ?ArchThunk64BufferEnd@@3PAEA
-%endif

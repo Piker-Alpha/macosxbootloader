@@ -17,15 +17,17 @@ UINT64 BdPcrPhysicalAddress													= 0;
 //
 VOID __declspec(naked) BOOTAPI DbgBreakPoint()
 {
-#ifdef _MSC_VER
 	__asm
+#ifdef _MSC_VER
 	{
 		int		3
 		retn
 	}
 #else
-    __asm("int $3\n"
-          "ret\n");
+	(
+		"int $3\n"
+		"ret\n"
+	);
 #endif
 }
 
@@ -34,8 +36,8 @@ VOID __declspec(naked) BOOTAPI DbgBreakPoint()
 //
 VOID __declspec(naked) BOOTAPI DbgService(UINTN serviceType, UINTN info1, UINTN info2, UINTN info3, UINTN info4)
 {
-#ifdef _MSC_VER
 	__asm
+#ifdef _MSC_VER
 	{
 		push		ebp
 		mov			ebp, esp
@@ -55,21 +57,23 @@ VOID __declspec(naked) BOOTAPI DbgService(UINTN serviceType, UINTN info1, UINTN 
 		retn
 	}
 #else
-    __asm("push %%ecx\n"
-          "push %%ebx\n"
-          "push %%edi\n"
-          "mov %0, %%eax\n"
-          "mov %1, %%ecx\n"
-          "mov %2, %%edx\n"
-          "mov %3, %%ebx\n"
-          "mov %4, %%edi\n"
-          "int $0x2d\n"
-          "int $3\n"
-          "pop %%edi\n"
-          "pop %%ebx\n"
-          "leave\n"
-          "ret\n"
-          :: "m" (serviceType), "m" (info1), "m" (info2), "m" (info3), "m" (info4));
+	(
+		"push		%%ecx\n"
+		"push		%%ebx\n"
+		"push		%%edi\n"
+		"mov		%0, %%eax\n"
+		"mov		%1, %%ecx\n"
+		"mov		%2, %%edx\n"
+		"mov		%3, %%ebx\n"
+		"mov		%4, %%edi\n"
+		"int		$0x2d\n"
+		"int		$3\n"
+		"pop		%%edi\n"
+		"pop		%%ebx\n"
+		"leave\n"
+		"ret\n"
+		:: "m" (serviceType), "m" (info1), "m" (info2), "m" (info3), "m" (info4)
+	);
 #endif
 }
 
@@ -78,8 +82,8 @@ VOID __declspec(naked) BOOTAPI DbgService(UINTN serviceType, UINTN info1, UINTN 
 //
 VOID __declspec(naked) BOOTAPI DbgService(VOID* info1, VOID* info2, UINTN serviceType)
 {
-#ifdef _MSC_VER
 	__asm
+#ifdef _MSC_VER
 	{
 		push		ebp
 		mov			ebp, esp
@@ -92,24 +96,26 @@ VOID __declspec(naked) BOOTAPI DbgService(VOID* info1, VOID* info2, UINTN servic
 		retn
 	}
 #else
-    __asm("mov %0, %%eax\n"
-          "mov %1, %%ecx\n"
-          "mov %2, %%edx\n"
-          "int $0x2d\n"
-          "int $3\n"
-          "leave\n"
-          "ret\n"
-          :: "m" (serviceType), "m" (info1), "m" (info2));
+	(
+		"mov	%0, %%eax\n"
+		"mov	%1, %%ecx\n"
+		"mov	%2, %%edx\n"
+		"int	$0x2d\n"
+		"int	$3\n"
+		"leave\n"
+		"ret\n"
+		:: "m" (serviceType), "m" (info1), "m" (info2)
+	);
 #endif
 }
 
 //
 // return from exception handler
 //
-VOID __declspec(naked) BdpTrapExit()
+extern "C" VOID __declspec(naked) BdpTrapExit()
 {
-#ifdef _MSC_VER
 	__asm
+#ifdef _MSC_VER
 	{
 		lea			esp, [ebp+0x30]
 		pop			gs
@@ -128,31 +134,32 @@ VOID __declspec(naked) BdpTrapExit()
 		iretd
 	}
 #else
-    __asm("lea 30(%ebp), %esp\n"
-          "pop %gs\n"
-          "pop %es\n"
-          "pop %ds\n"
-          "pop %edx\n"
-          "pop %ecx\n"
-          "pop %eax\n"
-          "add $8, %esp\n"
-          "pop %fs\n"
-          "pop %edi\n"
-          "pop %esi\n"
-          "pop %ebx\n"
-          "pop %ebp\n"
-          "add $4, %ebp\n"
-          "iret\n");
+	(
+		"lea		30(%ebp), %esp\n"
+		"pop		%gs\n"
+		"pop		%es\n"
+		"pop		%ds\n"
+		"pop		%edx\n"
+		"pop		%ecx\n"
+		"pop		%eax\n"
+		"add		$8, %esp\n"
+		"pop		%fs\n"
+		"pop		%edi\n"
+		"pop		%esi\n"
+		"pop		%ebx\n"
+		"pop		%ebp\n"
+		"add		$4, %ebp\n"
+		"iret\n");
 #endif
 }
 
 //
 // common dispatch
 //
-VOID __declspec(naked) BdpTrapDispatch()
+extern "C" VOID __declspec(naked) BdpTrapDispatch()
 {
-#ifdef _MSC_VER
 	__asm
+#ifdef _MSC_VER
 	{
 		sub			esp, size EXCEPTION_RECORD								// sizeof(EXCEPTION_RECORD) = 0x50
 		mov			[esp + EXCEPTION_RECORD.ExceptionCode], eax				// ExceptionCode
@@ -189,39 +196,41 @@ VOID __declspec(naked) BdpTrapDispatch()
 		retn
 	}
 #else
-    __asm("sub    $0x50,%esp\n"
-          "mov    %eax,(%esp)\n"
-          "xor    %eax,%eax\n"
-          "mov    %eax,0x4(%esp)\n"
-          "mov    %eax,0x8(%esp)\n"
-          "mov    %ebx,0xc(%esp)\n"
-          "mov    %ecx,0x10(%esp)\n"
-          "mov    %edx,0x14(%esp)\n"
-          "mov    %edi,0x18(%esp)\n"
-          "mov    %esi,0x1c(%esp)\n"
-          "mov    %db0,%eax\n"
-          "mov    %eax,0x18(%ebp)\n"
-          "mov    %db1,%eax\n"
-          "mov    %eax,0x1c(%ebp)\n"
-          "mov    %db2,%eax\n"
-          "mov    %eax,0x20(%ebp)\n"
-          "mov    %db3,%eax\n"
-          "mov    %eax,0x24(%ebp)\n"
-          "mov    %db6,%eax\n"
-          "mov    %eax,0x28(%ebp)\n"
-          "mov    %db7,%eax\n"
-          "mov    %eax,0x2c(%ebp)\n"
-          "mov    %ss,%ax\n"
-          "mov    %eax,0x10(%ebp)\n"
-          "mov    %ebp,0x14(%ebp)\n"
-          "addl   $0x74,0x14(%ebp)\n"
-          "mov    %esp,%ecx\n"
-          "push   %ebp\n"
-          "push   $0x0\n"
-          "push   %ecx\n"
-          "call   *0x0\n"
-          "add    $0x5c,%esp\n"
-          "ret\n");
+	(
+		"sub		$0x50,%esp\n"
+		"mov		%eax,(%esp)\n"
+		"xor		%eax,%eax\n"
+		"mov		%eax,0x4(%esp)\n"
+		"mov		%eax,0x8(%esp)\n"
+		"mov		%ebx,0xc(%esp)\n"
+		"mov		%ecx,0x10(%esp)\n"
+		"mov		%edx,0x14(%esp)\n"
+		"mov		%edi,0x18(%esp)\n"
+		"mov		%esi,0x1c(%esp)\n"
+		"mov		%db0,%eax\n"
+		"mov		%eax,0x18(%ebp)\n"
+		"mov		%db1,%eax\n"
+		"mov		%eax,0x1c(%ebp)\n"
+		"mov		%db2,%eax\n"
+		"mov		%eax,0x20(%ebp)\n"
+		"mov		%db3,%eax\n"
+		"mov		%eax,0x24(%ebp)\n"
+		"mov		%db6,%eax\n"
+		"mov		%eax,0x28(%ebp)\n"
+		"mov		%db7,%eax\n"
+		"mov		%eax,0x2c(%ebp)\n"
+		"mov		%ss,%ax\n"
+		"mov		%eax,0x10(%ebp)\n"
+		"mov		%ebp,0x14(%ebp)\n"
+		"addl		$0x74,0x14(%ebp)\n"
+		"mov		%esp,%ecx\n"
+		"push		%ebp\n"
+		"push		$0x0\n"
+		"push		%ecx\n"
+		"call		*0x0\n"
+		"add		$0x5c,%esp\n"
+		"ret\n"
+	);
 #endif
 }
 
@@ -230,8 +239,8 @@ VOID __declspec(naked) BdpTrapDispatch()
 //
 VOID __declspec(naked) BdTrap01()
 {
-#ifdef _MSC_VER
 	__asm
+#ifdef _MSC_VER
 	{
 		push		0														// dummy error code
 		push		ebp
@@ -258,55 +267,36 @@ VOID __declspec(naked) BdTrap01()
 		jmp			BdpTrapExit
 	}
 #else
-#ifdef GNU
-    __asm("push   $0x0\n"
-          "push   %ebp\n"
-          "push   %ebx\n"
-          "push   %esi\n"
-          "push   %edi\n"
-          "push   %fs\n"
-          "push   $0xffffffff\n"
-          "push   $0xffffffff\n"
-          "push   %eax\n"
-          "push   %ecx\n"
-          "push   %edx\n"
-          "push   %ds\n"
-          "push   %es\n"
-          "push   %gs\n"
-          "sub    $0x30,%esp\n"
-          "mov    %esp,%ebp\n"
-          "cld\n"
-          "andl   $0xfffffeff,0x70(%ebp)\n"
-          "mov    $0x80000004,%eax\n"
-          "mov    0x68(%ebp),%ebx\n"
-          "xor    %ecx,%ecx\n"
-          "call   _Z15BdpTrapDispatchv\n"
-          "jmp    _Z11BdpTrapExitv\n");
-#else
-    __asm("push   $0x0\n"
-          "push   %ebp\n"
-          "push   %ebx\n"
-          "push   %esi\n"
-          "push   %edi\n"
-          "push   %fs\n"
-          "push   $0xffffffff\n"
-          "push   $0xffffffff\n"
-          "push   %eax\n"
-          "push   %ecx\n"
-          "push   %edx\n"
-          "push   %ds\n"
-          "push   %es\n"
-          "push   %gs\n"
-          "sub    $0x30,%esp\n"
-          "mov    %esp,%ebp\n"
-          "cld\n"
-          "andl   $0xfffffeff,0x70(%ebp)\n"
-          "mov    $0x80000004,%eax\n"
-          "mov    0x68(%ebp),%ebx\n"
-          "xor    %ecx,%ecx\n"
-          "call   __Z15BdpTrapDispatchv\n"
-          "jmp    __Z11BdpTrapExitv\n");
-#endif
+	(
+		"push		$0x0\n"
+		"push		%ebp\n"
+		"push		%ebx\n"
+		"push		%esi\n"
+		"push		%edi\n"
+		"push		%fs\n"
+		"push		$0xffffffff\n"
+		"push		$0xffffffff\n"
+		"push		%eax\n"
+		"push		%ecx\n"
+		"push		%edx\n"
+		"push		%ds\n"
+		"push		%es\n"
+		"push		%gs\n"
+		"sub		$0x30,%esp\n"
+		"mov		%esp,%ebp\n"
+		"cld\n"
+		"andl		$0xfffffeff,0x70(%ebp)\n"
+		"mov		$0x80000004,%eax\n"
+		"mov		0x68(%ebp),%ebx\n"
+		"xor		%ecx,%ecx\n"
+	#ifdef GNU
+		"call		_Z15BdpTrapDispatchv\n"
+		"jmp		_Z11BdpTrapExitv\n"
+	#else
+		"call		_BdpTrapDispatch\n"
+		"jmp		_BdpTrapExit\n"
+	#endif
+	);
 #endif
 }
 
@@ -315,8 +305,8 @@ VOID __declspec(naked) BdTrap01()
 //
 VOID __declspec(naked) BdTrap03()
 {
-#ifdef _MSC_VER
 	__asm
+#ifdef _MSC_VER
 	{
 		push		0
 		push		ebp
@@ -344,57 +334,37 @@ VOID __declspec(naked) BdTrap03()
 		jmp			BdpTrapExit
 	}
 #else
-#ifdef GNU
-    __asm("push   $0x0\n"
-          "push   %ebp\n"
-          "push   %ebx\n"
-          "push   %esi\n"
-          "push   %edi\n"
-          "push   %fs\n"
-          "push   $0xffffffff\n"
-          "push   $0xffffffff\n"
-          "push   %eax\n"
-          "push   %ecx\n"
-          "push   %edx\n"
-          "push   %ds\n"
-          "push   %es\n"
-          "push   %gs\n"
-          "sub    $0x30,%esp\n"
-          "mov    %esp,%ebp\n"
-          "cld\n"
-          "decl   0x68(%ebp)\n"
-          "mov    $0x80000003,%eax\n"
-          "mov    0x68(%ebp),%ebx\n"
-          "mov    $0x0,%ecx\n"
-          "xor    %edx,%edx\n"
-          "call   _Z15BdpTrapDispatchv\n"
-          "jmp    _Z11BdpTrapExitv\n");
-#else
-    __asm("push   $0x0\n"
-          "push   %ebp\n"
-          "push   %ebx\n"
-          "push   %esi\n"
-          "push   %edi\n"
-          "push   %fs\n"
-          "push   $0xffffffff\n"
-          "push   $0xffffffff\n"
-          "push   %eax\n"
-          "push   %ecx\n"
-          "push   %edx\n"
-          "push   %ds\n"
-          "push   %es\n"
-          "push   %gs\n"
-          "sub    $0x30,%esp\n"
-          "mov    %esp,%ebp\n"
-          "cld\n"
-          "decl   0x68(%ebp)\n"
-          "mov    $0x80000003,%eax\n"
-          "mov    0x68(%ebp),%ebx\n"
-          "mov    $0x0,%ecx\n"
-          "xor    %edx,%edx\n"
-          "call   __Z15BdpTrapDispatchv\n"
-          "jmp    __Z11BdpTrapExitv\n");
-#endif
+	(
+		"push		$0x0\n"
+		"push		%ebp\n"
+		"push		%ebx\n"
+		"push		%esi\n"
+		"push		%edi\n"
+		"push		%fs\n"
+		"push		$0xffffffff\n"
+		"push		$0xffffffff\n"
+		"push		%eax\n"
+		"push		%ecx\n"
+		"push		%edx\n"
+		"push		%ds\n"
+		"push		%es\n"
+		"push		%gs\n"
+		"sub		$0x30,%esp\n"
+		"mov		%esp,%ebp\n"
+		"cld\n"
+		"decl		0x68(%ebp)\n"
+		"mov		$0x80000003,%eax\n"
+		"mov		0x68(%ebp),%ebx\n"
+		"mov		$0x0,%ecx\n"
+		"xor		%edx,%edx\n"
+	#ifdef GNU
+		"call		_Z15BdpTrapDispatchv\n"
+		"jmp		_Z11BdpTrapExitv\n"
+	#else
+		"call		_BdpTrapDispatch\n"
+		"jmp		_BdpTrapExit\n"
+	#endif
+	);
 #endif
 }
 
@@ -403,8 +373,8 @@ VOID __declspec(naked) BdTrap03()
 //
 VOID __declspec(naked) BdTrap0d()
 {
-#ifdef _MSC_VER
 	__asm
+#ifdef _MSC_VER
 	{
 		push		ebp
 		push		ebx
@@ -432,59 +402,37 @@ loop_forever:
 		jmp			loop_forever
 	}
 #else
-#ifdef GNU
-    __asm("push   $0x0\n"
-          "push   %ebp\n"
-          "push   %ebx\n"
-          "push   %esi\n"
-          "push   %edi\n"
-          "push   %fs\n"
-          "push   $0xffffffff\n"
-          "push   $0xffffffff\n"
-          "push   %eax\n"
-          "push   %ecx\n"
-          "push   %edx\n"
-          "push   %ds\n"
-          "push   %es\n"
-          "push   %gs\n"
-          "sub    $0x30,%esp\n"
-          "mov    %esp,%ebp\n"
-          "cld\n"
-          "Lloop_forever0d:\n"
-          "mov    $0xc0000005,%eax\n"
-          "mov    0x68(%ebp),%ebx\n"
-          "mov    $0x1,%ecx\n"
-          "mov    0x64(%ebp),%edx\n"
-          "and    $0xffff,%edx\n"
-          "call   _Z15BdpTrapDispatchv\n"
-          "jmp    Lloop_forever0d\n");
-#else
-    __asm("push   $0x0\n"
-          "push   %ebp\n"
-          "push   %ebx\n"
-          "push   %esi\n"
-          "push   %edi\n"
-          "push   %fs\n"
-          "push   $0xffffffff\n"
-          "push   $0xffffffff\n"
-          "push   %eax\n"
-          "push   %ecx\n"
-          "push   %edx\n"
-          "push   %ds\n"
-          "push   %es\n"
-          "push   %gs\n"
-          "sub    $0x30,%esp\n"
-          "mov    %esp,%ebp\n"
-          "cld\n"
-          "Lloop_forever0d:\n"
-          "mov    $0xc0000005,%eax\n"
-          "mov    0x68(%ebp),%ebx\n"
-          "mov    $0x1,%ecx\n"
-          "mov    0x64(%ebp),%edx\n"
-          "and    $0xffff,%edx\n"
-          "call   __Z15BdpTrapDispatchv\n"
-          "jmp    Lloop_forever0d\n");
-#endif
+	(
+		"push		$0x0\n"
+		"push		%ebp\n"
+		"push		%ebx\n"
+		"push		%esi\n"
+		"push		%edi\n"
+		"push		%fs\n"
+		"push		$0xffffffff\n"
+		"push		$0xffffffff\n"
+		"push		%eax\n"
+		"push		%ecx\n"
+		"push		%edx\n"
+		"push		%ds\n"
+		"push		%es\n"
+		"push		%gs\n"
+		"sub		$0x30,%esp\n"
+		"mov		%esp,%ebp\n"
+		"cld\n"
+		"Lloop_forever0d:\n"
+		"mov		$0xc0000005,%eax\n"
+		"mov		0x68(%ebp),%ebx\n"
+		"mov		$0x1,%ecx\n"
+		"mov		0x64(%ebp),%edx\n"
+		"and		$0xffff,%edx\n"
+	#ifdef GNU
+		"call		_Z15BdpTrapDispatchv\n"
+	#else
+		"call		_BdpTrapDispatch\n"
+	#endif
+		"jmp		Lloop_forever0d\n"
+	);
 #endif
 }
 
@@ -493,8 +441,8 @@ loop_forever:
 //
 VOID __declspec(naked) BdTrap0e()
 {
-#ifdef _MSC_VER
 	__asm
+#ifdef _MSC_VER
 	{
 		push		ebp
 		push		ebx
@@ -524,63 +472,39 @@ loop_forever:
 		jmp			loop_forever
 	}
 #else
-#ifdef GNU
-    __asm("push   $0x0\n"
-          "push   %ebp\n"
-          "push   %ebx\n"
-          "push   %esi\n"
-          "push   %edi\n"
-          "push   %fs\n"
-          "push   $0xffffffff\n"
-          "push   $0xffffffff\n"
-          "push   %eax\n"
-          "push   %ecx\n"
-          "push   %edx\n"
-          "push   %ds\n"
-          "push   %es\n"
-          "push   %gs\n"
-          "sub    $0x30,%esp\n"
-          "mov    %esp,%ebp\n"
-          "cld\n"
-          "Lloop_forever0e:\n"
-          "mov    $0xc0000005,%eax\n"
-          "mov    0x68(%ebp),%ebx\n"
-          "mov    $0x3,%ecx\n"
-          "mov    0x64(%ebp),%edx\n"
-          "and    $0x2,%edx\n"
-          "mov    %cr2,%edi\n"
-          "xor    %esi,%esi\n"
-          "call   _Z15BdpTrapDispatchv\n"
-          "jmp    Lloop_forever0e\n");
-#else
-    __asm("push   $0x0\n"
-          "push   %ebp\n"
-          "push   %ebx\n"
-          "push   %esi\n"
-          "push   %edi\n"
-          "push   %fs\n"
-          "push   $0xffffffff\n"
-          "push   $0xffffffff\n"
-          "push   %eax\n"
-          "push   %ecx\n"
-          "push   %edx\n"
-          "push   %ds\n"
-          "push   %es\n"
-          "push   %gs\n"
-          "sub    $0x30,%esp\n"
-          "mov    %esp,%ebp\n"
-          "cld\n"
-          "Lloop_forever0e:\n"
-          "mov    $0xc0000005,%eax\n"
-          "mov    0x68(%ebp),%ebx\n"
-          "mov    $0x3,%ecx\n"
-          "mov    0x64(%ebp),%edx\n"
-          "and    $0x2,%edx\n"
-          "mov    %cr2,%edi\n"
-          "xor    %esi,%esi\n"
-          "call   __Z15BdpTrapDispatchv\n"
-          "jmp    Lloop_forever0e\n");
-#endif
+	(
+		"push		$0x0\n"
+		"push		%ebp\n"
+		"push		%ebx\n"
+		"push		%esi\n"
+		"push		%edi\n"
+		"push		%fs\n"
+		"push		$0xffffffff\n"
+		"push		$0xffffffff\n"
+		"push		%eax\n"
+		"push		%ecx\n"
+		"push		%edx\n"
+		"push		%ds\n"
+		"push		%es\n"
+		"push		%gs\n"
+		"sub		$0x30,%esp\n"
+		"mov		%esp,%ebp\n"
+		"cld\n"
+		"Lloop_forever0e:\n"
+		"mov		$0xc0000005,%eax\n"
+		"mov		0x68(%ebp),%ebx\n"
+		"mov		$0x3,%ecx\n"
+		"mov		0x64(%ebp),%edx\n"
+		"and		$0x2,%edx\n"
+		"mov		%cr2,%edi\n"
+		"xor		%esi,%esi\n"
+	#ifdef GNU
+		"call		_Z15BdpTrapDispatchv\n"
+	#else
+		"call		_BdpTrapDispatch\n"
+	#endif
+		"jmp		Lloop_forever0e\n"
+	);
 #endif
 }
 
@@ -589,8 +513,8 @@ loop_forever:
 //
 VOID __declspec(naked) BdTrap2d()
 {
-#ifdef _MSC_VER
 	__asm
+#ifdef _MSC_VER
 	{
 		push		0
 		push		ebp
@@ -620,61 +544,39 @@ VOID __declspec(naked) BdTrap2d()
 		jmp			BdpTrapExit
 	}
 #else
-#ifdef GNU
-    __asm("push   $0x0\n"
-          "push   %ebp\n"
-          "push   %ebx\n"
-          "push   %esi\n"
-          "push   %edi\n"
-          "push   %fs\n"
-          "push   $0xffffffff\n"
-          "push   $0xffffffff\n"
-          "push   %eax\n"
-          "push   %ecx\n"
-          "push   %edx\n"
-          "push   %ds\n"
-          "push   %es\n"
-          "push   %gs\n"
-          "sub    $0x30,%esp\n"
-          "mov    %esp,%ebp\n"
-          "cld\n"
-          "mov    $0x80000003,%eax\n"
-          "mov    0x68(%ebp),%ebx\n"
-          "mov    $0x3,%ecx\n"
-          "xor    %edx,%edx\n"
-          "mov    0x44(%ebp),%edx\n"
-          "mov    0x40(%ebp),%edi\n"
-          "mov    0x3c(%ebp),%esi\n"
-          "call   _Z15BdpTrapDispatchv\n"
-          "jmp    _Z11BdpTrapExitv\n");
-#else
-    __asm("push   $0x0\n"
-          "push   %ebp\n"
-          "push   %ebx\n"
-          "push   %esi\n"
-          "push   %edi\n"
-          "push   %fs\n"
-          "push   $0xffffffff\n"
-          "push   $0xffffffff\n"
-          "push   %eax\n"
-          "push   %ecx\n"
-          "push   %edx\n"
-          "push   %ds\n"
-          "push   %es\n"
-          "push   %gs\n"
-          "sub    $0x30,%esp\n"
-          "mov    %esp,%ebp\n"
-          "cld\n"
-          "mov    $0x80000003,%eax\n"
-          "mov    0x68(%ebp),%ebx\n"
-          "mov    $0x3,%ecx\n"
-          "xor    %edx,%edx\n"
-          "mov    0x44(%ebp),%edx\n"
-          "mov    0x40(%ebp),%edi\n"
-          "mov    0x3c(%ebp),%esi\n"
-          "call   __Z15BdpTrapDispatchv\n"
-          "jmp    __Z11BdpTrapExitv\n");
-#endif
+	(
+		"push		$0x0\n"
+		"push		%ebp\n"
+		"push		%ebx\n"
+		"push		%esi\n"
+		"push		%edi\n"
+		"push		%fs\n"
+		"push		$0xffffffff\n"
+		"push		$0xffffffff\n"
+		"push		%eax\n"
+		"push		%ecx\n"
+		"push		%edx\n"
+		"push		%ds\n"
+		"push		%es\n"
+		"push		%gs\n"
+		"sub		$0x30,%esp\n"
+		"mov		%esp,%ebp\n"
+		"cld\n"
+		"mov		$0x80000003,%eax\n"
+		"mov		0x68(%ebp),%ebx\n"
+		"mov		$0x3,%ecx\n"
+		"xor		%edx,%edx\n"
+		"mov		0x44(%ebp),%edx\n"
+		"mov		0x40(%ebp),%edi\n"
+		"mov		0x3c(%ebp),%esi\n"
+	#ifdef GNU
+		"call		_Z15BdpTrapDispatchv\n"
+		"jmp		_Z11BdpTrapExitv\n"
+	#else
+		"call		_BdpTrapDispatch\n"
+		"jmp		_BdpTrapExit\n"
+	#endif
+	);
 #endif
 }
 
@@ -683,8 +585,8 @@ VOID __declspec(naked) BdTrap2d()
 //
 VOID __declspec(naked) BOOTAPI BdpSaveProcessorControlState(KPROCESSOR_STATE* processorState)
 {
-#ifdef _MSC_VER
 	__asm
+#ifdef _MSC_VER
 	{
 		mov			edx, [esp + 4]
 		xor			ecx, ecx
@@ -715,33 +617,35 @@ VOID __declspec(naked) BOOTAPI BdpSaveProcessorControlState(KPROCESSOR_STATE* pr
 		retn
 	}
 #else
-    __asm("mov    0x4(%esp),%edx\n"
-          "xor    %ecx,%ecx\n"
-          "mov    %cr0,%eax\n"
-          "mov    %eax,0x2cc(%edx)\n"
-          "mov    %cr2,%eax\n"
-          "mov    %eax,0x2d0(%edx)\n"
-          "mov    %cr3,%eax\n"
-          "mov    %eax,0x2d4(%edx)\n"
-          "mov    %ecx,0x2d8(%edx)\n"
-          "mov    %db0,%eax\n"
-          "mov    %eax,0x2dc(%edx)\n"
-          "mov    %db1,%eax\n"
-          "mov    %eax,0x2e0(%edx)\n"
-          "mov    %db2,%eax\n"
-          "mov    %eax,0x2e4(%edx)\n"
-          "mov    %db3,%eax\n"
-          "mov    %eax,0x2e8(%edx)\n"
-          "mov    %db6,%eax\n"
-          "mov    %eax,0x2ec(%edx)\n"
-          "mov    %db7,%eax\n"
-          "mov    %ecx,%db7\n"
-          "mov    %eax,0x2f0(%edx)\n"
-          "sgdtl  0x2f6(%edx)\n"
-          "sidtl  0x2fe(%edx)\n"
-          "str    0x304(%edx)\n"
-          "sldt   0x306(%edx)\n"
-          "ret\n");
+	(
+		"mov		0x4(%esp),%edx\n"
+		"xor		%ecx,%ecx\n"
+		"mov		%cr0,%eax\n"
+		"mov		%eax,0x2cc(%edx)\n"
+		"mov		%cr2,%eax\n"
+		"mov		%eax,0x2d0(%edx)\n"
+		"mov		%cr3,%eax\n"
+		"mov		%eax,0x2d4(%edx)\n"
+		"mov		%ecx,0x2d8(%edx)\n"
+		"mov		%db0,%eax\n"
+		"mov		%eax,0x2dc(%edx)\n"
+		"mov		%db1,%eax\n"
+		"mov		%eax,0x2e0(%edx)\n"
+		"mov		%db2,%eax\n"
+		"mov		%eax,0x2e4(%edx)\n"
+		"mov		%db3,%eax\n"
+		"mov		%eax,0x2e8(%edx)\n"
+		"mov		%db6,%eax\n"
+		"mov		%eax,0x2ec(%edx)\n"
+		"mov		%db7,%eax\n"
+		"mov		%ecx,%db7\n"
+		"mov		%eax,0x2f0(%edx)\n"
+		"sgdtl		0x2f6(%edx)\n"
+		"sidtl		0x2fe(%edx)\n"
+		"str		0x304(%edx)\n"
+		"sldt		0x306(%edx)\n"
+		"ret\n"
+	);
 #endif
 }
 
@@ -781,8 +685,8 @@ VOID BdpSaveKframe(KTRAP_FRAME* trapFrame, CONTEXT* contextRecord)
 //
 VOID __declspec(naked) BOOTAPI BdpRestoreProcessorControlState(KPROCESSOR_STATE* processorState)
 {
-#ifdef _MSC_VER
 	__asm
+#ifdef _MSC_VER
 	{
 		mov			edx, [esp + 4]
 		mov			eax, [edx + KPROCESSOR_STATE.SpecialRegisters.Cr0]
@@ -809,30 +713,32 @@ VOID __declspec(naked) BOOTAPI BdpRestoreProcessorControlState(KPROCESSOR_STATE*
 		retn
 	}
 #else
-    __asm("mov    %0,%%edx\n"
-          "mov    0x2cc(%%edx),%%eax\n"
-          "mov    %%eax,%%cr0\n"
-          "mov    0x2d0(%%edx),%%eax\n"
-          "mov    %%eax,%%cr2\n"
-          "mov    0x2d4(%%edx),%%eax\n"
-          "mov    %%eax,%%cr3\n"
-          "mov    0x2dc(%%edx),%%eax\n"
-          "mov    %%eax,%%db0\n"
-          "mov    0x2e0(%%edx),%%eax\n"
-          "mov    %%eax,%%db1\n"
-          "mov    0x2e4(%%edx),%%eax\n"
-          "mov    %%eax,%%db2\n"
-          "mov    0x2e8(%%edx),%%eax\n"
-          "mov    %%eax,%%db3\n"
-          "mov    0x2ec(%%edx),%%eax\n"
-          "mov    %%eax,%%db6\n"
-          "mov    0x2f0(%%edx),%%eax\n"
-          "mov    %%eax,%%db7\n"
-          "lgdtl  0x2f6(%%edx)\n"
-          "lidtl  0x2fe(%%edx)\n"
-          "lldt   0x306(%%edx)\n"
-          "ret\n"
-          :: "m" (processorState));
+	(
+		"mov		%0,%%edx\n"
+		"mov		0x2cc(%%edx),%%eax\n"
+		"mov		%%eax,%%cr0\n"
+		"mov		0x2d0(%%edx),%%eax\n"
+		"mov		%%eax,%%cr2\n"
+		"mov		0x2d4(%%edx),%%eax\n"
+		"mov		%%eax,%%cr3\n"
+		"mov		0x2dc(%%edx),%%eax\n"
+		"mov		%%eax,%%db0\n"
+		"mov		0x2e0(%%edx),%%eax\n"
+		"mov		%%eax,%%db1\n"
+		"mov		0x2e4(%%edx),%%eax\n"
+		"mov		%%eax,%%db2\n"
+		"mov		0x2e8(%%edx),%%eax\n"
+		"mov		%%eax,%%db3\n"
+		"mov		0x2ec(%%edx),%%eax\n"
+		"mov		%%eax,%%db6\n"
+		"mov		0x2f0(%%edx),%%eax\n"
+		"mov		%%eax,%%db7\n"
+		"lgdtl		0x2f6(%%edx)\n"
+		"lidtl		0x2fe(%%edx)\n"
+		"lldt		0x306(%%edx)\n"
+		"ret\n"
+		:: "m" (processorState)
+	);
 #endif
 }
 
@@ -859,9 +765,7 @@ VOID BdpRestoreKframe(KTRAP_FRAME* trapFrame, CONTEXT* contextRecord)
 	BdpRestoreProcessorControlState(&BdPrcb->ProcessorState);
 }
 
-#if defined(_MSC_VER)
 #pragma optimize("",off)
-#endif
 
 //
 // debug routine used when debugger is enabled
@@ -946,9 +850,7 @@ BOOLEAN BdTrap(EXCEPTION_RECORD* exceptionRecord, struct _KEXCEPTION_FRAME* exce
 	return TRUE;
 }
 
-#if defined(_MSC_VER)
 #pragma optimize("",on)
-#endif
 
 //
 // extract continuation control data from Manipulate_State message
