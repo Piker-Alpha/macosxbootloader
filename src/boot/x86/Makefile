@@ -1,18 +1,18 @@
 #
-#
+# Makefile for boot/x86
 #
 
 %.o: %.asm
 	@echo "\t[nasm]\t$<";
-	@$(NASM) $(NASMFLAGS) -o $(TMP_BOOT_DIR)/$@ $<
+	@$(NASM) $(NASMFLAGS) -o '$(TMP_BOOT_DIR)/$@' $<
 
 %.o: %.cpp
 	@echo "\t[$(CXX)]\t$<";
-	@$(CXX) $(CXXFLAGS) -c $< -o $(TMP_BOOT_DIR)/$@
+	@$(CXX) $(CXXFLAGS) -c $< -o '$(TMP_BOOT_DIR)/$@'
 
 %.dat: %.asm
 	@echo "\t[nasm]\t$<";
-	@$(NASM) -f bin -o $(TMP_BOOT_DIR)/$@ $<
+	@$(NASM) -f bin -o '$(TMP_BOOT_DIR)/$@' $<
 
 all: libx86.a
 
@@ -25,15 +25,15 @@ libx86.a: \
 	DebuggerUtilsX86.o
 
 	@echo "\t[ar]\t$@"
-	@$(AR) cru $(TMP_BOOT_DIR)/$@		\
-	$(TMP_BOOT_DIR)/ThunkCode32.o		\
-	$(TMP_BOOT_DIR)/ArchUtilsX86.o		\
-	$(TMP_BOOT_DIR)/CompilerX86.o		\
-	$(TMP_BOOT_DIR)/Thunk64.o			\
-	$(TMP_BOOT_DIR)/DebuggerUtilsX86.o
+	@$(AR) cru '$(TMP_BOOT_DIR)/$@'		\
+	'$(TMP_BOOT_DIR)/ThunkCode32.o'		\
+	'$(TMP_BOOT_DIR)/ArchUtilsX86.o'	\
+	'$(TMP_BOOT_DIR)/CompilerX86.o'		\
+	'$(TMP_BOOT_DIR)/Thunk64.o'			\
+	'$(TMP_BOOT_DIR)/DebuggerUtilsX86.o'
 
 	@echo "\t[ranlib]\t$@";
-	@$(RANLIB) $(TMP_BOOT_DIR)/$@
+	@$(RANLIB) '$(TMP_BOOT_DIR)/$@'
 	@echo "------------------------------------------------------";
 
 clean:
