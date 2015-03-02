@@ -88,7 +88,34 @@ export TMP_BOOT_DIR = $(TMP_DIR)/boot
 export TMP_RIJNDAEL_DIR = $(TMP_DIR)/rijndael
 export BINARY_DIR = bin/$(ARCHDIR)/$(BUILD_TARGET_TYPE)
 
-INCLUDES = -I /usr/include -I '$(PROJECT_DIR)/sdk/include' -I '$(PROJECT_DIR)/sdk/include/$(ARCHDIR)' -I '$(PROJECT_DIR)/src/include'
+#
+# Get Xcode path
+#
+XCODE = `xcode-select --print-path`
+#
+# Check if only the CommandLineTools are installed/selected.
+#
+ifeq ("$(XCODE)", CommandLineTools)
+#
+# Yes, check for Xcode directory
+#
+if [ -d '/Applications/Xcode.app/Contents/Developer' ]; then \
+#
+# Fix path.
+#
+XCODE = /Applications/Xcode.app/Contents/Developer \
+#
+# Done.
+#
+fi;
+#
+# Ok. Done.
+#
+endif
+
+XCODE_SDK = $(XCODE)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk
+
+INCLUDES = -I '$(XCODE_SDK)/usr/include' -I '$(PROJECT_DIR)/sdk/include' -I '$(PROJECT_DIR)/sdk/include/$(ARCHDIR)' -I '$(PROJECT_DIR)/src/include'
 
 WFLAGS = -Wall -Werror -Wno-unknown-pragmas
 
