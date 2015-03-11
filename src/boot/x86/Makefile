@@ -21,19 +21,16 @@ libx86.a: \
 	ThunkCode32.o		\
 	ArchUtilsX86.o		\
 	CompilerX86.o		\
-	Thunk64.o			\
-	DebuggerUtilsX86.o
+	DebuggerUtilsX86.o	\
+	Thunk64.o
 
-	@echo "\t[ar]\t$@"
-	@$(AR) cru '$(TMP_BOOT_DIR)/$@'		\
-	'$(TMP_BOOT_DIR)/ThunkCode32.o'		\
-	'$(TMP_BOOT_DIR)/ArchUtilsX86.o'	\
-	'$(TMP_BOOT_DIR)/CompilerX86.o'		\
-	'$(TMP_BOOT_DIR)/Thunk64.o'			\
-	'$(TMP_BOOT_DIR)/DebuggerUtilsX86.o'
+	@echo "\t[libtool]\t$@"
+	@libtool -static -o '$(TMP_BOOT_DIR)/$@'	\
+	'$(TMP_BOOT_DIR)/ArchUtilsX86.o'			\
+	'$(TMP_BOOT_DIR)/CompilerX86.o'				\
+	'$(TMP_BOOT_DIR)/DebuggerUtilsX86.o'		\
+	'$(TMP_BOOT_DIR)/Thunk64.o'
 
-	@echo "\t[ranlib]\t$@";
-	@$(RANLIB) '$(TMP_BOOT_DIR)/$@'
 	@echo "------------------------------------------------------";
 
 clean:
