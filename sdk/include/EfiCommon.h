@@ -20,12 +20,7 @@ Abstract:
 #ifndef _EFI_COMMON_H_
 #define _EFI_COMMON_H_
 
-#if defined(__x86_64__)
-    #include "x64/EfiBind.h"
-#else
-    #include "x86/EfiBind.h"
-#endif
-
+#include "EfiBind.h"
 #include "EfiTypes.h"
 #include "EfiStdArg.h"
 #include "EfiError.h"
