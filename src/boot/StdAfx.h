@@ -12,7 +12,7 @@
   #define __try if (1)
   #define __except(x) if (0 && (x))
   #define __finally if (1)
-  #define _alloca(size)    MmAllocatePool(size)
+  #define _alloca(size)														MmAllocatePool(size)
 
   #define CHAR16_STRING(S)													static_cast<CHAR16*>((VOID*)(S))
   #define CHAR8_STRING(S)													static_cast<CHAR8*>((VOID*)(S))
@@ -23,16 +23,18 @@
     //
     #define _INT8_T  1
   #endif
+
+  #define BOOTAPI
 #else
   #define CHAR16_STRING(S)													static_cast<CHAR16*>(static_cast<VOID*>(S))
   #define CHAR8_STRING(S)													static_cast<CHAR8*>(static_cast<VOID*>(S))
+
+  #define BOOTAPI															__cdecl
 #endif
 
 #define NOTHING
-#define BOOTAPI																__cdecl
 #define CHAR8_CONST_STRING(S)												static_cast<CHAR8 CONST*>(static_cast<VOID CONST*>(S))
 #define CHAR16_CONST_STRING(S)												static_cast<CHAR16 CONST*>(static_cast<VOID CONST*>(S))
-
 
 #define try_leave(S)														do{S;__leave;}while(0)
 #define ARRAYSIZE(A)														(sizeof((A)) / sizeof((A)[0]))
