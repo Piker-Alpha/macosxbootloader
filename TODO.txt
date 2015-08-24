@@ -1,4 +1,13 @@
 
+OS X 10.11 El Capitan TODO list:
+--------------------------------
+
+1.) Implement SIP support.
+
+Phase 1: Status - Work In Progress
+
+
+
 OS X 10.10 Yosemite TODO list:
 ------------------------------
 

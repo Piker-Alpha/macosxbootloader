@@ -336,6 +336,28 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 		AcpiGetPciConfigSpaceInfo(&bootArgs->PCIConfigSpaceBaseAddress, &bootArgs->PCIConfigSpaceStartBusNumber, &bootArgs->PCIConfigSpaceEndBusNumber);
 
 		//
+		// System Integrity Protection settings.
+		//
+		// Values: kBootArgsFlagCSRActiveConfig, kBootArgsFlagCSRConfigMode or kBootArgsFlagCSRBoot (like rootless=0)
+		//
+		bootArgs->Flags														|= kBootArgsFlagCSRActiveConfig;
+
+		//
+		// For now set SIP to fully enabled (we want to read NVRAM and check csr-data and csr-active-config).
+		//
+		bootArgs->CsrActiveConfig											= 0;
+
+		//
+		// System Integrity Protection Capabilties
+		//
+		bootArgs->CsrCapabilities											= CSR_VALID_FLAGS
+
+		//
+		// Power Management (set to 0 = no limit)
+		//
+		bootArgs->Boot_SMC_plimit											= 0;
+
+		//
 		// get root node
 		//
 		DEVICE_TREE_NODE* rootNode											= DevTreeFindNode(CHAR8_CONST_STRING("/"), FALSE);

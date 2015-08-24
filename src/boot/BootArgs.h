@@ -205,9 +205,34 @@ typedef struct _BOOT_ARGS
 	UINT32																	PCIConfigSpaceEndBusNumber;
 
 	//
+	//
+	//
+	UINT32																	CsrActiveConfig;
+
+	//
+	//
+	//
+	UINT32																	CsrCapabilities;
+
+	//
+	//
+	//
+	UINT32																	Boot_SMC_plimit;
+
+	//
+	//
+	//
+	UINT16																	BootProgressMeterStart;
+
+	//
+	//
+	//
+	UINT16																	BootProgressMeterEnd;
+
+	//
 	// padding
 	//
-	UINT32																	Reserved3[730];
+	UINT32																	Reserved3[726];
 }BOOT_ARGS;
 #include <poppack.h>
 
