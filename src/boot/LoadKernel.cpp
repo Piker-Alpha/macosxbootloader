@@ -339,7 +339,7 @@ VOID LdrSetupRamDiskPath(EFI_DEVICE_PATH_PROTOCOL* filePath, CHAR8* fileName)
 }
 
 //
-// load kernel cache
+// load prelinked kernel or kernel cache (fall back)
 //
 EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PROTOCOL* bootDevicePath)
 {
@@ -400,17 +400,27 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 		}
 		else
 		{
-			for(UINTN i = 0; i < 3; i ++)
+			for(UINTN i = 0; i < 4; i ++)
 			{
 				//
 				// build path
 				//
-				if(i == 0 && LdrpKernelCachePathName)
-					strcpy(kernelCachePathName, LdrpKernelCachePathName);
-				else if(i == 1)
-					strcpy(kernelCachePathName, (CONST CHAR8*)"System\\Library\\Caches\\com.apple.kext.caches\\Startup\\kernelcache");
-				else
-					kernelCachePathName[0]									= 0;
+				switch(i)
+				{
+					case 0:
+						if(LdrpKernelCachePathName)
+							strcpy(kernelCachePathName, LdrpKernelCachePathName);
+						break;
+					case 1:
+						strcpy(kernelCachePathName, (CONST CHAR8*)"System\\Library\\Prelinkedkernels\\prelinkedkernel");
+						break;
+					case 2:
+						strcpy(kernelCachePathName, (CONST CHAR8*)"System\\Library\\Caches\\com.apple.kext.caches\\Startup\\kernelcache");
+						break;
+					case 3:
+						kernelCachePathName[0]							= 0;
+						break;
+				}
 
 				//
 				// check name
@@ -420,7 +430,8 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 					//
 					// check valid
 					//
-					BOOLEAN kernelCacheValid									= FALSE;
+					BOOLEAN kernelCacheValid								= FALSE;
+
 					if(EFI_ERROR(status = LdrpKernelCacheValid(kernelCachePathName, &kernelCacheValid)))
 						try_leave(NOTHING);
 
