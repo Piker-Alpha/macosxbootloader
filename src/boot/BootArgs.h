@@ -232,7 +232,7 @@ typedef struct _BOOT_ARGS
 	//
 	// padding
 	//
-	UINT32																	Reserved3[726];
+	UINT32																	Reserved4[726];
 }BOOT_ARGS;
 #include <poppack.h>
 
