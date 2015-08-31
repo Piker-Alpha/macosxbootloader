@@ -149,49 +149,70 @@ STATIC EFI_STATUS LdrpKernelCacheValid(CHAR8 CONST* cachePathName, BOOLEAN* kern
 	EFI_FILE_INFO* checkerInfo												= nullptr;
 	*kernelCacheValid														= FALSE;
 
+#if DEBUG_LDRP_CALL_CSPRINTF
+	CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(%s).\n", cachePathName));
+#endif
 	__try
 	{
+#if DEBUG_LDRP_CALL_CSPRINTF
+		CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(1).\n"));
+#endif
 		//
 		// open cache file
 		//
 		if(EFI_ERROR(IoOpenFile(cachePathName, nullptr, &cacheFile, IO_OPEN_MODE_NORMAL)))
 			try_leave(LdrpKernelCachePathName ? status = EFI_NOT_FOUND : EFI_SUCCESS);
-
+#if DEBUG_LDRP_CALL_CSPRINTF
+		CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(2).\n"));
+#endif
 		//
 		// get cache file info
 		//
 		if(EFI_ERROR(status = IoGetFileInfo(&cacheFile, &cacheInfo)))
 			try_leave(NOTHING);
-
+#if DEBUG_LDRP_CALL_CSPRINTF
+		CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(3).\n"));
+#endif
 		//
 		// check cache file info
 		//
 		if(!cacheInfo || (cacheInfo->Attribute & EFI_FILE_DIRECTORY))
 			try_leave(status = EFI_NOT_FOUND);
-
+#if DEBUG_LDRP_CALL_CSPRINTF
+		CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(4).\n"));
+#endif
 		//
 		// kernel cache override
 		//
 		if(LdrpKernelCacheOverride)
 			try_leave(*kernelCacheValid = TRUE);
-
+#if DEBUG_LDRP_CALL_CSPRINTF
+		CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(5).\n"));
+#endif
 		//
 		// open kernel file
 		//
 		if(!EFI_ERROR(IoOpenFile(LdrpKernelPathName, nullptr, &kernelFile, IO_OPEN_MODE_NORMAL)))
 		{
+#if DEBUG_LDRP_CALL_CSPRINTF
+			CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(6).\n"));
+#endif
 			//
 			// get kernel file info
 			//
 			if(EFI_ERROR(status = IoGetFileInfo(&kernelFile, &kernelInfo)))
 				try_leave(NOTHING);
-
+#if DEBUG_LDRP_CALL_CSPRINTF
+			CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(7).\n"));
+#endif
 			//
 			// check kernel file info
 			//
 			if(!kernelInfo || (kernelInfo->Attribute & EFI_FILE_DIRECTORY))
 				try_leave(status = EFI_NOT_FOUND);
-
+#if DEBUG_LDRP_CALL_CSPRINTF
+			CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(8).\n"));
+#endif
 			checkerInfo														= kernelInfo;
 		}
 
@@ -200,17 +221,26 @@ STATIC EFI_STATUS LdrpKernelCacheValid(CHAR8 CONST* cachePathName, BOOLEAN* kern
 		//
 		if(!EFI_ERROR(IoOpenFile(CHAR8_CONST_STRING("System\\Library\\Extensions"), nullptr, &extensionsFile, IO_OPEN_MODE_NORMAL)))
 		{
+#if DEBUG_LDRP_CALL_CSPRINTF
+			CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(9).\n"));
+#endif
 			//
 			// get extensions file info
 			//
 			if(EFI_ERROR(status = IoGetFileInfo(&extensionsFile, &extensionsInfo)))
 				try_leave(NOTHING);
+#if DEBUG_LDRP_CALL_CSPRINTF
+			CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(A).\n"));
+#endif
 
 			//
 			// check extensions info
 			//
 			if(!extensionsInfo || !(extensionsInfo->Attribute & EFI_FILE_DIRECTORY) || BlTestBootMode(BOOT_MODE_SAFE))
 				try_leave(status = EFI_NOT_FOUND);
+#if DEBUG_LDRP_CALL_CSPRINTF
+			CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(B).\n"));
+#endif
 
 			//
 			// get bigger
@@ -218,12 +248,18 @@ STATIC EFI_STATUS LdrpKernelCacheValid(CHAR8 CONST* cachePathName, BOOLEAN* kern
 			if(!checkerInfo || BlCompareTime(&checkerInfo->ModificationTime, &extensionsInfo->ModificationTime) < 0)
 				checkerInfo													= extensionsInfo;
 		}
+#if DEBUG_LDRP_CALL_CSPRINTF
+		CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(C).\n"));
+#endif
 
 		//
 		// check time
 		//
 		if(!checkerInfo)
 			try_leave(*kernelCacheValid = TRUE);
+#if DEBUG_LDRP_CALL_CSPRINTF
+		CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(D).\n"));
+#endif
 
 		//
 		// add one second
@@ -237,7 +273,12 @@ STATIC EFI_STATUS LdrpKernelCacheValid(CHAR8 CONST* cachePathName, BOOLEAN* kern
 		if(memcmp(&modifyTime, &cacheInfo->ModificationTime, sizeof(modifyTime)))
 			status															= EFI_NOT_FOUND;
 		else
+		{
 			*kernelCacheValid												= TRUE;
+#if DEBUG_LDRP_CALL_CSPRINTF
+			CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(E).\n"));
+#endif
+		}
 	}
 	__finally
 	{
