@@ -342,6 +342,27 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 		//
 		bootArgs->Flags														|= (kBootArgsFlagCSRActiveConfig + kBootArgsFlagCSRBoot);
 
+		UINTN dataSize														= 4;
+		//
+		// Check 'csr-active-config' variable NVRAM.
+		//
+		if(EFI_ERROR(EfiRuntimeServices->GetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, nullptr, &dataSize, nullptr)))
+		{
+#if DEBUG_NVRAM_CALL_CSPRINTF
+			CsPrintf(CHAR8_CONST_STRING("PIKE: bootArgs->CsrActiveConfig not found!\n"));
+			//
+			// PIKE: Please compile boot.efi with and without the following line commented out!
+			//
+			// EfiRuntimeServices->SetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, 0, 0, nullptr);
+#endif
+		}
+		else
+		{
+#if DEBUG_NVRAM_CALL_CSPRINTF
+			CsPrintf(CHAR8_CONST_STRING("PIKE: Checking bootArgs->CsrActiveConfig found!\n"));
+#endif
+		}
+
 		//
 		// For now set SIP to fully enabled (we want to read NVRAM and check csr-data and csr-active-config).
 		//
