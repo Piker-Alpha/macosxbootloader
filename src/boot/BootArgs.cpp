@@ -340,7 +340,7 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 		//
 		// Values: kBootArgsFlagCSRActiveConfig, kBootArgsFlagCSRConfigMode or kBootArgsFlagCSRBoot (like rootless=0)
 		//
-		bootArgs->Flags														|= kBootArgsFlagCSRActiveConfig;
+		bootArgs->Flags														|= (kBootArgsFlagCSRActiveConfig + kBootArgsFlagCSRBoot);
 
 		//
 		// For now set SIP to fully enabled (we want to read NVRAM and check csr-data and csr-active-config).
