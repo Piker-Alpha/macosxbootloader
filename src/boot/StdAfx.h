@@ -31,7 +31,9 @@
 //
 #define LEGACY_GREY_SUPPORT													0
 
-#define DEBUG_LDRP_CALL_CSPRINTF											1
+#define DEBUG_LDRP_CALL_CSPRINTF											0
+
+#define DEBUG_NVRAM_CALL_CSPRINTF											1
 
 #ifndef kBootArgsFlagCSRActiveConfig
 	#define kBootArgsFlagCSRActiveConfig	(1 << 3)	// 8
