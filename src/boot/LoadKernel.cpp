@@ -236,7 +236,7 @@ STATIC EFI_STATUS LdrpKernelCacheValid(CHAR8 CONST* cachePathName, BOOLEAN* kern
 			//
 			// check extensions info
 			//
-			if(!extensionsInfo || !(extensionsInfo->Attribute & EFI_FILE_DIRECTORY) || BlTestBootMode(BOOT_MODE_SAFE))
+			if(!extensionsInfo || !(extensionsInfo->Attribute & EFI_FILE_DIRECTORY))
 				try_leave(status = EFI_NOT_FOUND);
 #if DEBUG_LDRP_CALL_CSPRINTF
 			CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(B).\n"));
