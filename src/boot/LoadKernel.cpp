@@ -150,7 +150,7 @@ STATIC EFI_STATUS LdrpKernelCacheValid(CHAR8 CONST* cachePathName, BOOLEAN* kern
 	*kernelCacheValid														= FALSE;
 
 #if DEBUG_LDRP_CALL_CSPRINTF
-	CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(%s).\n", cachePathName));
+	CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(%s).\n"), cachePathName);
 #endif
 	__try
 	{
