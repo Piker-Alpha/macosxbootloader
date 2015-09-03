@@ -331,45 +331,53 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 		}
 
 		//
-		// get pci config space info
+		// get PCI config space info
 		//
 		AcpiGetPciConfigSpaceInfo(&bootArgs->PCIConfigSpaceBaseAddress, &bootArgs->PCIConfigSpaceStartBusNumber, &bootArgs->PCIConfigSpaceEndBusNumber);
 
 		//
 		// System Integrity Protection settings.
 		//
-		// Values: kBootArgsFlagCSRActiveConfig, kBootArgsFlagCSRConfigMode or kBootArgsFlagCSRBoot (like rootless=0)
+		// Values: kBootArgsFlagCSRActiveConfig, kBootArgsFlagCSRConfigMode and kBootArgsFlagCSRBoot (required for installer).
 		//
 		bootArgs->Flags														|= (kBootArgsFlagCSRActiveConfig + kBootArgsFlagCSRBoot);
+		//
+		// Check 'csr-active-config' variable in NVRAM.
+		//
+		UINT32 attribute													= EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS;
+		UINT8 csrBuffer[4]													= {0};
+		UINTN dataSize														= sizeof(csrBuffer);
 
-		UINTN dataSize														= 4;
-		//
-		// Check 'csr-active-config' variable NVRAM.
-		//
-		if(EFI_ERROR(EfiRuntimeServices->GetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, nullptr, &dataSize, nullptr)))
+		if(EFI_ERROR(EfiRuntimeServices->GetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, nullptr, &dataSize, csrBuffer)))
 		{
 #if DEBUG_NVRAM_CALL_CSPRINTF
-			CsPrintf(CHAR8_CONST_STRING("PIKE: bootArgs->CsrActiveConfig not found!\n"));
+			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config NOT found (ERROR)!\n"));
+#endif			//
+			// Not there. Add it.
 			//
-			// PIKE: Please compile boot.efi with and without the following line commented out!
+			memset(csrBuffer, 0, sizeof(csrBuffer));
+			EfiRuntimeServices->SetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, attribute, sizeof(csrBuffer), nullptr);
 			//
-			// EfiRuntimeServices->SetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, 0, 0, nullptr);
+			// Set System Integrity Protection ON by default
+			//
+			bootArgs->CsrActiveConfig										= 0;
+#if DEBUG_NVRAM_CALL_CSPRINTF
+			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config added!\n"));
 #endif
 		}
 		else
 		{
+			//
+			// Set System Integrity Protection ON by default
+			//
+			bootArgs->CsrActiveConfig										= 0; // csrBuffer[0]
 #if DEBUG_NVRAM_CALL_CSPRINTF
-			CsPrintf(CHAR8_CONST_STRING("PIKE: Checking bootArgs->CsrActiveConfig found!\n"));
+			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config found (OK)!\n"));
 #endif
 		}
-
+		
 		//
-		// For now set SIP to fully enabled (we want to read NVRAM and check csr-data and csr-active-config).
-		//
-		bootArgs->CsrActiveConfig											= 0;
-
-		//
-		// System Integrity Protection Capabilties
+		// System Integrity Protection Capabilties.
 		//
 		bootArgs->CsrCapabilities											= CSR_VALID_FLAGS;
 
