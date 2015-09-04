@@ -341,50 +341,12 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 		// Values: kBootArgsFlagCSRActiveConfig, kBootArgsFlagCSRConfigMode and kBootArgsFlagCSRBoot (required for installer).
 		//
 		bootArgs->Flags														|= (kBootArgsFlagCSRActiveConfig + kBootArgsFlagCSRBoot);
-		//
-		// Check 'csr-active-config' variable in NVRAM.
-		//
-		UINT32 attribute													= EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE;
-		UINT8 *csrBuffer													= static_cast<UINT8*>(MmAllocatePool(4));
-		UINTN dataSize														= sizeof(csrBuffer);
 
-		if(EFI_ERROR(EfiRuntimeServices->GetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, nullptr, &dataSize, nullptr)))
-		{
-#if DEBUG_NVRAM_CALL_CSPRINTF
-			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config NOT found (ERROR)!\n"));
-#endif		//
-			// Not there. Zero out the csrBuffer.
-			//
-			memset(csrBuffer, 0, dataSize);
-			//
-			// Add variable.
-			//
-			if(EFI_ERROR(EfiRuntimeServices->SetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, attribute, sizeof(csrBuffer), csrBuffer)))
-			{
-				//
-				// In case of error (think EFI_OUT_OF_RESOURCES).
-				//
-				MmFreePool(csrBuffer);
-			}
-			//
-			// Set System Integrity Protection ON by default
-			//
-			bootArgs->CsrActiveConfig										= 0;
-#if DEBUG_NVRAM_CALL_CSPRINTF
-			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config added!\n"));
-#endif
-		}
-		else
-		{
-			//
-			// Set System Integrity Protection ON by default
-			//
-			bootArgs->CsrActiveConfig										= csrBuffer[3];
-#if DEBUG_NVRAM_CALL_CSPRINTF
-			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config found (OK)!\n"));
-#endif
-		}
-		
+		//
+		// Set System Integrity Protection ON by default
+		//
+		bootArgs->CsrActiveConfig											= CSR_ALLOW_APPLE_INTERNAL;
+
 		//
 		// System Integrity Protection Capabilties.
 		//
@@ -532,7 +494,7 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 		{
 			//
 			// The RDRAND instruction is part of the Intel Secure Key Technology, which is currently only available 
-			// on the Intel I5/I7 Ivy Bridge and Haswell processors. Not on processors used in the old MacPro models.
+			// on the Intel i5/i7 Ivy Bridge and Haswell processors. Not on processors used in the old MacPro models.
 			// This is why I had to disassemble Apple's boot.efi and port their assembler code to standard C.
 			//
 			PMTimerValue = ARCH_READ_PORT_UINT16(ArchConvertAddressToPointer(0x408, UINT16*));	// in		(%dx),	%ax
@@ -808,6 +770,79 @@ EFI_STATUS BlFinalizeBootArgs(BOOT_ARGS* bootArgs, CHAR8 CONST* kernelCommandLin
 	}
 	__finally
 	{
+	}
+
+	return status;
+}
+
+//
+// Read csr-active-config from NVRAM
+//
+EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
+{
+	UINT8 i																	= 0;
+	EFI_STATUS status														= EFI_SUCCESS;
+	UINT32 attribute														= EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE;
+	UINT8 *csrBuffer														= static_cast<UINT8*>(MmAllocatePool(4));
+	UINTN dataSize															= sizeof(csrBuffer);
+	
+	if(EFI_ERROR(status = EfiRuntimeServices->GetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, nullptr, &dataSize, nullptr)))
+	{
+// #if DEBUG_NVRAM_CALL_CSPRINTF
+		for (i = 0; i < 10; i++)
+		{
+			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config NOT found (ERROR: %d)!\n"), status);
+		}
+// #endif
+
+		//
+		// Not there. Zero out the csrBuffer.
+		//
+		memset(csrBuffer, 0, dataSize);
+
+		//
+		// Add variable.
+		//
+		if(EFI_ERROR(status = EfiRuntimeServices->SetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, attribute, sizeof(csrBuffer), csrBuffer)))
+		{
+			//
+			// In case of error (think EFI_OUT_OF_RESOURCES).
+			//
+			MmFreePool(csrBuffer);
+			
+// #if DEBUG_NVRAM_CALL_CSPRINTF
+			for (i = 0; i < 10; i++)
+			{
+				CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config add failed (ERROR: %d)!\n"), status);
+			}
+// #endif
+		}
+
+		//
+		// Set System Integrity Protection ON by default
+		//
+		bootArgs->CsrActiveConfig											= CSR_ALLOW_APPLE_INTERNAL;
+
+// #if DEBUG_NVRAM_CALL_CSPRINTF
+		for (i = 0; i < 10; i++)
+		{
+			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config added!\n"));
+		}
+// #endif
+	}
+	else
+	{
+		//
+		// Set System Integrity Protection ON by default
+		//
+		bootArgs->CsrActiveConfig											= csrBuffer[3];
+
+// #if DEBUG_NVRAM_CALL_CSPRINTF
+		for (i = 0; i < 10; i++)
+		{
+			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config found (OK)!\n"));
+		}
+// #endif
 	}
 
 	return status;
