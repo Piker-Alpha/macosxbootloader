@@ -250,3 +250,8 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 // finalize boot args
 //
 EFI_STATUS BlFinalizeBootArgs(BOOT_ARGS* bootArgs, CHAR8 CONST* kernelCommandLine, EFI_HANDLE bootDeviceHandle, struct _MACH_O_LOADED_INFO* loadedInfo);
+
+//
+// Read csr-active-config from NVRAM
+//
+EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs);
