@@ -344,19 +344,28 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 		//
 		// Check 'csr-active-config' variable in NVRAM.
 		//
-		UINT32 attribute													= EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS;
-		UINT8 csrBuffer[4]													= {0};
+		UINT32 attribute													= EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE;
+		UINT8 *csrBuffer													= static_cast<UINT8*>(MmAllocatePool(4));
 		UINTN dataSize														= sizeof(csrBuffer);
 
-		if(EFI_ERROR(EfiRuntimeServices->GetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, nullptr, &dataSize, csrBuffer)))
+		if(EFI_ERROR(EfiRuntimeServices->GetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, nullptr, &dataSize, nullptr)))
 		{
 #if DEBUG_NVRAM_CALL_CSPRINTF
 			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config NOT found (ERROR)!\n"));
-#endif			//
-			// Not there. Add it.
+#endif		//
+			// Not there. Zero out the csrBuffer.
 			//
-			memset(csrBuffer, 0, sizeof(csrBuffer));
-			EfiRuntimeServices->SetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, attribute, sizeof(csrBuffer), nullptr);
+			memset(csrBuffer, 0, dataSize);
+			//
+			// Add variable.
+			//
+			if(EFI_ERROR(EfiRuntimeServices->SetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, attribute, sizeof(csrBuffer), csrBuffer)))
+			{
+				//
+				// In case of error (think EFI_OUT_OF_RESOURCES).
+				//
+				MmFreePool(csrBuffer);
+			}
 			//
 			// Set System Integrity Protection ON by default
 			//
@@ -370,7 +379,7 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 			//
 			// Set System Integrity Protection ON by default
 			//
-			bootArgs->CsrActiveConfig										= 0; // csrBuffer[0]
+			bootArgs->CsrActiveConfig										= csrBuffer[3];
 #if DEBUG_NVRAM_CALL_CSPRINTF
 			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config found (OK)!\n"));
 #endif
