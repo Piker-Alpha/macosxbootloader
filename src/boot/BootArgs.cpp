@@ -344,7 +344,7 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 		//
 		// Check 'csr-active-config' variable in NVRAM.
 		//
-		UINT32 attribute													= EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE;
+		UINT32 attribute													= EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE;
 		UINT8 *csrBuffer													= static_cast<UINT8*>(MmAllocatePool(4));
 		UINTN dataSize														= sizeof(csrBuffer);
 
