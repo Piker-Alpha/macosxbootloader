@@ -784,7 +784,7 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 	EFI_STATUS status														= EFI_SUCCESS;
 	UINT32 attribute														= EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE;
 	UINT32 csrValue															= CSR_ALLOW_APPLE_INTERNAL;
-	UINTN dataSize															= sizeof(csrBuffer);
+	UINTN dataSize															= sizeof(csrValue);
 	
 	if(EFI_ERROR(status = EfiRuntimeServices->GetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, nullptr, &dataSize, nullptr)))
 	{
