@@ -782,7 +782,7 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 {
 	UINT8 i																	= 0;
 	EFI_STATUS status														= EFI_SUCCESS;
-	UINT32 attribute														= EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE;
+	// UINT32 attribute														= EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE;
 	UINT32 csrValue															= CSR_ALLOW_APPLE_INTERNAL;
 	UINTN dataSize															= sizeof(csrValue);
 	
