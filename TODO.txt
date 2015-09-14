@@ -2,10 +2,12 @@
 OS X 10.11 El Capitan TODO list:
 --------------------------------
 
-1.) Implement SIP support.
 
 Phase 1: Status - Work In Progress
 
+1.) Load the prelinkedkernel if -x is used (status: Done).
+
+2.) Implement SIP support (status: Work In Progress).
 
 
 OS X 10.10 Yosemite TODO list:
