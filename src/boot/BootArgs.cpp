@@ -785,10 +785,11 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 	UINT32 attribute														= EFI_VARIABLE_NON_VOLATILE;
 	UINT32 csrActiveConfig													= CSR_ALLOW_APPLE_INTERNAL;
 	UINT32 CsrCapabilities													= (kBootArgsFlagCSRActiveConfig | kBootArgsFlagCSRBoot);
+	UINTN dataSize															= sizeof(UINT32);
 	//
 	// Step one. Check the 'csr-active-config' variable in NVRAM.
 	//
-	if(EFI_ERROR(status = EfiRuntimeServices->GetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, nullptr, sizeof(UINT32), nullptr)))
+	if(EFI_ERROR(status = EfiRuntimeServices->GetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, nullptr, &dataSize, &csrActiveConfig)))
 	{
 		for (i = 0; i < 5; i++)
 		{
@@ -834,10 +835,12 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 		}
 	}
 
+	dataSize																= sizeof(UINT16);
+
 	//
 	// Step two. Check the 'bootercfg' variable in NVRAM.
 	//
-	if(EFI_ERROR(status = EfiRuntimeServices->GetVariable(CHAR16_STRING(L"bootercfg"), &AppleNVRAMVariableGuid, nullptr, sizeof(UINT16), nullptr)))
+	if(EFI_ERROR(status = EfiRuntimeServices->GetVariable(CHAR16_STRING(L"bootercfg"), &AppleNVRAMVariableGuid, nullptr, &dataSize, &CsrCapabilities)))
 	{
 		for (i = 0; i < 5; i++)
 		{
@@ -846,7 +849,7 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 		//
 		// Not there. Add the 'bootercfg' variable.
 		//
-		if(EFI_ERROR(status = EfiRuntimeServices->SetVariable(CHAR16_STRING(L"bootercfg"), &AppleNVRAMVariableGuid, attribute, sizeof(UINT16), &csrCapabilityValue)))
+		if(EFI_ERROR(status = EfiRuntimeServices->SetVariable(CHAR16_STRING(L"bootercfg"), &AppleNVRAMVariableGuid, attribute, sizeof(UINT16), &CsrCapabilities)))
 		{
 			for (i = 0; i < 5; i++)
 			{
@@ -875,7 +878,7 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 		//
 		// Set CsrCapabilities to the value found in NVRAM.
 		//
-		bootArgs->CsrCapabilities											= csrCapabilityValue;
+		bootArgs->CsrCapabilities											= CsrCapabilities;
 		
 		for (i = 0; i < 5; i++)
 		{
