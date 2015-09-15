@@ -525,7 +525,14 @@ EFI_STATUS EFIAPI EfiMain(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable)
 		if(filePath)
 		{
 			if(strstr(filePath, CHAR8_CONST_STRING("com.apple.recovery.boot")))
+			{
+				for (i = 0; i < 10; i++)
+				{
+					CsPrintf(CHAR8_CONST_STRING("PIKE: Set RecoveryHD mode!\n"));
+				}
+
 				BlSetBootMode(BOOT_MODE_FROM_RECOVER_BOOT_DIRECTORY, BOOT_MODE_EFI_NVRAM_RECOVERY_BOOT_MODE | BOOT_MODE_BOOT_IS_NOT_ROOT);
+			}
 
 			MmFreePool(filePath);
 		}

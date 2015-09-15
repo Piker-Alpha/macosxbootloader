@@ -799,6 +799,12 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 		//
 		if(BlTestBootMode(BOOT_MODE_EFI_NVRAM_RECOVERY_BOOT_MODE))
 		{
+#if DEBUG_NVRAM_CALL_CSPRINTF
+			for (i = 0; i < 10; i++)
+			{
+				CsPrintf(CHAR8_CONST_STRING("PIKE: RecoveryHD mode detected!\n"));
+			}
+#endif
 			//
 			// Yes. Add NVRAM variable.
 			//
