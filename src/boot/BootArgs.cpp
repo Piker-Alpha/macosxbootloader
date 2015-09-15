@@ -782,76 +782,105 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 {
 	UINT8 i																	= 0;
 	EFI_STATUS status														= EFI_SUCCESS;
-	UINT32 attribute														= EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE;
-	UINT32 csrValue															= CSR_ALLOW_APPLE_INTERNAL;
-	UINTN dataSize															= sizeof(csrValue);
-	
-	if(EFI_ERROR(status = EfiRuntimeServices->GetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, nullptr, &dataSize, nullptr)))
+	UINT32 attribute														= EFI_VARIABLE_NON_VOLATILE;
+	UINT32 csrActiveConfig													= CSR_ALLOW_APPLE_INTERNAL;
+	UINT32 CsrCapabilities													= (kBootArgsFlagCSRActiveConfig | kBootArgsFlagCSRBoot);
+	//
+	// Step one. Check the 'csr-active-config' variable in NVRAM.
+	//
+	if(EFI_ERROR(status = EfiRuntimeServices->GetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, nullptr, sizeof(UINT32), nullptr)))
 	{
-#if DEBUG_NVRAM_CALL_CSPRINTF
-		for (i = 0; i < 10; i++)
+		for (i = 0; i < 5; i++)
 		{
 			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config NOT found (ERROR: %d)!\n"), status);
 		}
-#endif
 		//
-		// Booting from the RecoveryHD?
+		// Not there. Add the 'csr-active-config' variable.
 		//
-		if(BlTestBootMode(BOOT_MODE_EFI_NVRAM_RECOVERY_BOOT_MODE))
+		if(EFI_ERROR(status = EfiRuntimeServices->SetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, attribute, sizeof(UINT32), &csrActiveConfig)))
 		{
-#if DEBUG_NVRAM_CALL_CSPRINTF
-			for (i = 0; i < 10; i++)
+			for (i = 0; i < 5; i++)
 			{
-				CsPrintf(CHAR8_CONST_STRING("PIKE: RecoveryHD mode detected!\n"));
-			}
-#endif
-			//
-			// Yes. Add NVRAM variable.
-			//
-			if(EFI_ERROR(status = EfiRuntimeServices->SetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, attribute, sizeof(UINT32), &csrValue)))
-			{
-#if DEBUG_NVRAM_CALL_CSPRINTF
-				for (i = 0; i < 10; i++)
-				{
-					CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config add failed (ERROR: %d)!\n"), status);
-				}
-#endif
-			}
-			else
-			{
-#if DEBUG_NVRAM_CALL_CSPRINTF
-				for (i = 0; i < 10; i++)
-				{
-					CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config set (OK)!\n"));
-				}
+				CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config add failed (ERROR: %d)!\n"), status);
 			}
 		}
-#endif
+		else
+		{
+			for (i = 0; i < 5; i++)
+			{
+				CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config set (OK)!\n"));
+			}
+		}
 		//
 		// Set System Integrity Protection ON by default
 		//
 		bootArgs->CsrActiveConfig											= CSR_ALLOW_APPLE_INTERNAL;
 
-#if DEBUG_NVRAM_CALL_CSPRINTF
-		for (i = 0; i < 10; i++)
+		for (i = 0; i < 5; i++)
 		{
 			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config added!\n"));
 		}
-#endif
 	}
 	else
 	{
 		//
-		// Set System Integrity Protection ON by default
+		// Set System Integrity Protection to the value found in NVRAM.
 		//
-		bootArgs->CsrActiveConfig											= csrValue;
+		bootArgs->CsrActiveConfig											= csrActiveConfig;
 
-#if DEBUG_NVRAM_CALL_CSPRINTF
-		for (i = 0; i < 10; i++)
+		for (i = 0; i < 5; i++)
 		{
 			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config found (OK)!\n"));
 		}
-#endif
+	}
+
+	//
+	// Step two. Check the 'bootercfg' variable in NVRAM.
+	//
+	if(EFI_ERROR(status = EfiRuntimeServices->GetVariable(CHAR16_STRING(L"bootercfg"), &AppleNVRAMVariableGuid, nullptr, sizeof(UINT16), nullptr)))
+	{
+		for (i = 0; i < 5; i++)
+		{
+			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM bootercfg NOT found (ERROR: %d)!\n"), status);
+		}
+		//
+		// Not there. Add the 'bootercfg' variable.
+		//
+		if(EFI_ERROR(status = EfiRuntimeServices->SetVariable(CHAR16_STRING(L"bootercfg"), &AppleNVRAMVariableGuid, attribute, sizeof(UINT16), &csrCapabilityValue)))
+		{
+			for (i = 0; i < 5; i++)
+			{
+				CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM bootercfg add failed (ERROR: %d)!\n"), status);
+			}
+		}
+		else
+		{
+			for (i = 0; i < 5; i++)
+			{
+				CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM bootercfg set (OK)!\n"));
+			}
+		}
+		//
+		// Set CsrCapabilities to the default value.
+		//
+		bootArgs->CsrCapabilities											= (kBootArgsFlagCSRActiveConfig | kBootArgsFlagCSRBoot);
+		
+		for (i = 0; i < 5; i++)
+		{
+			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM bootercfg added!\n"));
+		}
+	}
+	else
+	{
+		//
+		// Set CsrCapabilities to the value found in NVRAM.
+		//
+		bootArgs->CsrCapabilities											= csrCapabilityValue;
+		
+		for (i = 0; i < 5; i++)
+		{
+			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM bootercfg found (OK)!\n"));
+		}
 	}
 
 	return status;
