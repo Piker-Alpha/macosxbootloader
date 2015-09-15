@@ -628,8 +628,6 @@ EFI_STATUS EFIAPI EfiMain(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable)
 		//
 		CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlInitCSRState()!\n"));
 
-		UINT8 i																= 0;
-
 		if(EFI_ERROR(BlInitCSRState(bootArgs)))
 		{
 			for(i = 0; i < 10; i++)
