@@ -782,7 +782,7 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 {
 	UINT8 i																	= 0;
 	EFI_STATUS status														= EFI_SUCCESS;
-	// UINT32 attribute														= EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE;
+	UINT32 attribute														= EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE;
 	UINT32 csrValue															= CSR_ALLOW_APPLE_INTERNAL;
 	UINTN dataSize															= sizeof(csrValue);
 	
@@ -794,40 +794,44 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config NOT found (ERROR: %d)!\n"), status);
 		}
 #endif
-
-		/*
-		// Add variable.
 		//
-		if(EFI_ERROR(status = EfiRuntimeServices->SetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, attribute, sizeof(UINT32), &csrValue)))
+		// Booting from the RecoveryHD?
+		//
+		if(BlTestBootMode(BOOT_MODE_EFI_NVRAM_RECOVERY_BOOT_MODE))
 		{
-			
-#if DEBUG_NVRAM_CALL_CSPRINTF
-			for (i = 0; i < 10; i++)
+			//
+			// Yes. Add NVRAM variable.
+			//
+			if(EFI_ERROR(status = EfiRuntimeServices->SetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, attribute, sizeof(UINT32), &csrValue)))
 			{
-				CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config add failed (ERROR: %d)!\n"), status);
-			}
+#if DEBUG_NVRAM_CALL_CSPRINTF
+				for (i = 0; i < 10; i++)
+				{
+					CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config add failed (ERROR: %d)!\n"), status);
+				}
 #endif
-		}
-		else
-		{
-#if DEBUG_NVRAM_CALL_CSPRINTF
-			for (i = 0; i < 10; i++)
+			}
+			else
 			{
-				CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config set (OK)!\n"));
+#if DEBUG_NVRAM_CALL_CSPRINTF
+				for (i = 0; i < 10; i++)
+				{
+					CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config set (OK)!\n"));
+				}
 			}
 		}
 #endif
 		//
 		// Set System Integrity Protection ON by default
-		*/
+		//
 		bootArgs->CsrActiveConfig											= CSR_ALLOW_APPLE_INTERNAL;
 
-/* #if DEBUG_NVRAM_CALL_CSPRINTF
+#if DEBUG_NVRAM_CALL_CSPRINTF
 		for (i = 0; i < 10; i++)
 		{
 			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config added!\n"));
 		}
-#endif */
+#endif
 	}
 	else
 	{
