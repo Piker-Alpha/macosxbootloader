@@ -521,6 +521,7 @@ EFI_STATUS EFIAPI EfiMain(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable)
 		//
 		// check recovery
 		//
+		UINT8 i																= 0;
 		CHAR8* filePath														= DevPathExtractFilePathName(bootFilePath, TRUE);
 		if(filePath)
 		{
