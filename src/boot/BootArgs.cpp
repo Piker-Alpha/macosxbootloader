@@ -782,9 +782,9 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 {
 	UINT8 i																	= 0;
 	EFI_STATUS status														= EFI_SUCCESS;
-	UINT32 attribute														= EFI_VARIABLE_NON_VOLATILE;
+	UINT32 attributes														= EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE;
 	UINT32 csrActiveConfig													= CSR_ALLOW_APPLE_INTERNAL;
-	UINT32 CsrCapabilities													= (kBootArgsFlagCSRActiveConfig | kBootArgsFlagCSRBoot);
+	UINT32 csrCapabilities													= (kBootArgsFlagCSRActiveConfig | kBootArgsFlagCSRBoot);
 	UINTN dataSize															= sizeof(UINT32);
 	//
 	// Step one. Check the 'csr-active-config' variable in NVRAM.
@@ -798,7 +798,7 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 		//
 		// Not there. Add the 'csr-active-config' variable.
 		//
-		if(EFI_ERROR(status = EfiRuntimeServices->SetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, attribute, sizeof(UINT32), &csrActiveConfig)))
+		if(EFI_ERROR(status = EfiRuntimeServices->SetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, attributes, sizeof(UINT32), csrActiveConfig)))
 		{
 			for (i = 0; i < 5; i++)
 			{
@@ -840,7 +840,7 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 	//
 	// Step two. Check the 'bootercfg' variable in NVRAM.
 	//
-	if(EFI_ERROR(status = EfiRuntimeServices->GetVariable(CHAR16_STRING(L"bootercfg"), &AppleNVRAMVariableGuid, nullptr, &dataSize, &CsrCapabilities)))
+	if(EFI_ERROR(status = EfiRuntimeServices->GetVariable(CHAR16_STRING(L"bootercfg"), &AppleNVRAMVariableGuid, nullptr, &dataSize, &csrCapabilities)))
 	{
 		for (i = 0; i < 5; i++)
 		{
@@ -849,7 +849,7 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 		//
 		// Not there. Add the 'bootercfg' variable.
 		//
-		if(EFI_ERROR(status = EfiRuntimeServices->SetVariable(CHAR16_STRING(L"bootercfg"), &AppleNVRAMVariableGuid, attribute, sizeof(UINT16), &CsrCapabilities)))
+		if(EFI_ERROR(status = EfiRuntimeServices->SetVariable(CHAR16_STRING(L"bootercfg"), &AppleNVRAMVariableGuid, attributes, sizeof(UINT16), csrCapabilities)))
 		{
 			for (i = 0; i < 5; i++)
 			{
@@ -876,9 +876,9 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 	else
 	{
 		//
-		// Set CsrCapabilities to the value found in NVRAM.
+		// Set csrCapabilities to the value found in NVRAM.
 		//
-		bootArgs->CsrCapabilities											= CsrCapabilities;
+		bootArgs->CsrCapabilities											= csrCapabilities;
 		
 		for (i = 0; i < 5; i++)
 		{
