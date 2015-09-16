@@ -831,7 +831,7 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 
 		for (i = 0; i < 5; i++)
 		{
-			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config found (OK)!\n"));
+			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config[0x%x/0x%x] found (OK)!\n"), csrActiveConfig, dataSize);
 		}
 	}
 
@@ -882,7 +882,7 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 		
 		for (i = 0; i < 5; i++)
 		{
-			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM bootercfg found (OK)!\n"));
+			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM bootercfg[0x%x/0x%x] found (OK)!\n"), csrCapabilities, dataSize);
 		}
 	}
 
