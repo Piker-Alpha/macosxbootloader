@@ -454,13 +454,32 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 		//
 		// Set chosen/boot-file property.
 		//
+		UINT8 ix															= 0;
 		CHAR8 CONST* bootFileName											= LdrGetKernelCachePathName();
 		
 		if(BlTestBootMode(BOOT_MODE_SAFE))
 			bootFileName													= LdrGetKernelPathName();
 
+		for (ix = 0; ix < 5; ix++)
+		{
+			CsPrintf(CHAR8_CONST_STRING("PIKE: bootFileName = %s!\n"), bootFileName);
+		}
+
 		if(EFI_ERROR(status = DevTreeAddProperty(chosenNode, CHAR8_CONST_STRING("boot-file"), bootFileName, static_cast<UINT32>(strlen(bootFileName) + 1) * sizeof(CHAR8), FALSE)))
+		{
+			for (ix = 0; ix < 5; ix++)
+			{
+				CsPrintf(CHAR8_CONST_STRING("PIKE: DevTreeAddProperty('boot-file') failed with status 0x%x!\n"), status);
+			}
 			try_leave(NOTHING);
+		}
+		else
+		{
+			for (ix = 0; ix < 5; ix++)
+			{
+				CsPrintf(CHAR8_CONST_STRING("PIKE: DevTreeAddProperty('boot-file') status = OK!\n"));
+			}
+		}
 
 		//
 		// add boot device path
