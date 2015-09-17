@@ -163,6 +163,7 @@ STATIC EFI_STATUS IopCheckRPS(EFI_FILE_HANDLE rootFile, EFI_FILE_HANDLE* realRoo
 //
 STATIC EFI_STATUS IopDetectRoot(EFI_HANDLE deviceHandle, EFI_DEVICE_PATH_PROTOCOL* bootFilePath, BOOLEAN allowBootDirectory)
 {
+	UINT8 i																	= 0;
 	EFI_STATUS status														= EFI_SUCCESS;
 	EFI_FILE_HANDLE kernelFile												= nullptr;
 	EFI_FILE_HANDLE realRootFile											= nullptr;
@@ -191,7 +192,21 @@ STATIC EFI_STATUS IopDetectRoot(EFI_HANDLE deviceHandle, EFI_DEVICE_PATH_PROTOCO
 		//
 		// if(!EFI_ERROR(status = IopRootFile->Open(IopRootFile, &kernelFile, CHAR16_STRING(L"\\System\\Library\\Kernels\\kernel"), EFI_FILE_MODE_READ, 0)))
 		if(!EFI_ERROR(status = IopRootFile->Open(IopRootFile, &kernelFile, CHAR16_STRING(L"kernel"), EFI_FILE_MODE_READ, 0)))
+		{
+			for (i = 0; i < 10; i++)
+			{
+				CsPrintf(CHAR8_CONST_STRING("PIKE: Mike do you see this try_leave(NOTHING)?\n"));
+			}
+
 			try_leave(NOTHING);
+		}
+		else
+		{
+			for (i = 0; i < 10; i++)
+			{
+				CsPrintf(CHAR8_CONST_STRING("PIKE: Mike do you see this?\n"));
+			}
+		}
 
 		//
 		// detect RPS
