@@ -190,23 +190,8 @@ STATIC EFI_STATUS IopDetectRoot(EFI_HANDLE deviceHandle, EFI_DEVICE_PATH_PROTOCO
 		//
 		// check kernel in Kernels directory
 		//
-		// if(!EFI_ERROR(status = IopRootFile->Open(IopRootFile, &kernelFile, CHAR16_STRING(L"\\System\\Library\\Kernels\\kernel"), EFI_FILE_MODE_READ, 0)))
-		if(!EFI_ERROR(status = IopRootFile->Open(IopRootFile, &kernelFile, CHAR16_STRING(L"kernel"), EFI_FILE_MODE_READ, 0)))
-		{
-			for (i = 0; i < 10; i++)
-			{
-				CsPrintf(CHAR8_CONST_STRING("PIKE: Mike do you see this try_leave(NOTHING)?\n"));
-			}
-
+		if(!EFI_ERROR(status = IopRootFile->Open(IopRootFile, &kernelFile, CHAR16_STRING(L"System\\Library\\Kernels\\kernel"), EFI_FILE_MODE_READ, 0)))
 			try_leave(NOTHING);
-		}
-		else
-		{
-			for (i = 0; i < 10; i++)
-			{
-				CsPrintf(CHAR8_CONST_STRING("PIKE: Mike do you see this?\n"));
-			}
-		}
 
 		//
 		// detect RPS
