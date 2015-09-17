@@ -350,7 +350,7 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 		//
 		// System Integrity Protection Capabilties.
 		//
-		bootArgs->CsrCapabilities											= CSR_VALID_FLAGS;
+		bootArgs->CsrCapabilities											= CSR_VALID_FLAGS; // CSR_VALID_FLAGS;
 
 		//
 		// Power Management (set to 0 = no limit)
