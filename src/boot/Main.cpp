@@ -527,7 +527,7 @@ EFI_STATUS EFIAPI EfiMain(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable)
 		{
 			if(strstr(filePath, CHAR8_CONST_STRING("com.apple.recovery.boot")))
 			{
-				for (i = 0; i < 10; i++)
+				for (i = 0; i < 5; i++)
 				{
 					CsPrintf(CHAR8_CONST_STRING("PIKE: Set RecoveryHD mode!\n"));
 				}
@@ -630,14 +630,14 @@ EFI_STATUS EFIAPI EfiMain(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable)
 
 		if(EFI_ERROR(BlInitCSRState(bootArgs)))
 		{
-			for(i = 0; i < 10; i++)
+			for(i = 0; i < 5; i++)
 			{
 				CsPrintf(CHAR8_CONST_STRING("PIKE: Returned from BlInitCSRState(ERROR)!\n"));
 			}
 		}
 		else
 		{
-			for(i = 0; i < 10; i++)
+			for(i = 0; i < 5; i++)
 			{
 				CsPrintf(CHAR8_CONST_STRING("PIKE: Returned from BlInitCSRState(OK)!\n"));
 			}
