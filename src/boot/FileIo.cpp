@@ -163,7 +163,6 @@ STATIC EFI_STATUS IopCheckRPS(EFI_FILE_HANDLE rootFile, EFI_FILE_HANDLE* realRoo
 //
 STATIC EFI_STATUS IopDetectRoot(EFI_HANDLE deviceHandle, EFI_DEVICE_PATH_PROTOCOL* bootFilePath, BOOLEAN allowBootDirectory)
 {
-	UINT8 i																	= 0;
 	EFI_STATUS status														= EFI_SUCCESS;
 	EFI_FILE_HANDLE kernelFile												= nullptr;
 	EFI_FILE_HANDLE realRootFile											= nullptr;
