@@ -784,7 +784,6 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 	EFI_STATUS status														= EFI_SUCCESS;
 	UINT32 attributes														= (EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE);
 	UINT32 csrActiveConfig													= CSR_ALLOW_APPLE_INTERNAL;
-	UINT32 csrCapabilities													= (kBootArgsFlagCSRActiveConfig | kBootArgsFlagCSRBoot);
 	UINTN dataSize															= sizeof(UINT32);
 	//
 	// Step one. Check the 'csr-active-config' variable in NVRAM.
@@ -832,57 +831,6 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 		for (i = 0; i < 5; i++)
 		{
 			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config[0x%x/0x%x] found (OK)!\n"), csrActiveConfig, dataSize);
-		}
-	}
-
-	dataSize																= sizeof(UINT16);
-
-	//
-	// Step two. Check the 'bootercfg' variable in NVRAM.
-	//
-	if(EFI_ERROR(status = EfiRuntimeServices->GetVariable(CHAR16_STRING(L"bootercfg"), &AppleNVRAMVariableGuid, nullptr, &dataSize, &csrCapabilities)))
-	{
-		for (i = 0; i < 5; i++)
-		{
-			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM bootercfg NOT found (ERROR: %d)!\n"), status);
-		}
-		//
-		// Not there. Add the 'bootercfg' variable.
-		//
-		if(EFI_ERROR(status = EfiRuntimeServices->SetVariable(CHAR16_STRING(L"bootercfg"), &AppleNVRAMVariableGuid, attributes, sizeof(UINT16), &csrCapabilities)))
-		{
-			for (i = 0; i < 5; i++)
-			{
-				CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM bootercfg add failed (ERROR: %d)!\n"), status);
-			}
-		}
-		else
-		{
-			for (i = 0; i < 5; i++)
-			{
-				CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM bootercfg set (OK)!\n"));
-			}
-		}
-		//
-		// Set CsrCapabilities to the default value.
-		//
-		bootArgs->CsrCapabilities											= (kBootArgsFlagCSRActiveConfig | kBootArgsFlagCSRBoot);
-		
-		for (i = 0; i < 5; i++)
-		{
-			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM bootercfg added!\n"));
-		}
-	}
-	else
-	{
-		//
-		// Set csrCapabilities to the value found in NVRAM.
-		//
-		bootArgs->CsrCapabilities											= csrCapabilities;
-		
-		for (i = 0; i < 5; i++)
-		{
-			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM bootercfg[0x%x/0x%x] found (OK)!\n"), csrCapabilities, dataSize);
 		}
 	}
 
