@@ -465,7 +465,7 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 			CsPrintf(CHAR8_CONST_STRING("PIKE: bootFileName = %s!\n"), bootFileName);
 		}
 
-		if(EFI_ERROR(status = DevTreeAddProperty(chosenNode, CHAR8_CONST_STRING("boot-file"), bootFileName, static_cast<UINT32>(strlen(bootFileName) + 1) * sizeof(CHAR8), TRUE)))
+		if(EFI_ERROR(status = DevTreeAddProperty(chosenNode, CHAR8_CONST_STRING("boot-file"), bootFileName, static_cast<UINT32>(strlen(bootFileName) + 1) * sizeof(CHAR8), FALSE)))
 		{
 			for (ix = 0; ix < 5; ix++)
 			{
