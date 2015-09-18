@@ -255,3 +255,8 @@ EFI_STATUS BlFinalizeBootArgs(BOOT_ARGS* bootArgs, CHAR8 CONST* kernelCommandLin
 // Read csr-active-config from NVRAM
 //
 EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs);
+
+//
+// Mimic boot.efi and set boot.efi info properties.
+//
+EFI_STATUS BlAddBooterInfo(DEVICE_TREE_NODE* chosenNode);
