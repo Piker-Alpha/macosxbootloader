@@ -398,7 +398,7 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 			//
 			// get root match
 			//
-			CHAR8 CONST* rootMatchDict										= CmSerializeValueForKey(CHAR8_CONST_STRING("Root Match"), nullptr);
+			CHAR8 const* rootMatchDict										= CmSerializeValueForKey(CHAR8_CONST_STRING("Root Match"), nullptr);
 			if(!rootMatchDict)
 			{
 				//
@@ -455,7 +455,7 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 		// Set chosen/boot-file property.
 		//
 		UINT8 ix															= 0;
-		CHAR8 CONST* bootFileName											= LdrGetKernelCachePathName();
+		CHAR8 const* bootFileName											= LdrGetKernelCachePathName();
 		
 		if(BlTestBootMode(BOOT_MODE_SAFE))
 			bootFileName													= LdrGetKernelPathName();
@@ -465,7 +465,7 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 			CsPrintf(CHAR8_CONST_STRING("PIKE: bootFileName = %s!\n"), bootFileName);
 		}
 
-		if(EFI_ERROR(status = DevTreeAddProperty(chosenNode, CHAR8_CONST_STRING("boot-file"), bootFileName, static_cast<UINT32>(strlen(bootFileName) + 1) * sizeof(CHAR8), FALSE)))
+		if(EFI_ERROR(status = DevTreeAddProperty(chosenNode, CHAR8_CONST_STRING("boot-file"), bootFileName, static_cast<UINT32>(strlen(bootFileName) + 1) * sizeof(CHAR8), TRUE)))
 		{
 			for (ix = 0; ix < 5; ix++)
 			{
