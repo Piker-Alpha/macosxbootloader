@@ -864,7 +864,7 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 }
 
 //
-// mimic boot.efi and set boot.efi info properties.
+// Mimic boot.efi and set boot.efi info properties.
 //
 EFI_STATUS BlAddBooterInfo(DEVICE_TREE_NODE* chosenNode)
 {
