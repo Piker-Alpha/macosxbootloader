@@ -196,13 +196,7 @@ STATIC EFI_STATUS IopDetectRoot(EFI_HANDLE deviceHandle, EFI_DEVICE_PATH_PROTOCO
 		// detect RPS
 		//
 		if(!EFI_ERROR(status = IopCheckRPS(IopRootFile, &realRootFile)))
-		{
-			DEVICE_TREE_NODE* chosenNode									= DevTreeFindNode(CHAR8_CONST_STRING("/chosen"), TRUE);
-			if(chosenNode)
-				DevTreeAddProperty(chosenNode, CHAR8_CONST_STRING("bootroot-active"), nullptr, 0, FALSE);
-
 			try_leave(BlSetBootMode(BOOT_MODE_BOOT_IS_NOT_ROOT, 0));
-		}
 
 		//
 		// check boot directory
