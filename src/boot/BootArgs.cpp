@@ -454,31 +454,14 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 		//
 		// Set chosen/boot-file property.
 		//
-		UINT8 ix															= 0;
 		CHAR8 const* bootFileName											= LdrGetKernelCachePathName();
 		
 		if(BlTestBootMode(BOOT_MODE_SAFE))
 			bootFileName													= LdrGetKernelPathName();
 
-		for (ix = 0; ix < 5; ix++)
-		{
-			CsPrintf(CHAR8_CONST_STRING("PIKE: bootFileName = %s!\n"), bootFileName);
-		}
-
 		if(EFI_ERROR(status = DevTreeAddProperty(chosenNode, CHAR8_CONST_STRING("boot-file"), bootFileName, static_cast<UINT32>(strlen(bootFileName) + 1) * sizeof(CHAR8), FALSE)))
 		{
-			for (ix = 0; ix < 5; ix++)
-			{
-				CsPrintf(CHAR8_CONST_STRING("PIKE: DevTreeAddProperty('boot-file') failed with status 0x%x!\n"), status);
-			}
 			try_leave(NOTHING);
-		}
-		else
-		{
-			for (ix = 0; ix < 5; ix++)
-			{
-				CsPrintf(CHAR8_CONST_STRING("PIKE: DevTreeAddProperty('boot-file') status = OK!\n"));
-			}
 		}
 
 		//
@@ -494,10 +477,27 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 			try_leave(NOTHING);
 
 		//
+		// Boot != Root key for firmware's /chosen
+		//
+		if(BlTestBootMode(BOOT_MODE_BOOT_IS_NOT_ROOT))
+		{
+			if(EFI_ERROR(status = DevTreeAddProperty(chosenNode, CHAR8_CONST_STRING("bootroot-active"), nullptr, 0, FALSE)))
+			{
+				try_leave(NOTHING);
+			}
+		}
+
+		//
+		// Add booter version information.
+		//
+		BlAddBooterInfo(chosenNode);
+
+		//
 		// add ram dmg info
 		//
 		BlpAddRamDmgProperty(chosenNode, bootDevicePath);
-		
+
+
 		//
 		// add random-seed property with a static data (for testing only)
 		//
@@ -812,7 +812,7 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 		attributes															|= EFI_VARIABLE_NON_VOLATILE;
 	}
 	//
-	// Step one. Check the 'csr-active-config' variable in NVRAM.
+	// Check 'csr-active-config' variable in NVRAM.
 	//
 	if(EFI_ERROR(status = EfiRuntimeServices->GetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, nullptr, &dataSize, &csrActiveConfig)))
 	{
@@ -859,6 +859,23 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config[0x%x/0x%x] found (OK)!\n"), csrActiveConfig, dataSize);
 		}
 	}
+
+	return status;
+}
+
+//
+// mimic boot.efi and set boot.efi info properties.
+//
+EFI_STATUS BlAddBooterInfo(DEVICE_TREE_NODE* chosenNode)
+{
+	EFI_STATUS status														= EFI_SUCCESS;
+
+	//
+	// Static data for now. Should extract this from Apple's boot.efi
+	//
+	DevTreeAddProperty(chosenNode, CHAR8_CONST_STRING("booter-name"), "boot.efi", 8, FALSE);
+	DevTreeAddProperty(chosenNode, CHAR8_CONST_STRING("booter-version"), "version:307", 11, FALSE);
+	DevTreeAddProperty(chosenNode, CHAR8_CONST_STRING("booter-build-time"), "Fri Sep  4 15:34:00 PDT 2015", 28, FALSE);
 
 	return status;
 }
