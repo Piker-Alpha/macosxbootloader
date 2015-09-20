@@ -317,29 +317,23 @@ EFI_STATUS BlDetectMemorySize()
 					break;
 				
 				SMBIOS_TABLE_TYPE1* table1									= reinterpret_cast<SMBIOS_TABLE_TYPE1*>(startOfTable);
-				if(table1->Uuid)
+				//
+				// Build UUID
+				//
+				UINT8 ix												= 0;
+				EFI_GUID* g												= &table1->Uuid;
+				CHAR8 CONST* guidFormat									= CHAR8_CONST_STRING("%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X");
+				snprintf(BlpSystemId, ARRAYSIZE(BlpSystemId) - 1, guidFormat, g->Data1, g->Data2, g->Data3, g->Data4[0], g->Data4[1], g->Data4[2], g->Data4[3], g->Data4[4], g->Data4[5], g->Data4[6], g->Data4[7]);
+					
+				for (ix = 0; ix < 5; ix++)
 				{
-					//
-					// Build UUID
-					//
-					EFI_GUID* g												= &table1->Uuid;
-					CHAR8 CONST* guidFormat									= CHAR8_CONST_STRING("%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X");
-					snprintf(BlpSystemId, ARRAYSIZE(BlpSystemId) - 1, guidFormat, g->Data1, g->Data2, g->Data3, g->Data4[0], g->Data4[1], g->Data4[2], g->Data4[3], g->Data4[4], g->Data4[5], g->Data4[6], g->Data4[7]);
-					
-					for (ix = 0; ix < 5; ix++)
-					{
-						CsPrintf(CHAR8_CONST_STRING("PIKE: table1->Uuid[%s] found!\n"), BlpSystemId);
-					}
-					
-					//
-					// Get /efi/platform node
-					//
-					DEVICE_TREE_NODE* platformNode							= DevTreeFindNode(CHAR8_CONST_STRING("/efi/platform"), FALSE);
-					if(!platformNode)
-						try_leave(status = EFI_OUT_OF_RESOURCES);
-
-					DevTreeAddProperty(platformNode, CHAR8_CONST_STRING("system-id"), &table1->Uuid, ARRAYSIZE(BlpSystemId), TRUE);
+					CsPrintf(CHAR8_CONST_STRING("PIKE: table1->Uuid[%s] found!\n"), BlpSystemId);
 				}
+				//
+				// Get /efi/platform node
+				//
+				DEVICE_TREE_NODE* platformNode							= DevTreeFindNode(CHAR8_CONST_STRING("/efi/platform"), FALSE);
+				DevTreeAddProperty(platformNode, CHAR8_CONST_STRING("system-id"), &table1->Uuid, ARRAYSIZE(BlpSystemId), TRUE);
 			}
 			else if(tableHeader->Type == 2)
 			{
