@@ -12,11 +12,15 @@ Phase 1: Status - Work In Progress
     - "\System\Library\Prelinkedkernels\prelinkedkernel" for regular bootups.
 
 3.) Implement SIP support (status: Work In Progress).
+    - Currently csrutil disable/enable fails to operate properly!
 
-4.) Fix Beach Ball of Death (BBOD) issue after clearing NVRAM. 
+4.) Fix Beach Ball of Death (BBOD) issue after clearing NVRAM:. (status: Done).
+    - Booting from the Recovery HD is fine.
+    - This issue was fixed by setting IODeviceTREE:efi/platform/system-id to the SMBIOS UUID.
 
 5.) Add missing booter info properties, like: "booter-name", "booted-version" and "booter-build-time" (status: Work In Progress).
 
+6.) Fix safe boot.
 
 
 OS X 10.10 Yosemite TODO list:
