@@ -175,7 +175,9 @@ int xts_encrypt(
          symmetric_xts *xts)
 {
    aesedp_encrypt_ctx *encrypt_ctx = &xts->key1.encrypt;
-   uint8_t PP[16], CC[16], T[16];
+	uint8_t PP[16]	= {0};
+   uint8_t CC[16]	= {0};
+   uint8_t T[16]	= {0};
    uint32_t i, m, mo, lim;
    uint32_t err;
 
@@ -273,7 +275,9 @@ int xts_decrypt(
          symmetric_xts *xts)
 {
    aesedp_decrypt_ctx *decrypt_ctx = &xts->key1.decrypt;
-   uint8_t PP[16], CC[16], T[16];
+	uint8_t PP[16]	= {0};
+   uint8_t CC[16]	= {0};
+   uint8_t T[16]	= {0};
    uint32_t i, m, mo, lim;
    uint32_t err;
 
@@ -302,7 +306,9 @@ int xts_decrypt(
    }
 
    for (i = 0; i < lim; i++) {
-      err = tweak_uncrypt(ct, pt, T, decrypt_ctx);
+      if ((err = tweak_uncrypt(ct, pt, T, decrypt_ctx)) != CRYPT_OK) {
+		  return err;
+	  }
       ct += 16;
       pt += 16;
    }

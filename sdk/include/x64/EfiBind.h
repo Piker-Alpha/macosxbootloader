@@ -31,11 +31,10 @@ Abstract:
 #define EFI_APPLICATION_ENTRY_POINT EFI_DRIVER_ENTRY_POINT
 
 
-
 //
-// Make sure we are useing the correct packing rules per EFI specification
+// Make sure we are using the correct packing rules per EFI specification
 //
-#pragma pack()
+#pragma pack(8)
 
 #if _MSC_EXTENSIONS
 
@@ -95,9 +94,8 @@ Abstract:
   //
  
   #if _MSC_EXTENSIONS 
-    
     //
-    // use Microsoft* C complier dependent interger width types 
+    // use Microsoft* C complier dependent interger width types
     //
     typedef unsigned __int64    uint64_t;
     typedef __int64             int64_t;
