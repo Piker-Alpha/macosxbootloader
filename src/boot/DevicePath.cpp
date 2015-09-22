@@ -350,7 +350,7 @@ EFI_HANDLE DevPathGetPartitionHandleByNumber(EFI_DEVICE_PATH_PROTOCOL* reference
 		EFI_DEVICE_PATH_PROTOCOL* pathA										= referencePath;
 		EFI_DEVICE_PATH_PROTOCOL* pathB										= devicePath;
 		BOOLEAN checkResult													= TRUE;
-		for(UINTN i = 0; i < nodeCount && !EfiIsDevicePathEnd(pathA) && !EfiIsDevicePathEnd(pathB); i ++)
+		for(UINTN ix = 0; ix < nodeCount && !EfiIsDevicePathEnd(pathA) && !EfiIsDevicePathEnd(pathB); ix++)
 		{
 			if(EfiDevicePathNodeLength(pathA) != EfiDevicePathNodeLength(pathB))
 			{

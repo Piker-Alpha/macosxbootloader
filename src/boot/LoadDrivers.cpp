@@ -155,13 +155,13 @@ STATIC EFI_STATUS LdrpLoadDriverPList(CHAR8 CONST* extensionDir, CHAR8 CONST* fi
 		//
 		// build directory
 		//
-		snprintf(driverDirectory, filePathLength / sizeof(CHAR8), CHAR8_CONST_STRING("%a\\%a\\%a"), extensionDir, fileName, inContentsFolder ? contentsMacOSDir : CHAR8_CONST_STRING(""));
+		snprintf(driverDirectory, filePathLength / sizeof(CHAR8), CHAR8_CONST_STRING("%s\\%s\\%s"), extensionDir, fileName, inContentsFolder ? contentsMacOSDir : CHAR8_CONST_STRING(""));
 
 		//
 		// build file name
 		//
 		STATIC CHAR8 fullFileName[1025]										= {0};
-		snprintf(fullFileName, ARRAYSIZE(fullFileName), CHAR8_CONST_STRING("%a\\%a\\%aInfo.plist"), extensionDir, fileName, inContentsFolder ? contentsDir : CHAR8_CONST_STRING(""));
+		snprintf(fullFileName, ARRAYSIZE(fullFileName), CHAR8_CONST_STRING("%s\\%s\\%sInfo.plist"), extensionDir, fileName, inContentsFolder ? contentsDir : CHAR8_CONST_STRING(""));
 
 		//
 		// open file
@@ -308,7 +308,7 @@ STATIC EFI_STATUS LdrpLoadDrivers(CHAR8 CONST* extensionsDirectory, BOOLEAN isPl
 			// check content folder
 			//
 			IO_FILE_HANDLE tempFileHandle									= {0};
-			snprintf(localBuffer, ARRAYSIZE(localBuffer) - 1, CHAR8_CONST_STRING("%a\\%a\\Contents"), extensionsDirectory, utf8FileName);
+			snprintf(localBuffer, ARRAYSIZE(localBuffer) - 1, CHAR8_CONST_STRING("%s\\%s\\Contents"), extensionsDirectory, utf8FileName);
 			BOOLEAN hasContentsFolder										= EFI_ERROR(IoOpenFile(localBuffer, nullptr, &tempFileHandle, IO_OPEN_MODE_NORMAL)) ? FALSE : TRUE;
 			IoCloseFile(&tempFileHandle);
 
@@ -317,7 +317,7 @@ STATIC EFI_STATUS LdrpLoadDrivers(CHAR8 CONST* extensionsDirectory, BOOLEAN isPl
 			//
 			STATIC CHAR8 pluginBuffer[1024]									= {0};
 			if(!isPluginModule)
-				snprintf(pluginBuffer, ARRAYSIZE(pluginBuffer) - 1, CHAR8_CONST_STRING("%a\\%a\\%aPlugIns"), extensionsDirectory, utf8FileName, hasContentsFolder ? "Contents\\" : "");
+				snprintf(pluginBuffer, ARRAYSIZE(pluginBuffer) - 1, CHAR8_CONST_STRING("%s\\%s\\%sPlugIns"), extensionsDirectory, utf8FileName, hasContentsFolder ? "Contents\\" : "");
 
 			//
 			// load plist
@@ -410,7 +410,7 @@ STATIC EFI_STATUS LdrpLoadMatchedModules()
 				if(theProperty)
 				{
 					CHAR8* fileName											= theProperty->StringValue;
-					snprintf(fileFullPath, ARRAYSIZE(fileFullPath) - 1, CHAR8_CONST_STRING("%a%a"), theModule->DriverPath, fileName);
+					snprintf(fileFullPath, ARRAYSIZE(fileFullPath) - 1, CHAR8_CONST_STRING("%s%s"), theModule->DriverPath, fileName);
 					if(EFI_ERROR(IoOpenFile(fileFullPath, nullptr, &fileHandle, IO_OPEN_MODE_NORMAL)))
 						try_leave(NOTHING);
 
@@ -442,7 +442,7 @@ STATIC EFI_STATUS LdrpLoadMatchedModules()
 				memcpy(ArchConvertAddressToPointer(driverInfo->InfoPlistAddress, CHAR8*), theModule->InfoPlistBuffer, theModule->InfoPlistLength);
 				memcpy(ArchConvertAddressToPointer(driverInfo->DriverPath, CHAR8*), theModule->DriverPath, theModule->DriverPathLength);
 				BlConvertPathSeparator(ArchConvertAddressToPointer(driverInfo->DriverPath, CHAR8*), '\\', '/');
-				snprintf(segName, ARRAYSIZE(segName) - 1, CHAR8_CONST_STRING("Driver-%lX"), physicalAddress);
+				snprintf(segName, ARRAYSIZE(segName) - 1, CHAR8_CONST_STRING("Driver-%llx"), physicalAddress);
 				if(!EFI_ERROR(BlAddMemoryRangeNode(segName, driverAddress, driverLength)))
 					physicalAddress											= 0;
 			}

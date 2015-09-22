@@ -17,9 +17,10 @@ STATIC UINT64 AcpipNVSMemoryAddress											= 0;
 //
 VOID CONST* AcpipGetTable(UINT32 signature)
 {
+	UINT32																	i = 0;
 	EFI_CONFIGURATION_TABLE* theTable										= EfiSystemTable->ConfigurationTable;
 	EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER CONST* acpiRsdp			= nullptr;
-	for(UINTN i = 0; i < EfiSystemTable->NumberOfTableEntries; i ++, theTable ++)
+	for(i < EfiSystemTable->NumberOfTableEntries; i++, theTable++)
 	{
 		if(!memcmp(&theTable->VendorGuid, &EfiAcpi20TableGuid, sizeof(EfiAcpi20TableGuid)))
 		{
@@ -53,12 +54,12 @@ VOID CONST* AcpipGetTable(UINT32 signature)
 	}
 
 	VOID* tableArray														= acpiRsdt + 1;
-	for(UINT32 i = 0; i < tableCount; i ++, tableArray = Add2Ptr(tableArray, itemSize, VOID*))
+	for(i = 0; i < tableCount; i ++, tableArray = Add2Ptr(tableArray, itemSize, VOID*))
 	{
 		UINT64 tableAddress													= itemSize == sizeof(UINT64) ? *static_cast<UINT64*>(tableArray) : *static_cast<UINT32*>(tableArray);
-		EFI_ACPI_DESCRIPTION_HEADER* theTable								= ArchConvertAddressToPointer(tableAddress, EFI_ACPI_DESCRIPTION_HEADER*);
-		if(theTable->Signature == signature)
-			return theTable;
+		EFI_ACPI_DESCRIPTION_HEADER* theHeader								= ArchConvertAddressToPointer(tableAddress, EFI_ACPI_DESCRIPTION_HEADER*);
+		if(theHeader->Signature == signature)
+			return theHeader;
 	}
 
 	return nullptr;

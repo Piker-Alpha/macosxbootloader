@@ -48,7 +48,7 @@ STATIC BOOLEAN BlpDetectPanicLoop(UINT8 maxPanicInfoIndex, UINTN totalInfoLength
 
 	__try
 	{
-		UINT8* panicInfoBuffer												= static_cast<UINT8*>(MmAllocatePool(totalInfoLength));
+		panicInfoBuffer														= static_cast<UINT8*>(MmAllocatePool(totalInfoLength));
 		if(!panicInfoBuffer)
 			try_leave(NOTHING);
 

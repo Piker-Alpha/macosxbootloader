@@ -1073,6 +1073,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 		//
 		VOID* dataSegment													= nullptr;
 		VOID* linkEditSegment												= nullptr;
+		UINT32 ix															= 0;
 		UINT64 linkEditSegmentOffset										= 0;
 		LOAD_COMMAND_HEADER* theCommand										= static_cast<LOAD_COMMAND_HEADER*>(commandsBuffer);
 		for(UINT32 i = 0; i < machHeader.CommandsCount; i ++, theCommand = Add2Ptr(theCommand, theCommand->CommandLength, LOAD_COMMAND_HEADER*))
@@ -1103,7 +1104,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 					if(LdrGetASLRDisplacement())
 					{
 						SYMTAB_ENTRY64* symbolEntry							= Add2Ptr(linkEditSegment, symbolTableCommand->SymbolTableOffset - linkEditSegmentOffset, SYMTAB_ENTRY64*);
-						for(UINT32 i = 0; i < symbolTableCommand->SymbolCount; i ++, symbolEntry ++)
+						for(ix = 0; ix < symbolTableCommand->SymbolCount; ix++, symbolEntry++)
 						{
 							if(symbolEntry->Type <= 0x1f)
 								symbolEntry->Value							+= LdrGetASLRDisplacement();
@@ -1121,7 +1122,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 							try_leave(status = EFI_LOAD_ERROR);
 
 						RELOCATION_INFO* relocationInfo						= Add2Ptr(linkEditSegment, dynamicSymbolTableCommand->LocalRelocationOffset - linkEditSegmentOffset, RELOCATION_INFO*);
-						for(UINT32 i = 0; i < dynamicSymbolTableCommand->LocalRelocationCount; i ++, relocationInfo ++)
+						for(ix = 0; ix < dynamicSymbolTableCommand->LocalRelocationCount; ix++, relocationInfo++)
 						{
 							//
 							// In final linked images, there are only two valid relocation kinds:

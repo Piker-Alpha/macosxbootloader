@@ -149,7 +149,7 @@ VOID MmpCreateSubRegion(EFI_MEMORY_DESCRIPTOR* memoryMap, UINTN* memoryMapSize, 
 			UINT64 newPagesCount											= EFI_SIZE_TO_PAGES(newPhysicalAddress - curDescriptor->PhysicalStart);
 			memcpy(newDescriptor, curDescriptor, descriptorSize);
 			newDescriptor->NumberOfPages									= newPagesCount;
-			UINT64 length													= newPagesCount << EFI_PAGE_SHIFT;
+			length															= newPagesCount << EFI_PAGE_SHIFT;
 			curDescriptor->PhysicalStart									+= length;
 			curDescriptor->NumberOfPages									-= newPagesCount;
 			curPagesCount													-= newPagesCount;

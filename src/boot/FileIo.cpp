@@ -605,12 +605,12 @@ EFI_STATUS IoReadFile(IO_FILE_HANDLE* fileHandle, VOID* readBuffer, UINTN buffer
 				if(!fileHandle->FileBuffer)
 					try_leave(status = EFI_OUT_OF_RESOURCES);
 
-				UINTN readLength											= static_cast<UINTN>(fileSize);
-				status														= fileHandle->EfiLoadFileProtocol->LoadFile(fileHandle->EfiLoadFileProtocol, fileHandle->EfiFilePath, FALSE, &readLength, fileHandle->FileBuffer);
+				UINTN read_length											= static_cast<UINTN>(fileSize);
+				status														= fileHandle->EfiLoadFileProtocol->LoadFile(fileHandle->EfiLoadFileProtocol, fileHandle->EfiFilePath, FALSE, &read_length, fileHandle->FileBuffer);
 				if(EFI_ERROR(status))
 					try_leave(NOTHING);
 
-				if(readLength != fileHandle->FileSize)
+				if(read_length != fileHandle->FileSize)
 					try_leave(MmFreePool(fileHandle->FileBuffer); fileHandle->FileBuffer = nullptr; status = EFI_DEVICE_ERROR);
 			}
 		}
