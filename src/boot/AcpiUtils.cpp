@@ -17,10 +17,10 @@ STATIC UINT64 AcpipNVSMemoryAddress											= 0;
 //
 VOID CONST* AcpipGetTable(UINT32 signature)
 {
-	UINT32																	i = 0;
+	UINT32 i																= 0;
 	EFI_CONFIGURATION_TABLE* theTable										= EfiSystemTable->ConfigurationTable;
 	EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER CONST* acpiRsdp			= nullptr;
-	for(i < EfiSystemTable->NumberOfTableEntries; i++, theTable++)
+	for(; i < EfiSystemTable->NumberOfTableEntries; i++, theTable++)
 	{
 		if(!memcmp(&theTable->VendorGuid, &EfiAcpi20TableGuid, sizeof(EfiAcpi20TableGuid)))
 		{
