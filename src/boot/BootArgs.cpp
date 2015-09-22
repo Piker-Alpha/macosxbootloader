@@ -336,23 +336,6 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 		AcpiGetPciConfigSpaceInfo(&bootArgs->PCIConfigSpaceBaseAddress, &bootArgs->PCIConfigSpaceStartBusNumber, &bootArgs->PCIConfigSpaceEndBusNumber);
 
 		//
-		// System Integrity Protection settings.
-		//
-		// Values: kBootArgsFlagCSRActiveConfig, kBootArgsFlagCSRConfigMode and kBootArgsFlagCSRBoot (required for installer).
-		//
-		bootArgs->Flags														|= (kBootArgsFlagCSRActiveConfig + kBootArgsFlagCSRBoot);
-
-		//
-		// Set System Integrity Protection ON by default
-		//
-		bootArgs->CsrActiveConfig											= CSR_ALLOW_APPLE_INTERNAL;
-
-		//
-		// System Integrity Protection Capabilties.
-		//
-		bootArgs->CsrCapabilities											= CSR_VALID_FLAGS;
-
-		//
 		// Power Management (set to 0 = no limit)
 		//
 		bootArgs->Boot_SMC_plimit											= 0;
@@ -810,8 +793,19 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 	if(BlTestBootMode(BOOT_MODE_EFI_NVRAM_RECOVERY_BOOT_MODE))
 	{
 		attributes															|= EFI_VARIABLE_NON_VOLATILE;
-		csrActiveConfig														= CSR_VALID_FLAGS;
+		csrActiveConfig														= CSR_ALLOW_DEVICE_CONFIGURATION;
+		bootArgs->Flags														|= kBootArgsFlagCSRBoot;
 	}
+	else
+	{
+		bootArgs->Flags														|= (kBootArgsFlagCSRActiveConfig + kBootArgsFlagCSRBoot);
+	}
+
+	//
+	// System Integrity Protection Capabilties.
+	//
+	bootArgs->CsrCapabilities												= CSR_VALID_FLAGS;
+
 	//
 	// Check 'csr-active-config' variable in NVRAM.
 	//
