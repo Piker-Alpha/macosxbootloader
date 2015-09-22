@@ -350,7 +350,7 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 		//
 		// System Integrity Protection Capabilties.
 		//
-		bootArgs->CsrCapabilities											= CSR_VALID_FLAGS; // CSR_VALID_FLAGS;
+		bootArgs->CsrCapabilities											= CSR_VALID_FLAGS;
 
 		//
 		// Power Management (set to 0 = no limit)
@@ -810,6 +810,7 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 	if(BlTestBootMode(BOOT_MODE_EFI_NVRAM_RECOVERY_BOOT_MODE))
 	{
 		attributes															|= EFI_VARIABLE_NON_VOLATILE;
+		csrActiveConfig														= CSR_VALID_FLAGS;
 	}
 	//
 	// Check 'csr-active-config' variable in NVRAM.
@@ -840,7 +841,7 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 		//
 		// Set System Integrity Protection ON by default
 		//
-		bootArgs->CsrActiveConfig											= CSR_ALLOW_APPLE_INTERNAL;
+		bootArgs->CsrActiveConfig											= csrActiveConfig;
 
 		for (i = 0; i < 5; i++)
 		{
