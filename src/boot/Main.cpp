@@ -70,11 +70,11 @@ STATIC EFI_STATUS BlpSetupRomVariable()
 				if(i)
 				{
 					dataSize												= 0;
-					UINT8* mlbBuffer										= tempBuffer + i * 0x12 - 0x12;
-					while(mlbBuffer[dataSize] != ' ')
+					UINT8* mlb_buffer										= tempBuffer + i * 0x12 - 0x12;
+					while(mlb_buffer[dataSize] != ' ')
 						dataSize											+= 1;
 
-					EfiRuntimeServices->SetVariable(CHAR16_STRING(L"MLB"), &AppleFirmwareVariableGuid, attribute, dataSize, mlbBuffer);
+					EfiRuntimeServices->SetVariable(CHAR16_STRING(L"MLB"), &AppleFirmwareVariableGuid, attribute, dataSize, mlb_buffer);
 				}
 				break;
 			}
@@ -521,17 +521,11 @@ EFI_STATUS EFIAPI EfiMain(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable)
 		//
 		// check recovery
 		//
-		UINT8 i																= 0;
 		CHAR8* filePath														= DevPathExtractFilePathName(bootFilePath, TRUE);
 		if(filePath)
 		{
 			if(strstr(filePath, CHAR8_CONST_STRING("com.apple.recovery.boot")))
 			{
-				for (i = 0; i < 5; i++)
-				{
-					CsPrintf(CHAR8_CONST_STRING("PIKE: Set RecoveryHD mode!\n"));
-				}
-
 				BlSetBootMode(BOOT_MODE_FROM_RECOVER_BOOT_DIRECTORY, BOOT_MODE_EFI_NVRAM_RECOVERY_BOOT_MODE | BOOT_MODE_BOOT_IS_NOT_ROOT);
 			}
 
@@ -623,26 +617,13 @@ EFI_STATUS EFIAPI EfiMain(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable)
 		//
 		CsFinalize();
 
+#if (TARGET_OS == EL_CAPITAN)
 		//
 		// SIP configuration.
 		//
-		CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlInitCSRState()!\n"));
-
 		if(EFI_ERROR(BlInitCSRState(bootArgs)))
-		{
-			for(i = 0; i < 5; i++)
-			{
-				CsPrintf(CHAR8_CONST_STRING("PIKE: Returned from BlInitCSRState(ERROR)!\n"));
-			}
-		}
-		else
-		{
-			for(i = 0; i < 5; i++)
-			{
-				CsPrintf(CHAR8_CONST_STRING("PIKE: Returned from BlInitCSRState(OK)!\n"));
-			}
-		}
-
+			try_leave(NOTHING);
+#endif
 		//
 		// finish boot args
 		//

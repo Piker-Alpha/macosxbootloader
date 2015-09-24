@@ -9,7 +9,10 @@
 
 #define KERNEL_CACHE_MAGIC													0x636f6d70
 #define KERNEL_CACHE_LZSS													0x6c7a7373
-#define KERNEL_CACHE_LZVN													0x6c7a766e
+
+#if (TARGET_OS >= YOSEMITE)
+	#define KERNEL_CACHE_LZVN												0x6c7a766e
+#endif
 
 //
 // compressed header
@@ -583,19 +586,21 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 				if(EFI_ERROR(status = BlDecompressLZSS(compressedBuffer, compressedSize, uncompressedBuffer, uncompressedSize, &readLength)))
 					try_leave(NOTHING);
 			}
+#if (TARGET_OS >= YOSEMITE)
 			else if(fileHeader.CompressType == SWAP_BE32_TO_HOST(KERNEL_CACHE_LZVN))
 			{
-#if DEBUG_LDRP_CALL_CSPRINTF
+	#if DEBUG_LDRP_CALL_CSPRINTF
 				CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlDecompressLZVN().\n"));
-#endif
+	#endif
 				if(EFI_ERROR(status = BlDecompressLZVN(compressedBuffer, compressedSize, uncompressedBuffer, uncompressedSize, &readLength)))
 				{
-#if DEBUG_LDRP_CALL_CSPRINTF
+	#if DEBUG_LDRP_CALL_CSPRINTF
 					CsPrintf(CHAR8_CONST_STRING("PIKE: BlDecompressLZVN() returned: %d!\n"), status);
-#endif
+	#endif
 					try_leave(NOTHING);
 				}
 			}
+#endif // #if (TARGET_OS >= YOSEMITE)
 
 			//
 			// length check

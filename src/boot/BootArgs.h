@@ -204,6 +204,7 @@ typedef struct _BOOT_ARGS
 	//
 	UINT32																	PCIConfigSpaceEndBusNumber;
 
+#if (TARGET_OS == EL_CAPITAN)
 	//
 	//
 	//
@@ -233,6 +234,12 @@ typedef struct _BOOT_ARGS
 	// padding
 	//
 	UINT32																	Reserved4[726];
+#else // #if (TARGET_OS == EL_CAPITAN)
+	//
+	// padding
+	//
+	UINT32																	Reserved4[730];
+#endif // #if (TARGET_OS == EL_CAPITAN)
 }BOOT_ARGS;
 #include <poppack.h>
 
@@ -251,10 +258,12 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 //
 EFI_STATUS BlFinalizeBootArgs(BOOT_ARGS* bootArgs, CHAR8 CONST* kernelCommandLine, EFI_HANDLE bootDeviceHandle, struct _MACH_O_LOADED_INFO* loadedInfo);
 
+#if (TARGET_OS == EL_CAPITAN)
 //
 // Read csr-active-config from NVRAM
 //
 EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs);
+#endif
 
 //
 // Mimic boot.efi and set boot.efi info properties.

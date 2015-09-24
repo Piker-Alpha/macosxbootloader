@@ -85,3 +85,5 @@ extern EFI_GUID																AppleImageCodecProtocolGuid;
 extern EFI_GUID																AppleDiskIoProtocolGuid;
 extern EFI_GUID																AppleSMCProtocolGuid;
 extern EFI_GUID																AppleFileVaultVariableGuid;
+
+BOOLEAN isEfiNullGuid(EFI_GUID* aGuid);

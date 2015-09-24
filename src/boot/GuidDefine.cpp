@@ -6,7 +6,6 @@
 //********************************************************************
 
 #include "StdAfx.h"
-#include "GuidDefine.h"
 
 EFI_GUID EfiDataHubProtocolGuid												= EFI_DATA_HUB_PROTOCOL_GUID;
 EFI_GUID EfiAcpi20TableGuid													= EFI_ACPI_20_TABLE_GUID;
@@ -49,3 +48,19 @@ EFI_SYSTEM_TABLE* EfiSystemTable											= nullptr;
 EFI_BOOT_SERVICES* EfiBootServices											= nullptr;
 EFI_RUNTIME_SERVICES* EfiRuntimeServices									= nullptr;
 EFI_HANDLE EfiImageHandle													= nullptr;
+
+//
+// Check for NULL guid.
+//
+
+BOOLEAN isEfiNullGuid(EFI_GUID *aGuid)
+{
+	UINT32 *guid = (UINT32 *) aGuid;
+	
+	if ((guid[0] == 0) && (guid[1] == 0) && (guid[2] == 0) && (guid[3] == 0))
+	{
+		return TRUE;
+	}
+	
+	return FALSE;
+}

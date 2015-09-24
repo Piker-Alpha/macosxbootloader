@@ -333,6 +333,7 @@ STATIC EFI_STATUS CspConvertLogoImage(BOOLEAN normalLogo, EFI_UGA_PIXEL** logoIm
 		if(!imageData)
 			try_leave(status = EFI_OUT_OF_RESOURCES);
 
+#if (TARGET_OS >= YOSMITE)
 		if (index < 2)
 		{
 			if(EFI_ERROR(status = BlDecompressLZVN(imageInfo[index].Buffer, imageInfo[index].BufferSize, imageData, imageSize, &imageSize)))
@@ -340,10 +341,12 @@ STATIC EFI_STATUS CspConvertLogoImage(BOOLEAN normalLogo, EFI_UGA_PIXEL** logoIm
 		}
 		else
 		{
+#endif // #if (TARGET_OS >= YOSMITE)
 			if(EFI_ERROR(status = BlDecompressLZSS(imageInfo[index].Buffer, imageInfo[index].BufferSize, imageData, imageSize, &imageSize)))
 				try_leave(NOTHING);
+#if (TARGET_OS >= YOSMITE)
 		}
-
+#endif // #if (TARGET_OS >= YOSMITE)
 		//
 		// convert it
 		//
@@ -974,15 +977,21 @@ EFI_STATUS CsDrawPanicImage()
 		//
 		if(!CspFrameBufferAddress || CspConsoleMode != EfiConsoleControlScreenGraphics)
 			try_leave(NOTHING);
-		
+
 		//
 		// decompress data
 		//
 		UINTN imageWidth													= CspHiDPIMode ? 920 : 460;
 		UINTN imageHeight													= CspHiDPIMode ? 570 : 285;
 		UINTN imageSize														= imageWidth * imageHeight;
+
+#if (TARGET_OS >= YOSEMITE)
 		if(EFI_ERROR(status = BlDecompressLZVN(CspHiDPIMode ? ApplePanicDialog2X : ApplePanicDialog, CspHiDPIMode ? sizeof(ApplePanicDialog2X) : sizeof(ApplePanicDialog), imageData, imageSize, &imageSize)))
 			try_leave(NOTHING);
+#else
+		if(EFI_ERROR(status = BlDecompressLZSS(CspHiDPIMode ? CspPanicDialog2x : CspPanicDialog, CspHiDPIMode ? sizeof(CspPanicDialog2x) : sizeof(CspPanicDialog), imageData, imageSize, &imageSize)))
+			try_leave(NOTHING);
+#endif // #if (TARGET_OD => YOSEMITE)
 
 		//
 		// convert it

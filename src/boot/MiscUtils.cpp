@@ -48,6 +48,14 @@ CHAR8* BlGetBoardId()
 }
 
 //
+// Get systemId.
+//
+CHAR8* BlGetSystemId()
+{
+	return BlpSystemId;
+}
+
+//
 // connect drivers
 //
 EFI_STATUS BlConnectAllController()
@@ -317,23 +325,13 @@ EFI_STATUS BlDetectMemorySize()
 					break;
 				
 				SMBIOS_TABLE_TYPE1* table1									= reinterpret_cast<SMBIOS_TABLE_TYPE1*>(startOfTable);
-				//
-				// Build UUID
-				//
-				UINT8 ix												= 0;
-				EFI_GUID* g												= &table1->Uuid;
-				CHAR8 CONST* guidFormat									= CHAR8_CONST_STRING("%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X");
-				snprintf(BlpSystemId, ARRAYSIZE(BlpSystemId) - 1, guidFormat, g->Data1, g->Data2, g->Data3, g->Data4[0], g->Data4[1], g->Data4[2], g->Data4[3], g->Data4[4], g->Data4[5], g->Data4[6], g->Data4[7]);
-					
-				for (ix = 0; ix < 5; ix++)
+				if(!isEfiNullGuid(&table1->Uuid))
 				{
-					CsPrintf(CHAR8_CONST_STRING("PIKE: table1->Uuid[%s] found!\n"), BlpSystemId);
+					//
+					// Copy SMBIOS UUID into BlpSystemId.
+					//
+					memcpy(BlpSystemId, &table1->Uuid, 16);
 				}
-				//
-				// Get /efi/platform node
-				//
-				DEVICE_TREE_NODE* platformNode							= DevTreeFindNode(CHAR8_CONST_STRING("/efi/platform"), FALSE);
-				DevTreeAddProperty(platformNode, CHAR8_CONST_STRING("system-id"), &table1->Uuid, ARRAYSIZE(BlpSystemId), TRUE);
 			}
 			else if(tableHeader->Type == 2)
 			{
@@ -834,6 +832,7 @@ EFI_STATUS BlDecompressLZSS(VOID CONST* compressedBuffer, UINTN compressedSize, 
 	return EFI_SUCCESS;
 }
 
+#if (TARGET_OS >= YOSEMITE)
 //
 // uncompress LZVN
 //
@@ -1294,3 +1293,4 @@ EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN aCompressedSize,
 	
 	return EFI_LOAD_ERROR;
 }
+#endif // #if (TARGET_OS => YOSEMITE)

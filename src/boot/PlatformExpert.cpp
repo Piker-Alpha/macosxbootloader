@@ -21,6 +21,9 @@ EFI_STATUS PeInitialize()
 	if(!platformNode)
 		return EFI_OUT_OF_RESOURCES;
 
+	CHAR8* smbiosUuid = BlGetSystemId();
+	DevTreeAddProperty(platformNode, CHAR8_CONST_STRING("system-id"), smbiosUuid, 16, TRUE);
+
 	EFI_DATA_HUB_PROTOCOL* dataHubProtocol									= nullptr;
 	EFI_STATUS status														= EfiBootServices->LocateProtocol(&EfiDataHubProtocolGuid, nullptr, reinterpret_cast<VOID**>(&dataHubProtocol));
 	if(EFI_ERROR(status))
@@ -99,7 +102,7 @@ CHAR8 CONST* PeGetModelName()
 						while(*oemTableId == ' ')
 							oemTableId										+= 1;
 
-						snprintf(PepModelName, ARRAYSIZE(PepModelName) - 1, CHAR8_CONST_STRING("%a%d,%d"), oemTableId, acpiDsdt->OemRevision >> 16, acpiDsdt->OemRevision & 0xffff);
+						snprintf(PepModelName, ARRAYSIZE(PepModelName) - 1, CHAR8_CONST_STRING("%s%d,%d"), oemTableId, acpiDsdt->OemRevision >> 16, acpiDsdt->OemRevision & 0xffff);
 					}
 				}
 			}

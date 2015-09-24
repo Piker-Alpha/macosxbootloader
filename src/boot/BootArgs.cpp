@@ -335,11 +335,12 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 		//
 		AcpiGetPciConfigSpaceInfo(&bootArgs->PCIConfigSpaceBaseAddress, &bootArgs->PCIConfigSpaceStartBusNumber, &bootArgs->PCIConfigSpaceEndBusNumber);
 
+#if (TARGET_OS == EL_CAPITAN)
 		//
-		// Power Management (set to 0 = no limit)
+		// Boot P-State limit for Power Management (set to 0 = no limit)
 		//
 		bootArgs->Boot_SMC_plimit											= 0;
-
+#endif
 		//
 		// get root node
 		//
@@ -381,7 +382,7 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 			//
 			// get root match
 			//
-			CHAR8 const* rootMatchDict										= CmSerializeValueForKey(CHAR8_CONST_STRING("Root Match"), nullptr);
+			CHAR8 CONST* rootMatchDict										= CmSerializeValueForKey(CHAR8_CONST_STRING("Root Match"), nullptr);
 			if(!rootMatchDict)
 			{
 				//
@@ -437,7 +438,7 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 		//
 		// Set chosen/boot-file property.
 		//
-		CHAR8 const* bootFileName											= LdrGetKernelCachePathName();
+		CHAR8 CONST* bootFileName											= LdrGetKernelCachePathName();
 		
 		if(BlTestBootMode(BOOT_MODE_SAFE))
 			bootFileName													= LdrGetKernelPathName();
@@ -480,9 +481,9 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 		//
 		BlpAddRamDmgProperty(chosenNode, bootDevicePath);
 
-
+#if (TARGET_OS >= YOSEMITE)
 		//
-		// add random-seed property with a static data (for testing only)
+		// Add 'random-seed' property.
 		//
 		UINT8 index															= 0;
 		UINT16 PMTimerValue													= 0;
@@ -530,6 +531,7 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 																								// jne		0x17e55		(next)
 
 		DevTreeAddProperty(chosenNode, CHAR8_CONST_STRING("random-seed"), seedBuffer, sizeof(seedBuffer), TRUE);
+#endif // #if (TARGET_OS >= YOSEMITE)
 
 		//
 		// output
@@ -779,6 +781,7 @@ EFI_STATUS BlFinalizeBootArgs(BOOT_ARGS* bootArgs, CHAR8 CONST* kernelCommandLin
 	return status;
 }
 
+#if (TARGET_OS == EL_CAPITAN)
 //
 // Read csr-active-config from NVRAM
 //
@@ -857,6 +860,7 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 
 	return status;
 }
+#endif
 
 //
 // Mimic boot.efi and set boot.efi info properties.

@@ -7,6 +7,21 @@
 
 #pragma once
 
+#define DEBUG_LDRP_CALL_CSPRINTF											0
+#define DEBUG_NVRAM_CALL_CSPRINTF											1
+
+#define OS_LEGACY															6
+#define YOSEMITE															10
+#define EL_CAPITAN															11
+
+#define TARGET_OS															EL_CAPITAN
+
+#if (TARGET_OS >= YOSEMITE)
+	#define LEGACY_GREY_SUPPORT												0
+#else
+	#define LEGACY_GREY_SUPPORT												1
+#endif
+
 #define NOTHING
 #define BOOTAPI																__cdecl
 #define CHAR8_CONST_STRING(S)												static_cast<CHAR8 CONST*>(static_cast<VOID CONST*>(S))
@@ -26,15 +41,7 @@
 #define SWAP32(V)															((((UINT32)(V) & 0xff) << 24) | (((UINT32)(V) & 0xff00) << 8) | (((UINT32)(V) & 0xff0000) >> 8) |  (((UINT32)(V) & 0xff000000) >> 24))
 #define SWAP_BE32_TO_HOST													SWAP32
 
-//
-// Use 1 for grey Apple logo/panic dialog.
-//
-#define LEGACY_GREY_SUPPORT													0
-
-#define DEBUG_LDRP_CALL_CSPRINTF											0
-
-#define DEBUG_NVRAM_CALL_CSPRINTF											1
-
+#if (TARGET_OS == EL_CAPITAN)
 #ifndef kBootArgsFlagCSRActiveConfig
 	#define kBootArgsFlagCSRActiveConfig	(1 << 3)	// 8
 #endif
@@ -67,6 +74,7 @@
 			CSR_ALLOW_UNRESTRICTED_NVRAM | \
 			CSR_ALLOW_DEVICE_CONFIGURATION)
 #endif
+#endif // #if (TARGET_OS == YOSMITE)
 
 #include "EfiCommon.h"
 #include "EfiApi.h"
