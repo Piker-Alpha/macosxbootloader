@@ -433,15 +433,15 @@ EFI_STATUS EFIAPI EfiMain(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable)
 			try_leave(NOTHING);
 
 		//
-		// init platform expert
-		//
-		if(EFI_ERROR(status = PeInitialize()))
-			try_leave(NOTHING);
-
-		//
 		// detect memory size
 		//
 		if(EFI_ERROR(status = BlDetectMemorySize()))
+			try_leave(NOTHING);
+
+		//
+		// init platform expert
+		//
+		if(EFI_ERROR(status = PeInitialize()))
 			try_leave(NOTHING);
 
 		//
