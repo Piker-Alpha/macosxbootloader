@@ -21,8 +21,8 @@ EFI_STATUS PeInitialize()
 	if(!platformNode)
 		return EFI_OUT_OF_RESOURCES;
 
-	CHAR8* smbiosUuid = BlGetSystemId();
-	DevTreeAddProperty(platformNode, CHAR8_CONST_STRING("system-id"), smbiosUuid, 16, TRUE);
+	EFI_GUID smbiosUuid														= BlGetSmbiosUuid();
+	DevTreeAddProperty(platformNode, CHAR8_CONST_STRING("system-id"), &smbiosUuid, 16, TRUE);
 
 	EFI_DATA_HUB_PROTOCOL* dataHubProtocol									= nullptr;
 	EFI_STATUS status														= EfiBootServices->LocateProtocol(&EfiDataHubProtocolGuid, nullptr, reinterpret_cast<VOID**>(&dataHubProtocol));

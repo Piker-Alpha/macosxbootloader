@@ -14,7 +14,7 @@ STATIC UINT64 BlpMemoryCapacity												= 0;
 STATIC UINT32 BlpMemoryDevices												= 0;
 STATIC UINT64 BlpMemorySize													= 0;
 STATIC CHAR8 BlpBoardId[64]													= {0};
-STATIC CHAR8 BlpSystemId[16]												= {0};
+EFI_GUID BlpSmbiosUuid														= {0};
 
 #define IS_LEAP_YEAR(y)														(((y) % 4 == 0 && (y) % 100 != 0) || (y) % 400 == 0)
 
@@ -50,9 +50,9 @@ CHAR8* BlGetBoardId()
 //
 // Get systemId.
 //
-CHAR8* BlGetSystemId()
+EFI_GUID BlGetSmbiosUuid()
 {
-	return BlpSystemId;
+	return BlpSmbiosUuid;
 }
 
 //
@@ -330,7 +330,7 @@ EFI_STATUS BlDetectMemorySize()
 					//
 					// Copy SMBIOS UUID into BlpSystemId.
 					//
-					memcpy(BlpSystemId, &table1->Uuid, 16);
+					memcpy((VOID*)&BlpSmbiosUuid, (VOID*)&table1->Uuid, 16);
 				}
 			}
 			else if(tableHeader->Type == 2)

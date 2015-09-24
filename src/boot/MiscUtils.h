@@ -23,9 +23,9 @@ UINT64 BlGetMemorySize();
 CHAR8* BlGetBoardId();
 
 //
-// Get systemId.
+// Get SMBIOS UUID
 //
-CHAR8* BlGetSystemId();
+EFI_GUID BlGetSmbiosUuid();
 
 //
 // connect drivers
