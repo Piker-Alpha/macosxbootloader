@@ -797,7 +797,7 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 	{
 		attributes															|= EFI_VARIABLE_NON_VOLATILE;
 		csrActiveConfig														= CSR_ALLOW_DEVICE_CONFIGURATION;
-		bootArgs->Flags														|= kBootArgsFlagCSRBoot;
+		bootArgs->Flags														|= (kBootArgsFlagCSRConfigMode + kBootArgsFlagCSRBoot);
 	}
 	else
 	{
