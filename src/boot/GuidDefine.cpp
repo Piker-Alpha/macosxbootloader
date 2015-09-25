@@ -53,24 +53,24 @@ EFI_HANDLE EfiImageHandle													= nullptr;
 // Check for NULL guid.
 //
 
-BOOLEAN isEfiNullGuid(EFI_GUID *aGuid)
+BOOLEAN isEfiNullGuid(EFI_GUID* aGuid)
 {
-	UINT8 i = 0;
+	// UINT8 i = 0;
 	UINT32 *guid = (UINT32 *) aGuid;
 	
 	if ((guid[0] == 0) && (guid[1] == 0) && (guid[2] == 0) && (guid[3] == 0))
 	{
-		for (; i < 5; i++)
+		/* for (; i < 5; i++)
 		{
 			CsPrintf(CHAR8_CONST_STRING("PIKE: isEfiNullGuid() is about to return TRUE!\n"));
-		}
+		} */
 		return TRUE;
 	}
 
-	for (; i < 5; i++)
+	/* for (; i < 5; i++)
 	{
 		CsPrintf(CHAR8_CONST_STRING("PIKE: isEfiNullGuid() is about to return FALSE!\n"));
-	}
+	} */
 	
 	return FALSE;
 }
