@@ -793,7 +793,7 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 	UINT32 csrActiveConfig													= CSR_ALLOW_APPLE_INTERNAL;
 	UINTN dataSize															= sizeof(UINT32);
 	
-	if(BlTestBootMode(BOOT_MODE_EFI_NVRAM_RECOVERY_BOOT_MODE))
+	if(BlTestBootMode(BOOT_MODE_FROM_RECOVER_BOOT_DIRECTORY | BOOT_MODE_EFI_NVRAM_RECOVERY_BOOT_MODE)) // Perhaps BOOT_MODE_BOOT_IS_NOT_ROOT also?
 	{
 		for (i = 0; i < 5; i++)
 		{
@@ -806,10 +806,7 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 	}
 	else
 	{
-		// bootArgs->Flags														|= (kBootArgsFlagCSRActiveConfig + kBootArgsFlagCSRBoot);
-		attributes															|= EFI_VARIABLE_NON_VOLATILE;
-		csrActiveConfig														= CSR_ALLOW_DEVICE_CONFIGURATION;
-		bootArgs->Flags														|= (kBootArgsFlagCSRConfigMode + kBootArgsFlagCSRBoot);
+		bootArgs->Flags														|= (kBootArgsFlagCSRActiveConfig + kBootArgsFlagCSRBoot);
 	}
 	
 	//
