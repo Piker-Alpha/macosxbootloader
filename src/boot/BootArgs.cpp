@@ -802,7 +802,7 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 
 		attributes															|= EFI_VARIABLE_NON_VOLATILE;
 		csrActiveConfig														= CSR_ALLOW_DEVICE_CONFIGURATION;
-		bootArgs->Flags														|= (kBootArgsFlagCSRConfigMode + kBootArgsFlagCSRBoot);
+		bootArgs->Flags														|= (kBootArgsFlagCSRActiveConfig + kBootArgsFlagCSRConfigMode + kBootArgsFlagCSRBoot);
 	}
 	else
 	{
@@ -861,11 +861,6 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 		{
 			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config[0x%x/0x%x] found (OK)!\n"), csrActiveConfig, dataSize);
 		}
-	}
-
-	if(BlTestBootMode(BOOT_MODE_EFI_NVRAM_RECOVERY_BOOT_MODE))
-	{
-		bootArgs->CsrActiveConfig											= CSR_ALLOW_DEVICE_CONFIGURATION;
 	}
 
 	return status;
