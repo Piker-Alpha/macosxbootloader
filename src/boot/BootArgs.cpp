@@ -832,7 +832,7 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 		{
 			for (i = 0; i < 5; i++)
 			{
-				CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config set (OK)!\n"));
+				CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config[0x%x] set (OK)!\n"), csrActiveConfig);
 			}
 		}
 		//
@@ -842,7 +842,7 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 		
 		for (i = 0; i < 5; i++)
 		{
-			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config added!\n"));
+			CsPrintf(CHAR8_CONST_STRING("PIKE: bootArgs->CsrActiveConfig[0x%x] set!\n"), csrActiveConfig);
 		}
 	}
 	else
