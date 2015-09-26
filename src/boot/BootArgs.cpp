@@ -795,13 +795,21 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 	
 	if(BlTestBootMode(BOOT_MODE_EFI_NVRAM_RECOVERY_BOOT_MODE))
 	{
+		for (i = 0; i < 5; i++)
+		{
+			CsPrintf(CHAR8_CONST_STRING("PIKE: BlInitCSRState(RecoveryOS detected)!\n"));
+		}
+
 		attributes															|= EFI_VARIABLE_NON_VOLATILE;
 		csrActiveConfig														= CSR_ALLOW_DEVICE_CONFIGURATION;
 		bootArgs->Flags														|= (kBootArgsFlagCSRConfigMode + kBootArgsFlagCSRBoot);
 	}
 	else
 	{
-		bootArgs->Flags														|= (kBootArgsFlagCSRActiveConfig + kBootArgsFlagCSRBoot);
+		// bootArgs->Flags														|= (kBootArgsFlagCSRActiveConfig + kBootArgsFlagCSRBoot);
+		attributes															|= EFI_VARIABLE_NON_VOLATILE;
+		csrActiveConfig														= CSR_ALLOW_DEVICE_CONFIGURATION;
+		bootArgs->Flags														|= (kBootArgsFlagCSRConfigMode + kBootArgsFlagCSRBoot);
 	}
 	
 	//
