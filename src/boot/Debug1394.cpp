@@ -155,6 +155,19 @@ typedef struct _DBG1394_DEBUG_CONFIG_INFO
 	UINT64																	ReceiveBuffer;
 }DBG1394_DEBUG_CONFIG_INFO;
 
+typedef struct _SAVED_INFO
+{
+	//
+	// saved info length
+	//
+	UINT8														CriSavedInfoLength;
+	
+	//
+	// saved crc length
+	//
+	UINT8														CriSavedCrcLength;
+}SAVED_INFO;
+
 //
 // config rom header
 //
@@ -169,18 +182,7 @@ typedef union _IEEE1394_CONFIG_ROM_INFO
 			//
 			UINT16															CriCrcValue;
 
-			struct _SAVED_INFO
-			{
-				//
-				// saved info length
-				//
-				UINT8														CriSavedInfoLength;
-
-				//
-				// saved crc length
-				//
-				UINT8														CriSavedCrcLength;
-			}SavedInfo;
+			SAVED_INFO SavedInfo;
 		};
 
 		//
@@ -1035,7 +1037,7 @@ EFI_STATUS Bd1394ConfigureDebuggerDevice(CHAR8 CONST* loaderOptions)
 		//
 		// disconnect from efi
 		//
-		EFI_GUID firewireProtocolGuid										= {0x67708aa8, 0x2079, 0x4e4f, 0xb1, 0x58, 0xb1, 0x5b, 0x1f, 0x6a, 0x6c, 0x92};
+		EFI_GUID firewireProtocolGuid										= {0x67708aa8, 0x2079, 0x4e4f, {0xb1, 0x58, 0xb1, 0x5b, 0x1f, 0x6a, 0x6c, 0x92}};
 		VOID* protocol														= nullptr;
 		status																= EfiBootServices->HandleProtocol(controllerHandle, &firewireProtocolGuid, &protocol);
 		CsPrintf(CHAR8_CONST_STRING("handle protocol %08x, %08x\n"), status, protocol);
