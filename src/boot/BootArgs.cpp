@@ -783,80 +783,47 @@ EFI_STATUS BlFinalizeBootArgs(BOOT_ARGS* bootArgs, CHAR8 CONST* kernelCommandLin
 
 #if (TARGET_OS == EL_CAPITAN)
 //
-// Read csr-active-config from NVRAM
+// Configure System Integrity Protection.
 //
 EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 {
-	UINT8 i																	= 0;
 	EFI_STATUS status														= EFI_SUCCESS;
-	UINT32 attributes														= (EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS);
+	UINT32 attributes														= (EFI_VARIABLE_BOOTSERVICE_ACCESS + EFI_VARIABLE_RUNTIME_ACCESS + EFI_VARIABLE_NON_VOLATILE);
 	UINT32 csrActiveConfig													= CSR_ALLOW_APPLE_INTERNAL;
 	UINTN dataSize															= sizeof(UINT32);
 	
 	if(BlTestBootMode(BOOT_MODE_EFI_NVRAM_RECOVERY_BOOT_MODE))
 	{
-		attributes															|= EFI_VARIABLE_NON_VOLATILE;
-		csrActiveConfig														= CSR_ALLOW_DEVICE_CONFIGURATION;
 		bootArgs->Flags														|= (kBootArgsFlagCSRConfigMode + kBootArgsFlagCSRBoot);
+		bootArgs->CsrActiveConfig											= CSR_ALLOW_DEVICE_CONFIGURATION;
 	}
 	else
 	{
 		bootArgs->Flags														|= (kBootArgsFlagCSRActiveConfig + kBootArgsFlagCSRBoot);
+
+		//
+		// Check for 'csr-active-config' variable in NVRAM.
+		//
+		if(EFI_ERROR(status = EfiRuntimeServices->GetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, nullptr, &dataSize, &csrActiveConfig)))
+		{
+			//
+			// Not found. Set System Integrity Protection to the default value.
+			//
+			bootArgs->CsrActiveConfig										= CSR_ALLOW_APPLE_INTERNAL;
+		}
+		else
+		{
+			//
+			// Found. Use the value found in NVRAM.
+			//
+			bootArgs->CsrActiveConfig										= csrActiveConfig;
+		}
 	}
 
 	//
 	// System Integrity Protection Capabilties.
 	//
 	bootArgs->CsrCapabilities												= CSR_VALID_FLAGS;
-
-	//
-	// Check 'csr-active-config' variable in NVRAM.
-	//
-	if(EFI_ERROR(status = EfiRuntimeServices->GetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, nullptr, &dataSize, &csrActiveConfig)))
-	{
-		for (i = 0; i < 5; i++)
-		{
-			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config NOT found (ERROR: %d)!\n"), status);
-		}
-		//
-		// Not there. Add the 'csr-active-config' variable.
-		//
-		if(EFI_ERROR(status = EfiRuntimeServices->SetVariable(CHAR16_STRING(L"csr-active-config"), &AppleNVRAMVariableGuid, attributes, sizeof(UINT32), &csrActiveConfig)))
-		{
-			for (i = 0; i < 5; i++)
-			{
-				CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config add failed (ERROR: %d)!\n"), status);
-			}
-		}
-		else
-		{
-			for (i = 0; i < 5; i++)
-			{
-				CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config set (OK)!\n"));
-			}
-		}
-		//
-		// Set System Integrity Protection ON by default
-		//
-		bootArgs->CsrActiveConfig											= csrActiveConfig;
-
-		for (i = 0; i < 5; i++)
-		{
-			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config added!\n"));
-		}
-	}
-	else
-	{
-		//
-		// Set System Integrity Protection to the value found in NVRAM.
-		//
-		bootArgs->CsrActiveConfig											= csrActiveConfig;
-
-		for (i = 0; i < 5; i++)
-		{
-			CsPrintf(CHAR8_CONST_STRING("PIKE: NVRAM csr-active-config[0x%x/0x%x] found (OK)!\n"), csrActiveConfig, dataSize);
-		}
-	}
 
 	return status;
 }
