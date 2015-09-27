@@ -29,7 +29,7 @@ A second development phase began on Saturday 26 September 2015 and was completed
 Download
 --------
 
-You can download a prebuild copy of boot.efi (compiled on Microsoft Windows 10 with Microsoft Visual Studio 2015) [here]https://raw.githubusercontent.com/Piker-Alpha/macosxbootloader/El-Capitan/Prebuilt/boot.efi
+You can download a prebuild copy of boot.efi (compiled on Microsoft Windows 10 with Microsoft Visual Studio 2015) [here](https://raw.githubusercontent.com/Piker-Alpha/macosxbootloader/El-Capitan/Prebuilt/boot.efi)
 
 This will download boot.efi The next step is to verify the download by entering (either one):
 
