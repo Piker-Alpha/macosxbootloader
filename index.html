@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Macosxbootloader by Piker-Alpha</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Macosxbootloader</h1>
+      <h2 class="project-tagline">Pike&#39;s bootloader</h2>
+      <a href="https://github.com/Piker-Alpha/macosxbootloader" class="btn">View on GitHub</a>
+      <a href="https://github.com/Piker-Alpha/macosxbootloader/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/Piker-Alpha/macosxbootloader/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h2>
+<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction</h2>
+
+<p>This Github project is a new and updated branch of the <a href="https://github.com/Piker-Alpha/macosxbootloader/tree/master">Yosemite tree</a></p>
+
+<h2>
+<a id="goals" class="anchor" href="#goals" aria-hidden="true"><span class="octicon octicon-link"></span></a>Goals</h2>
+
+<p>This project aims to add support for El Capitan (OS X 10.11) for unsupported Mac hardware with a 32-bit only EFI implementation. Like for example the first and second generation Mac Pro models. Though it should work well with any other model with a 32-bit EFI implementation.</p>
+
+<h2>
+<a id="development" class="anchor" href="#development" aria-hidden="true"><span class="octicon octicon-link"></span></a>Development</h2>
+
+<p>This project is maintained by <a href="https://pikeralpha.wordpress.com">Pike R. Alpha</a></p>
+
+<h2>
+<a id="current-state" class="anchor" href="#current-state" aria-hidden="true"><span class="octicon octicon-link"></span></a>Current State</h2>
+
+<p>The current state of this project is: Phase 1 and 2 Completed (OS X 10.11 El Capitan is now supported).</p>
+
+<p>Note:</p>
+
+<p>A second development phase began on Saturday 26 September 2015 and was completed on Sunday 27 September 2015. A third development phase is also planned, to finish it up. See also our <a href="https://github.com/Piker-Alpha/macosxbootloader/blob/El-Capitan/TODO.md">TODO list</a>.</p>
+
+<h2>
+<a id="download" class="anchor" href="#download" aria-hidden="true"><span class="octicon octicon-link"></span></a>Download</h2>
+
+<p>First. All downloads should be done from the following links. All other sources are unsupported. </p>
+
+<p>Download your copy of the prebuild (32-bit) version of boot.efi for El Capitan (compiled on Microsoft Windows 10 with Microsoft Visual Studio 2015) with a <a href="https://raw.githubusercontent.com/Piker-Alpha/macosxbootloader/El-Capitan/Prebuilt/boot.efi">black background and white Apple logo</a> now, and verify the download by entering (either one) in a terminal window:</p>
+
+<pre><code>openssl md5  boot.efi = 4db3cf800b8888337a70448c9ed370a4
+openssl sha1 boot.efi = 91456d827b1e656ea72ec0d78fea39273ab48dd8
+</code></pre>
+
+<p>Or download the one for legacy hardware, with a <a href="https://raw.githubusercontent.com/Piker-Alpha/macosxbootloader/El-Capitan/Prebuilt/boot_grey.efi">grey background and logo</a> for your Mac Pro and verify the download by entering (either one) in a terminal window:</p>
+
+<pre><code>openssl md5  boot.efi = 1218d85076b8e2bb9d711f5aaf617a6d
+openssl sha1 boot.efi = 4853bf4bed4a9727ab572ebccf1baf0d7eb6c048
+</code></pre>
+
+<p>Note: If the output is different, then your copy of boot.efi should not be used!</p>
+
+<h2>
+<a id="compilation" class="anchor" href="#compilation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Compilation</h2>
+
+<p>Don't want a prebuilt copy of boot.efi then compile the source code yourself, with either Microsoft Visual Studio 2013 or 2015. The latter requires you to update the solution files, but that should be done automatically in the MS Visual Studio IDE.</p>
+
+<p>Note: See also <a href="https://github.com/Piker-Alpha/macosxbootloader/wiki/Compiling-Instructions">Compiling-Instructions</a></p>
+
+<h2>
+<a id="thanks-to" class="anchor" href="#thanks-to" aria-hidden="true"><span class="octicon octicon-link"></span></a>Thanks To</h2>
+
+<p>This project would not have been possible without the help of Peter Holbrook and Mike Boss. Peter did all compiling and Mike ran dozens of test builds that Peter pushed out over at forums.macrumors.com Awesome work guys. Job well done!</p>
+
+<h2>
+<a id="donations" class="anchor" href="#donations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Donations</h2>
+
+<p>If you like to support my work then you may want to consider to <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=JXFBXK7J97RAE">make a donation</a></p>
+
+<h2>
+<a id="help" class="anchor" href="#help" aria-hidden="true"><span class="octicon octicon-link"></span></a>Help</h2>
+
+<p>If you need help with the setup then please visit <a href="http://forums.macrumors.com/threads/2006-2007-mac-pro-1-1-2-1-and-os-x-el-capitan.1890435/">this macrumor thread</a></p>
+
+<p>Note: Sorry. I can't help you. I don't have unsupported hardware with 32-bit EFI.</p>
+
+<h2>
+<a id="bugs" class="anchor" href="#bugs" aria-hidden="true"><span class="octicon octicon-link"></span></a>Bugs</h2>
+
+<p>Bugs can be reported <a href="https://github.com/Piker-Alpha/macosxbootloader/issues">here</a></p>
+
+<p>Note: Please provide a clear step by step way to reproduce the bug.</p>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>My work is licensed under <a href="http://creativecommons.org/licenses/by-nc/3.0/">the Creative Commons Attribution-NonCommercial 3.0 Unported License</a> and as such you must add a link to this license. Even if you only use a download link. Also note the term "NonCommercial" because I don't want to see my work end up anywhere else but here.</p>
+
+<p>Note: "Tiamo" released his work under a <a href="http://opensource.org/licenses/BSD-3-Clause">BSD-3-Clause license</a></p>
+
+<h2>
+<a id="disclaimer" class="anchor" href="#disclaimer" aria-hidden="true"><span class="octicon octicon-link"></span></a>Disclaimer</h2>
+
+<p>Copyright (c) 2014-2015, by Pike R. Alpha – All right reserved.</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/Piker-Alpha/macosxbootloader">Macosxbootloader</a> is maintained by <a href="https://github.com/Piker-Alpha">Piker-Alpha</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
