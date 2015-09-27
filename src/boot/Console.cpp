@@ -311,15 +311,23 @@ STATIC EFI_STATUS CspConvertLogoImage(BOOLEAN normalLogo, EFI_UGA_PIXEL** logoIm
 		//
 		STATIC builtin_image_info imageInfo[4] =
 		{
-#if LEGACY_GREY_SUPPORT
+#if (TARGET_OS >= YOSMITE)
+	#if LEGACY_GREY_SUPPORT
 			/* normal */		{ 84, 103, sizeof(AppleLogoPacked),			AppleLogoPacked,			AppleLogoClut},
 			/* normal@2x */		{168, 206, sizeof(AppleLogo2XPacked),		AppleLogo2XPacked,			AppleLogo2XClut},
-#else
+	#else
 			/* normal */		{ 84, 103, sizeof(AppleLogoBlackPacked),	AppleLogoBlackPacked,		AppleLogoBlackClut},
 			/* normal@2x */		{168, 206, sizeof(AppleLogoBlack2XPacked),	AppleLogoBlack2XPacked,		AppleLogoBlack2XClut},
-#endif
+	#endif
 			/* failed */		{100, 100, sizeof(CspFailedLogo),			CspFailedLogo,				CspFailedLogoLookupTable},
 			/* failed@2x */		{200, 200, sizeof(CspFailedLogo2x),			CspFailedLogo2x,			CspFailedLogoLookupTable2x},
+#else // #if TARGET_OS_LEGACY
+			/* normal */		{ 84, 103, sizeof(CspNormalLogo),			CspNormalLogo,				CspNormalLogoLookupTable},
+			/* normal@2x */		{168, 206, sizeof(CspNormalLogo2x),			CspNormalLogo2x,			CspNormalLogoLookupTable2x},
+
+			/* failed */		{100, 100, sizeof(CspFailedLogo),			CspFailedLogo,				CspFailedLogoLookupTable},
+			/* failed@2x */		{200, 200, sizeof(CspFailedLogo2x),			CspFailedLogo2x,			CspFailedLogoLookupTable2x},
+#endif // #if (TARGET_OS >= YOSMITE)
 		};
 
 		//
