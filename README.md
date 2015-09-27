@@ -1,7 +1,7 @@
 Introduction
 ------------
 
-This Github project is a new and updated branch of the [Yosemite tree]https://github.com/Piker-Alpha/macosxbootloader/tree/master
+This Github project is a new and updated branch of the [Yosemite tree](https://github.com/Piker-Alpha/macosxbootloader/tree/master)
 
 
 Goals
@@ -13,7 +13,7 @@ This project aims to add support for El Capitan (OS X 10.11) for unsupported Mac
 Development
 -----------
 
-This project is maintained by [Pike R. Alpha]https://pikeralpha.wordpress.com
+This project is maintained by [Pike R. Alpha](https://pikeralpha.wordpress.com)
 
 
 Current State
@@ -44,7 +44,7 @@ Compilation
 
 You can compile the source code yourself with either Microsoft Visual Studio 2013 or 2015. The latter requires you to update the solution files, but that should be done automatically in the MS Visual Studio IDE.
 
-Note: See also [Compiling-Instructions]https://github.com/Piker-Alpha/macosxbootloader/wiki/Compiling-Instructions
+Note: See also [Compiling-Instructions](https://github.com/Piker-Alpha/macosxbootloader/wiki/Compiling-Instructions)
 
 
 Thanks To
@@ -56,7 +56,7 @@ This project would not have been possible without the help of Peter Holbrook and
 Help
 ----
 
-If you need help with the setup then please visit [this macrumor thread]http://forums.macrumors.com/threads/2006-2007-mac-pro-1-1-2-1-and-os-x-el-capitan.1890435/
+If you need help with the setup then please visit [this macrumor thread](http://forums.macrumors.com/threads/2006-2007-mac-pro-1-1-2-1-and-os-x-el-capitan.1890435/)
 
 Note: Sorry. I can't help you. I don't have unsupported hardware with 32-bit EFI.
 
@@ -64,7 +64,7 @@ Note: Sorry. I can't help you. I don't have unsupported hardware with 32-bit EFI
 Bugs
 ----
 
-Bugs can be reported [here]https://github.com/Piker-Alpha/macosxbootloader/issues
+Bugs can be reported [here](https://github.com/Piker-Alpha/macosxbootloader/issues)
 
 Note: Please provide a clear step by step way to reproduce the bug.
 
@@ -72,9 +72,9 @@ Note: Please provide a clear step by step way to reproduce the bug.
 License
 -------
 
-My work is licensed under [the Creative Commons Attribution-NonCommercial 3.0 Unported License]http://creativecommons.org/licenses/by-nc/3.0/
+My work is licensed under [the Creative Commons Attribution-NonCommercial 3.0 Unported License](http://creativecommons.org/licenses/by-nc/3.0/)
 
-Note: "Tiamo" released his work under a [BSD-3-Clause license]http://opensource.org/licenses/BSD-3-Clause
+Note: "Tiamo" released his work under a [BSD-3-Clause license](http://opensource.org/licenses/BSD-3-Clause)
 
 
 Disclaimer
