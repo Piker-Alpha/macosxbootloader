@@ -17,9 +17,9 @@
 #define TARGET_OS															EL_CAPITAN
 
 #if (TARGET_OS >= YOSEMITE)
-	#define LEGACY_GREY_SUPPORT												0
-#else
 	#define LEGACY_GREY_SUPPORT												1
+#else
+	#define LEGACY_GREY_SUPPORT												0
 #endif
 
 #define NOTHING
