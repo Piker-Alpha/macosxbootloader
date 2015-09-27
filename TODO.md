@@ -22,20 +22,20 @@ Phase 1: Status - Completed (in 2015)!
 5.) Add missing booter info properties, like: "booter-name", "booter-version" and "booter-build-time" (status: Done).
 ```
 
-Phase 2: Status - Work In Progress
+Phase 2: Status - Work In Progress (in 2015)!
 
 ```
 1.) Back port Clang changes (status: Done).
 
 2.) Add OS X support for (pre)Mavericks, Yosemite and El Capitan (status: Done).
 
-3.) Mask csr-active-config so that csrutil never reports 0x80.
+3.) Mask csr-active-config so that csrutil never reports 0x80 (status: Done).
 
-4.) Include image data for mavericks and older versions of OS X (status: work in progress).
+4.) Include image data for mavericks and older versions of OS X (status: Done).
    
-5.) Disable debug output.
+5.) Disable debug output (status: Done).
 
-6.) Select normal boot (no more verbose boots).
+6.) Select normal boot – no more verbose boots (status: Done).
 ```
 
 Phase 3: Status - Work In Progress
