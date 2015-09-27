@@ -23,7 +23,7 @@ The current state of this project is: Phase 1 and 2 Completed (OS X 10.11 El Cap
 
 Note:
 
-A second development phase began on Saturday 26 September 2015 and was completed on Sunday 27 September 2015. A third development phase is also planned, to finish it up. See also our TODO list.
+A second development phase began on Saturday 26 September 2015 and was completed on Sunday 27 September 2015. A third development phase is also planned, to finish it up. See also our [TODO list](https://github.com/Piker-Alpha/macosxbootloader/blob/El-Capitan/TODO.md).
 
 
 Download
