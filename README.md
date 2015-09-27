@@ -33,8 +33,13 @@ You can download a prebuild copy of boot.efi (compiled on Microsoft Windows 10 w
 
 This will download boot.efi The next step is to verify the download by entering (either one):
 
+```
 openssl md5  boot.efi = 4db3cf800b8888337a70448c9ed370a4
+
+or:
+
 openssl sha1 boot.efi = 91456d827b1e656ea72ec0d78fea39273ab48dd8
+```
 
 Note: If the output is different, then your copy of boot.efi should not be used!
 
