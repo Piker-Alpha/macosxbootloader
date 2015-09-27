@@ -29,16 +29,16 @@ A second development phase began on Saturday 26 September 2015 and was completed
 Download
 --------
 
-You can download a prebuild copy of (32-bit) boot.efi (compiled on Microsoft Windows 10 with Microsoft Visual Studio 2015) with a [black background and white Apple logo](https://raw.githubusercontent.com/Piker-Alpha/macosxbootloader/El-Capitan/Prebuilt/boot.efi).
+First. All downloads should be done from the following links. All other sources are unsupported. 
 
-This will download boot.efi The next step is to verify the download by entering (either one):
+Download your copy of the prebuild (32-bit) version of boot.efi for El Capitan (compiled on Microsoft Windows 10 with Microsoft Visual Studio 2015) with a [black background and white Apple logo](https://raw.githubusercontent.com/Piker-Alpha/macosxbootloader/El-Capitan/Prebuilt/boot.efi) now, and verify the download by entering (either one) in a terminal window:
 
 ```
 openssl md5  boot.efi = 4db3cf800b8888337a70448c9ed370a4
 openssl sha1 boot.efi = 91456d827b1e656ea72ec0d78fea39273ab48dd8
 ```
 
-Or the one for legacy hardware, with a [grey background and logo] (https://raw.githubusercontent.com/Piker-Alpha/macosxbootloader/El-Capitan/Prebuilt/boot_grey.efi) for your Mac Pro.
+Or download the one for legacy hardware, with a [grey background and logo] (https://raw.githubusercontent.com/Piker-Alpha/macosxbootloader/El-Capitan/Prebuilt/boot_grey.efi) for your Mac Pro and verify the download by entering (either one) in a terminal window:
 
 ```
 openssl md5  boot.efi = 1218d85076b8e2bb9d711f5aaf617a6d
@@ -51,7 +51,7 @@ Note: If the output is different, then your copy of boot.efi should not be used!
 Compilation
 -----------
 
-You can compile the source code yourself with either Microsoft Visual Studio 2013 or 2015. The latter requires you to update the solution files, but that should be done automatically in the MS Visual Studio IDE.
+Don't want a prebuilt copy of boot.efi then compile the source code yourself, with either Microsoft Visual Studio 2013 or 2015. The latter requires you to update the solution files, but that should be done automatically in the MS Visual Studio IDE.
 
 Note: See also [Compiling-Instructions](https://github.com/Piker-Alpha/macosxbootloader/wiki/Compiling-Instructions)
 
@@ -60,6 +60,12 @@ Thanks To
 ---------
 
 This project would not have been possible without the help of Peter Holbrook and Mike Boss. Peter did all compiling and Mike ran dozens of test builds that Peter pushed out over at forums.macrumors.com Awesome work guys. Job well done!
+
+
+Donations
+---------
+
+If you like to support my work then you may want to consider to [make a donation](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JXFBXK7J97RAE)
 
 
 Help
@@ -81,7 +87,7 @@ Note: Please provide a clear step by step way to reproduce the bug.
 License
 -------
 
-My work is licensed under [the Creative Commons Attribution-NonCommercial 3.0 Unported License](http://creativecommons.org/licenses/by-nc/3.0/)
+My work is licensed under [the Creative Commons Attribution-NonCommercial 3.0 Unported License](http://creativecommons.org/licenses/by-nc/3.0/) and as such you must add a link to this license. Even if you only use a download link. Also note the term "NonCommercial" because I don't want to see my work end up anywhere else but here.
 
 Note: "Tiamo" released his work under a [BSD-3-Clause license](http://opensource.org/licenses/BSD-3-Clause)
 
