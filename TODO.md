@@ -2,7 +2,7 @@
 OS X 10.11 El Capitan TODO list:
 --------------------------------
 
-Phase 1: Status - Completed (in 2015)!
+Phase 1: Status - Completed (on 26 September 2015)!
 
 ```
 1.) Load the prelinkedkernel for safe boot mode i.e. when -x is used (status: Done).
@@ -22,7 +22,7 @@ Phase 1: Status - Completed (in 2015)!
 5.) Add missing booter info properties, like: "booter-name", "booter-version" and "booter-build-time" (status: Done).
 ```
 
-Phase 2: Status - Work In Progress (in 2015)!
+Phase 2: Status - Completed (on 27 September 2015)!
 
 ```
 1.) Back port Clang changes (status: Done).
