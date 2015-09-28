@@ -1249,8 +1249,8 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 				{
 					UINT64 step												= 0;
 					UINT64 asld												= LdrGetASLRDisplacement();
-					CHAR8 CONST* stringTable								= Add2Ptr(linkEditSegment, symbolTableCommand->StringTableOffset - linkEditSegmentOffset, CHAR8 CONST*);
 					SYMTAB_COMMAND* symbolTableCommand						= _CR(theCommand, SYMTAB_COMMAND, Header);
+					CHAR8 CONST* stringTable								= Add2Ptr(linkEditSegment, symbolTableCommand->StringTableOffset - linkEditSegmentOffset, CHAR8 CONST*);
 					SYMTAB_ENTRY64* symbolEntry								= Add2Ptr(linkEditSegment, symbolTableCommand->SymbolTableOffset - linkEditSegmentOffset, SYMTAB_ENTRY64*);
 						
 					for(ix = 0; ix < symbolTableCommand->SymbolCount; ix++, symbolEntry++)
@@ -1261,13 +1261,13 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 						}
 
 #if (TARGET_OS == EL_CAPITAN)
-						if(strstr("loadExecutable", stringTable + symbolEntry->StringIndex))
+						if(strcmp(CHAR8_CONST_STRING("loadExecutable"), stringTable + symbolEntry->StringIndex))
 						{
 							loadedInfo->LoadExecutableVirtualAddress		= symbolEntry->Value;
 							step++;
 						}
 #endif
-						else if(!strcmp("_IdlePML4", stringTable + symbolEntry->StringIndex))
+						else if(!strcmp(CHAR8_CONST_STRING("_IdlePML4"), stringTable + symbolEntry->StringIndex))
 						{
 							loadedInfo->IdlePML4VirtualAddress				= symbolEntry->Value;
 							step++;
