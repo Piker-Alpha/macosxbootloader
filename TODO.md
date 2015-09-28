@@ -2,7 +2,7 @@
 OS X 10.11 El Capitan TODO list:
 --------------------------------
 
-Phase 1: Status - Completed (on 26 September 2015)!
+Phase 1: Status - Completed (on 26 September 2015)
 
 ```
 1.) Load the prelinkedkernel for safe boot mode i.e. when -x is used (status: Done).
@@ -22,7 +22,7 @@ Phase 1: Status - Completed (on 26 September 2015)!
 5.) Add missing booter info properties, like: "booter-name", "booter-version" and "booter-build-time" (status: Done).
 ```
 
-Phase 2: Status - Completed (on 27 September 2015)!
+Phase 2: Status - Completed (on 27 September 2015)
 
 ```
 1.) Back port Clang changes (status: Done).
@@ -38,22 +38,23 @@ Phase 2: Status - Completed (on 27 September 2015)!
 6.) Select normal boot – no more verbose boots (status: Done).
 ```
 
-Phase 3: Status - Work In Progress
+Phase 3: Status - Work In Progress (started on 28 September 2015)
 
 ```
 1.) Fix flush cache i.e. when -f is used.
+    - Have patch ready. Waiting for a confirmation of my previous commit.
 ```
 
 OS X 10.10 Yosemite TODO list:
 ------------------------------
 
-Phase 1: Status - Completed (in 2014)!
+Phase 1: Status - Completed (in 2014)
 
 ```
 1.) None. All issues related to full Yosemite compatibility have been completed.
 ```
 
-Phase 2: Status - Completed (in 2014)!
+Phase 2: Status - Completed (in 2014)
 
 ```
 1.) Fix Recovery HD boot support for Yosemite (status: Done).
