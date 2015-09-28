@@ -773,6 +773,7 @@ EFI_STATUS MachpLoadMachOThinFatFile(IO_FILE_HANDLE* fileHandle, UINT64* offsetI
 		//
 		MACH_HEADER machHeader												= {0};
 		UINTN readLength													= 0;
+
 		if(EFI_ERROR(status = IoReadFile(fileHandle, &machHeader, sizeof(machHeader), &readLength, FALSE)))
 			try_leave(NOTHING);
 
@@ -792,6 +793,7 @@ EFI_STATUS MachpLoadMachOThinFatFile(IO_FILE_HANDLE* fileHandle, UINT64* offsetI
 		// get file size
 		//
 		UINT64 fileSize														= 0;
+
 		if(EFI_ERROR(status = IoGetFileSize(fileHandle, &fileSize)))
 			try_leave(NOTHING);
 
@@ -802,7 +804,7 @@ EFI_STATUS MachpLoadMachOThinFatFile(IO_FILE_HANDLE* fileHandle, UINT64* offsetI
 			try_leave(status = EFI_NOT_FOUND);
 
 		//
-		// check cpu arch type
+		// check CPU arch type
 		//
 		if(machHeader.CpuType != 0x1000007)
 			try_leave(status = EFI_NOT_FOUND);
@@ -812,6 +814,7 @@ EFI_STATUS MachpLoadMachOThinFatFile(IO_FILE_HANDLE* fileHandle, UINT64* offsetI
 		//
 		if(offsetInFile)
 			*offsetInFile													= 0;
+
 		if(dataSize)
 			*dataSize														= static_cast<UINT32>(fileSize);
 	}
@@ -860,6 +863,7 @@ EFI_STATUS MachLoadThinFatFile(IO_FILE_HANDLE* fileHandle, UINT64* offsetInFile,
 		// check fat header
 		//
 		BOOLEAN needSwap													= TRUE;
+
 		if(fatHeader.Magic == FAT_MAGIC)
 			needSwap														= FALSE;
 		else if(fatHeader.Magic == FAT_CIGAM)
@@ -872,6 +876,7 @@ EFI_STATUS MachLoadThinFatFile(IO_FILE_HANDLE* fileHandle, UINT64* offsetInFile,
 		//
 		FAT_ARCH_HEADER x64ArchHeader										= {0};
 		FAT_ARCH_HEADER curArchHeader										= {0};
+
 		for(UINT32 i = 0; i < fatHeader.ArchHeadersCount; i ++)
 		{
 			//
@@ -939,11 +944,13 @@ EFI_STATUS MachLoadThinFatFile(IO_FILE_HANDLE* fileHandle, UINT64* offsetInFile,
 SEGMENT_COMMAND64* MachpGetFirstSegment64(MACH_HEADER64* machHeader)
 {
 	SEGMENT_COMMAND64* segment64											= Add2Ptr(machHeader, sizeof(MACH_HEADER64), SEGMENT_COMMAND64*);
+
 	for(UINT32 i = 0; i < machHeader->CommandsCount; i ++, segment64 = Add2Ptr(segment64, segment64->Header.CommandLength, SEGMENT_COMMAND64*))
 	{
 		if(segment64->Header.CommandType == MACH_O_COMMAND_SEGMENT64)
 			return segment64;
 	}
+
 	return nullptr;
 }
 
@@ -954,6 +961,7 @@ SEGMENT_COMMAND64* MachpGetNextSegment64(MACH_HEADER64* machHeader, SEGMENT_COMM
 {
 	UINT32 i																= 0;
 	LOAD_COMMAND_HEADER* loadCommand										= Add2Ptr(machHeader, sizeof(MACH_HEADER64), LOAD_COMMAND_HEADER*);
+
 	for(; i < machHeader->CommandsCount && static_cast<VOID*>(loadCommand) != static_cast<VOID*>(segment64); i ++)
 		loadCommand															= Add2Ptr(loadCommand, loadCommand->CommandLength, LOAD_COMMAND_HEADER*);
 
@@ -964,6 +972,7 @@ SEGMENT_COMMAND64* MachpGetNextSegment64(MACH_HEADER64* machHeader, SEGMENT_COMM
 
 		loadCommand															= Add2Ptr(loadCommand, loadCommand->CommandLength, LOAD_COMMAND_HEADER*);
 	}
+
 	return nullptr;
 }
 
@@ -984,11 +993,12 @@ SECTION64* MachpGetNextSection64(SEGMENT_COMMAND64* segment64, SECTION64* sectio
 		return nullptr;
 
 	UINTN index																= (static_cast<UINT8*>(static_cast<VOID*>(section64)) - static_cast<UINT8*>(static_cast<VOID*>(segment64 + 1))) / sizeof(SECTION64);
+
 	return index + 1 >= segment64->SectionCount ? nullptr : section64 + 1;
 }
 
 //
-// load mach-o
+// Load kernel, prelinkedkernel or kernelcache
 //
 EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MACH_O_LOADED_INFO* loadedInfo)
 {
@@ -998,130 +1008,220 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 	__try
 	{
 		//
-		// get info
+		// Get info
 		//
 		UINT64 machOffset													= 0;
 		UINTN machLength													= 0;
+
 		if(EFI_ERROR(status = MachLoadThinFatFile(fileHandle, &machOffset, &machLength)))
 			try_leave(NOTHING);
 
 		//
-		// check length
+		// Check length
 		//
 		if(!machLength)
 			try_leave(status = EFI_NOT_FOUND);
 
 		//
-		// read mach header
+		// Read mach header
 		//
 		MACH_HEADER64 machHeader											= {0};
 		UINTN readLength													= 0;
+
 		if(EFI_ERROR(status = IoReadFile(fileHandle, &machHeader, sizeof(MACH_HEADER), &readLength, FALSE)))
 			try_leave(NOTHING);
 
 		//
-		// check length
+		// Check length
 		//
 		if(readLength != sizeof(MACH_HEADER))
 			try_leave(status = EFI_LOAD_ERROR);
 
 		//
-		// check signature
+		// Check signature
 		//
 		if(machHeader.Magic != MH_MAGIC_64)
 			try_leave(CsPrintf(CHAR8_CONST_STRING("Booting from 32-bit kernelcache is not supported.\n")); status = EFI_LOAD_ERROR);
 
 		//
-		// read 64bit header
+		// Read 64bit header
 		//
 		if(EFI_ERROR(status = IoReadFile(fileHandle, &machHeader.Reserved, sizeof(machHeader.Reserved), &readLength, FALSE)))
 			try_leave(NOTHING);
 
 		//
-		// length check
+		// Length check
 		//
 		if(readLength != sizeof(machHeader.Reserved))
 			try_leave(status = EFI_LOAD_ERROR);
 
 		//
-		// check ASLR
+		// Check ASLR
 		//
 		if(BlTestBootMode(BOOT_MODE_ASLR) && !(machHeader.Flags & MH_PIE))
 			LdrSetupASLR(FALSE, 0);
 
 		//
-		// allocate commands buffer
+		// Allocate commands buffer
 		//
 		commandsBuffer														= MmAllocatePool(machHeader.CommandsLength);
+
 		if(!commandsBuffer)
 			try_leave(status = EFI_OUT_OF_RESOURCES);
 
 		//
-		// read commands
+		// Read commands
 		//
 		if(EFI_ERROR(status = IoReadFile(fileHandle, commandsBuffer, machHeader.CommandsLength, &readLength, FALSE)))
 			try_leave(NOTHING);
 
 		//
-		// length check
+		// Length check
 		//
 		if(readLength != machHeader.CommandsLength)
 			try_leave(status = EFI_LOAD_ERROR);
 
 		//
-		// process commands
+		// Process Load Commands
 		//
 		VOID* dataSegment													= nullptr;
 		VOID* linkEditSegment												= nullptr;
 		UINT32 ix															= 0;
 		UINT64 linkEditSegmentOffset										= 0;
 		LOAD_COMMAND_HEADER* theCommand										= static_cast<LOAD_COMMAND_HEADER*>(commandsBuffer);
+
 		for(UINT32 i = 0; i < machHeader.CommandsCount; i ++, theCommand = Add2Ptr(theCommand, theCommand->CommandLength, LOAD_COMMAND_HEADER*))
 		{
 			//
-			// process it
+			// Process it
 			//
 			switch(theCommand->CommandType)
 			{
-			case MACH_O_COMMAND_UNIX_THREAD:
+				case MACH_O_COMMAND_SEGMENT64:
 				{
 					//
-					// get rip
+					// Get info
 					//
-					THREAD_COMMAND* threadCommand							= _CR(theCommand, THREAD_COMMAND, Header);
-					if(threadCommand->ThreadStateFlavor != THREAD_STATE_FLAVOR_X64)
-						try_leave(CsPrintf(CHAR8_CONST_STRING("Only 64-bit version of LC_UNIXTHREAD is supported.\n")); status = EFI_LOAD_ERROR);
-					else 
-						loadedInfo->EntryPointVirtualAddress				= threadCommand->ThreadState.X64.Rip + LdrGetASLRDisplacement();
+					SEGMENT_COMMAND64* segmentCommand64						= _CR(theCommand, SEGMENT_COMMAND64, Header);
+					UINT64 segmentVirtualAddress							= segmentCommand64->VirtualAddress + LdrGetASLRDisplacement();
+					UINT64 segmentVirtualSize								= segmentCommand64->VirtualSize;
+					UINT64 segmentFileSize									= segmentCommand64->FileSize;
+					UINT64 segmentFileOffset								= segmentCommand64->FileOffset;
 
-					loadedInfo->EntryPointPhysicalAddress					= LdrStaticVirtualToPhysical(loadedInfo->EntryPointVirtualAddress);
-				}
-				break;
+					//
+					// Empty segment
+					//
+					if(!segmentVirtualSize)
+						break;
 
-			case MACH_O_COMMAND_SYMTAB:
-				{
-					SYMTAB_COMMAND* symbolTableCommand						= _CR(theCommand, SYMTAB_COMMAND, Header);
-					if(LdrGetASLRDisplacement())
+					//
+					// Seek file
+					//
+					if(EFI_ERROR(status = IoSetFilePosition(fileHandle, machOffset + segmentFileOffset)))
+						try_leave(NOTHING);
+
+					//
+					// Allocate buffer
+					//
+					UINTN allocatedLength									= static_cast<UINTN>(segmentVirtualSize);
+					UINT64 virtualAddress									= segmentVirtualAddress;
+					UINT64 physicalAddress									= useKernelMemory ? MmAllocateKernelMemory(&allocatedLength, &virtualAddress) : MmAllocateLoaderData(&allocatedLength, &virtualAddress);
+
+					if(!physicalAddress)
+						try_leave(status = EFI_OUT_OF_RESOURCES);
+
+					//
+					// read in
+					//
+					UINTN fileLength										= static_cast<UINTN>(segmentVirtualSize > segmentFileSize ? segmentFileSize : segmentVirtualSize);
+
+					if(fileLength && EFI_ERROR(status = IoReadFile(fileHandle, ArchConvertAddressToPointer(physicalAddress, VOID*), fileLength, &readLength, FALSE)))
+						try_leave(NOTHING);
+
+					//
+					// Zero out
+					//
+					if(readLength != allocatedLength)
+						EfiBootServices->SetMem(Add2Ptr(physicalAddress, readLength, VOID*), allocatedLength - readLength, 0);
+
+					//
+					// __TEXT segment
+					//
+					if(!strcmp(segmentCommand64->Name, CHAR8_CONST_STRING("__TEXT")))
 					{
-						SYMTAB_ENTRY64* symbolEntry							= Add2Ptr(linkEditSegment, symbolTableCommand->SymbolTableOffset - linkEditSegmentOffset, SYMTAB_ENTRY64*);
-						for(ix = 0; ix < symbolTableCommand->SymbolCount; ix++, symbolEntry++)
+						//
+						// Save mach header
+						//
+						loadedInfo->ImageBasePhysicalAddress				= physicalAddress;
+						loadedInfo->ImageBaseVirtualAddress					= virtualAddress;
+
+						//
+						// Relocation for ASLR
+						//
+						if(LdrGetASLRDisplacement())
 						{
-							if(symbolEntry->Type <= 0x1f)
-								symbolEntry->Value							+= LdrGetASLRDisplacement();
+
+							SEGMENT_COMMAND64* theSegment64					= MachpGetFirstSegment64(Add2Ptr(physicalAddress, 0, MACH_HEADER64*));
+
+							while(theSegment64)
+							{
+								theSegment64->VirtualAddress				+= LdrGetASLRDisplacement();
+								SECTION64* theSection64						= MachpGetFirstSection64(theSegment64);
+
+								while(theSection64)
+								{
+									theSection64->Address					+= LdrGetASLRDisplacement();
+									theSection64							= MachpGetNextSection64(theSegment64, theSection64);
+								}
+
+								theSegment64								= MachpGetNextSegment64(Add2Ptr(physicalAddress, 0, MACH_HEADER64*), theSegment64);
+							}
 						}
+					}
+
+					//
+					// __DATA segment
+					//
+					if(!dataSegment && !strcmp(segmentCommand64->Name, CHAR8_CONST_STRING("__DATA")))
+						dataSegment											= ArchConvertAddressToPointer(physicalAddress, VOID*);
+
+					//
+					// __LINKEDIT segment
+					//
+					if(!linkEditSegment && !strcmp(segmentCommand64->Name, CHAR8_CONST_STRING("__LINKEDIT")))
+					{
+						linkEditSegment										= ArchConvertAddressToPointer(physicalAddress, VOID*);
+						linkEditSegmentOffset								= segmentFileOffset;
+					}
+
+					//
+					// Update min/max
+					//
+					if(!loadedInfo->MinVirtualAddress || virtualAddress < loadedInfo->MinVirtualAddress)
+					{
+						loadedInfo->MinVirtualAddress						= virtualAddress;
+						loadedInfo->MinPhysicalAddress						= LdrStaticVirtualToPhysical(loadedInfo->MinVirtualAddress);
+					}
+
+					if(!loadedInfo->MaxVirtualAddress || loadedInfo->MaxVirtualAddress < virtualAddress + allocatedLength)
+					{
+						loadedInfo->MaxVirtualAddress						= virtualAddress + allocatedLength;
+						loadedInfo->MaxPhysicalAddress						= LdrStaticVirtualToPhysical(loadedInfo->MaxVirtualAddress);
 					}
 				}
 				break;
-
-			case MACH_O_COMMAND_DYSYMTAB:
+			
+				case MACH_O_COMMAND_DYSYMTAB:
 				{
 					DYSYMTAB_COMMAND* dynamicSymbolTableCommand				= _CR(theCommand, DYSYMTAB_COMMAND, Header);
+
 					if(dynamicSymbolTableCommand->LocalRelocationCount && LdrGetASLRDisplacement())
 					{
 						if(!dataSegment || !linkEditSegment)
 							try_leave(status = EFI_LOAD_ERROR);
-
+						
 						RELOCATION_INFO* relocationInfo						= Add2Ptr(linkEditSegment, dynamicSymbolTableCommand->LocalRelocationOffset - linkEditSegmentOffset, RELOCATION_INFO*);
+
 						for(ix = 0; ix < dynamicSymbolTableCommand->LocalRelocationCount; ix++, relocationInfo++)
 						{
 							//
@@ -1137,127 +1237,68 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 							//
 							if(relocationInfo->Type || relocationInfo->Length != 3 || relocationInfo->PCRelative || relocationInfo->External)
 								try_leave(status = EFI_LOAD_ERROR);
-
+							
 							UINT64* address									= Add2Ptr(dataSegment, static_cast<INT64>(relocationInfo->SectionOffset), UINT64*);
 							*address										+= LdrGetASLRDisplacement();
 						}
 					}
 				}
 				break;
-				
-			case MACH_O_COMMAND_SEGMENT64:
+
+				case MACH_O_COMMAND_SYMTAB:
+				{
+					UINT64 step												= 0;
+					UINT64 asld												= LdrGetASLRDisplacement();
+					CHAR8 CONST* stringTable								= Add2Ptr(linkEditSegment, symbolTableCommand->StringTableOffset - linkEditSegmentOffset, CHAR8 CONST*);
+					SYMTAB_COMMAND* symbolTableCommand						= _CR(theCommand, SYMTAB_COMMAND, Header);
+					SYMTAB_ENTRY64* symbolEntry								= Add2Ptr(linkEditSegment, symbolTableCommand->SymbolTableOffset - linkEditSegmentOffset, SYMTAB_ENTRY64*);
+						
+					for(ix = 0; ix < symbolTableCommand->SymbolCount; ix++, symbolEntry++)
+					{
+						if(asld && (symbolEntry->Type <= 0x1f))
+						{
+							symbolEntry->Value								+= LdrGetASLRDisplacement();
+						}
+
+#if (TARGET_OS == EL_CAPITAN)
+						if(strstr("loadExecutable", stringTable + symbolEntry->StringIndex))
+						{
+							loadedInfo->LoadExecutableVirtualAddress		= symbolEntry->Value;
+							step++;
+						}
+#endif
+						else if(!strcmp("_IdlePML4", stringTable + symbolEntry->StringIndex))
+						{
+							loadedInfo->IdlePML4VirtualAddress				= symbolEntry->Value;
+							step++;
+						}
+						
+						if (step == 2)
+							break;
+					}
+				}
+				break;
+
+				case MACH_O_COMMAND_UNIX_THREAD:
 				{
 					//
-					// get info
+					// Get rip
 					//
-					SEGMENT_COMMAND64* segmentCommand64						= _CR(theCommand, SEGMENT_COMMAND64, Header);
-					UINT64 segmentVirtualAddress							= segmentCommand64->VirtualAddress + LdrGetASLRDisplacement();
-					UINT64 segmentVirtualSize								= segmentCommand64->VirtualSize;
-					UINT64 segmentFileSize									= segmentCommand64->FileSize;
-					UINT64 segmentFileOffset								= segmentCommand64->FileOffset;
+					THREAD_COMMAND* threadCommand							= _CR(theCommand, THREAD_COMMAND, Header);
 
-					//
-					// empty segment
-					//
-					if(!segmentVirtualSize)
-						break;
-
-					//
-					// seek file
-					//
-					if(EFI_ERROR(status = IoSetFilePosition(fileHandle, machOffset + segmentFileOffset)))
-						try_leave(NOTHING);
-
-					//
-					// allocate buffer
-					//
-					UINTN allocatedLength									= static_cast<UINTN>(segmentVirtualSize);
-					UINT64 virtualAddress									= segmentVirtualAddress;
-					UINT64 physicalAddress									= useKernelMemory ? MmAllocateKernelMemory(&allocatedLength, &virtualAddress) : MmAllocateLoaderData(&allocatedLength, &virtualAddress);
-					if(!physicalAddress)
-						try_leave(status = EFI_OUT_OF_RESOURCES);
-
-					//
-					// read in
-					//
-					UINTN fileLength										= static_cast<UINTN>(segmentVirtualSize > segmentFileSize ? segmentFileSize : segmentVirtualSize);
-					if(fileLength && EFI_ERROR(status = IoReadFile(fileHandle, ArchConvertAddressToPointer(physicalAddress, VOID*), fileLength, &readLength, FALSE)))
-						try_leave(NOTHING);
-
-					//
-					// zero out
-					//
-					if(readLength != allocatedLength)
-						EfiBootServices->SetMem(Add2Ptr(physicalAddress, readLength, VOID*), allocatedLength - readLength, 0);
-
-					//
-					// first writable segment
-					//
-					if(!dataSegment && (segmentCommand64->InitialProtection & VM_PROT_WRITE))
-						dataSegment											= ArchConvertAddressToPointer(physicalAddress, VOID*);
-
-					//
-					// link edit segment
-					//
-					if(!linkEditSegment && !strcmp(segmentCommand64->Name, CHAR8_CONST_STRING("__LINKEDIT")))
-					{
-						linkEditSegment										= ArchConvertAddressToPointer(physicalAddress, VOID*);
-						linkEditSegmentOffset								= segmentFileOffset;
-					}
-
-					//
-					// first __TEXT segment also contains MACH_HEADER
-					//
-					if(!strcmp(segmentCommand64->Name, CHAR8_CONST_STRING("__TEXT")))
-					{
-						//
-						// save mach header
-						//
-						loadedInfo->ImageBasePhysicalAddress				= physicalAddress;
-						loadedInfo->ImageBaseVirtualAddress					= virtualAddress;
-
-						//
-						// relocation for ASLR
-						//
-						if(LdrGetASLRDisplacement())
-						{
-
-							SEGMENT_COMMAND64* theSegment64					= MachpGetFirstSegment64(Add2Ptr(physicalAddress, 0, MACH_HEADER64*));
-							while(theSegment64)
-							{
-								theSegment64->VirtualAddress				+= LdrGetASLRDisplacement();
-								SECTION64* theSection64						= MachpGetFirstSection64(theSegment64);
-								while(theSection64)
-								{
-									theSection64->Address					+= LdrGetASLRDisplacement();
-									theSection64							= MachpGetNextSection64(theSegment64, theSection64);
-								}
-								theSegment64								= MachpGetNextSegment64(Add2Ptr(physicalAddress, 0, MACH_HEADER64*), theSegment64);
-							}
-						}
-					}
-
-					//
-					// update min/max
-					//
-					if(!loadedInfo->MinVirtualAddress || virtualAddress < loadedInfo->MinVirtualAddress)
-					{
-						loadedInfo->MinVirtualAddress						= virtualAddress;
-						loadedInfo->MinPhysicalAddress						= LdrStaticVirtualToPhysical(loadedInfo->MinVirtualAddress);
-					}
-
-					if(!loadedInfo->MaxVirtualAddress || loadedInfo->MaxVirtualAddress < virtualAddress + allocatedLength)
-					{
-						loadedInfo->MaxVirtualAddress						= virtualAddress + allocatedLength;
-						loadedInfo->MaxPhysicalAddress						= LdrStaticVirtualToPhysical(loadedInfo->MaxVirtualAddress);
-					}
+					if(threadCommand->ThreadStateFlavor != THREAD_STATE_FLAVOR_X64)
+						try_leave(CsPrintf(CHAR8_CONST_STRING("Only 64-bit version of LC_UNIXTHREAD is supported.\n")); status = EFI_LOAD_ERROR);
+					else
+						loadedInfo->EntryPointVirtualAddress				= threadCommand->ThreadState.X64.Rip + LdrGetASLRDisplacement();
+					
+					loadedInfo->EntryPointPhysicalAddress					= LdrStaticVirtualToPhysical(loadedInfo->EntryPointVirtualAddress);
 				}
 				break;
 			}
 		}
 
 		//
-		// save arch type
+		// Save arch type
 		//
 		loadedInfo->ArchType												= machHeader.CpuType;
 	}
@@ -1282,12 +1323,14 @@ UINT64 MachFindSymbolVirtualAddressByName(MACH_O_LOADED_INFO* loadedInfo, CHAR8 
 	VOID* linkEditSegment													= nullptr;
 	UINT64 linkEditSegmentOffset											= 0;
 	SYMTAB_COMMAND* symbolTableCommand										= nullptr;
+
 	for(UINT32 i = 0; i < machHeader->CommandsCount; i ++, commandHeader = Add2Ptr(commandHeader, commandHeader->CommandLength, LOAD_COMMAND_HEADER*))
 	{
 		if(commandHeader->CommandType == MACH_O_COMMAND_SEGMENT32 || commandHeader->CommandType == MACH_O_COMMAND_SEGMENT64)
 		{
 			SEGMENT_COMMAND64* segmentCommand64									= _CR(commandHeader, SEGMENT_COMMAND64, Header);
 			SEGMENT_COMMAND* segmentCommand										= _CR(commandHeader, SEGMENT_COMMAND, Header);
+
 			if(is64Bits ? strcmp(segmentCommand64->Name, CHAR8_CONST_STRING("__LINKEDIT")) : strcmp(segmentCommand->Name, CHAR8_CONST_STRING("__LINKEDIT")))
 				continue;
 
@@ -1299,15 +1342,18 @@ UINT64 MachFindSymbolVirtualAddressByName(MACH_O_LOADED_INFO* loadedInfo, CHAR8 
 			symbolTableCommand												= _CR(commandHeader, SYMTAB_COMMAND, Header);
 		}
 	}
+
 	if(!linkEditSegment || !linkEditSegmentOffset || !symbolTableCommand)
 		return 0;
 
 	CHAR8 CONST* stringTable												= Add2Ptr(linkEditSegment, symbolTableCommand->StringTableOffset - linkEditSegmentOffset, CHAR8 CONST*);
 	SYMTAB_ENTRY64* symbolEntry												= Add2Ptr(linkEditSegment, symbolTableCommand->SymbolTableOffset - linkEditSegmentOffset, SYMTAB_ENTRY64*);
+
 	for(UINT32 i = 0; i < symbolTableCommand->SymbolCount; i ++, symbolEntry ++)
 	{
 		if(!strcmp(symbolName, stringTable + symbolEntry->StringIndex))
 			return symbolEntry->Value;
 	}
+
 	return 0;
 }

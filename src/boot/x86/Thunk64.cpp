@@ -87,7 +87,8 @@ VOID ArchSetupThunkCode0(UINT64 thunkOffset, MACH_O_LOADED_INFO* loadedInfo)
 {
 	if(loadedInfo)
 	{
-		ArchpKernelIdlePML4													= MachFindSymbolVirtualAddressByName(loadedInfo, CHAR8_CONST_STRING("_IdlePML4")); //0x8c0ac8 + thunkOffset;
+		// ArchpKernelIdlePML4													= MachFindSymbolVirtualAddressByName(loadedInfo, CHAR8_CONST_STRING("_IdlePML4")); //0x8c0ac8 + thunkOffset;
+		ArchpKernelIdlePML4													= loadedInfo->IdlePML4VirtualAddress;
 		EfiRuntimeServices->SetVariable(CHAR16_STRING(L"IdlePML4"), &AppleNVRAMVariableGuid, EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS, sizeof(UINT64), &ArchpKernelIdlePML4);
 	}
 	else
