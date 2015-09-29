@@ -1262,14 +1262,17 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 						}
 
 #if (TARGET_OS => YOSEMITE)
-						if(strcmp(CHAR8_CONST_STRING("loadExecutable"), stringTable + symbolEntry->StringIndex))
+						if(BlTestBootMode(BOOT_MODE_FLUSH_CACHES))
 						{
-							for (ix = 0; i x< 5; ix++)
+							if(strcmp(CHAR8_CONST_STRING("loadExecutable"), stringTable + symbolEntry->StringIndex))
 							{
-								CsPrintf(CHAR8_CONST_STRING("PIKE: loadExecutable found!\n"));
-							}
+								for (ix = 0; i x< 5; ix++)
+								{
+									CsPrintf(CHAR8_CONST_STRING("PIKE: loadExecutable found!\n"));
+								}
 
-							loadedInfo->LoadExecutableVirtualAddress		= symbolEntry->Value;
+								loadedInfo->LoadExecutableVirtualAddress		= symbolEntry->Value;
+							}
 						}
 #endif
 						else if(!strcmp(CHAR8_CONST_STRING("_IdlePML4"), stringTable + symbolEntry->StringIndex))
