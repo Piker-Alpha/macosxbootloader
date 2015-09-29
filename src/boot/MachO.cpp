@@ -1271,7 +1271,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 									CsPrintf(CHAR8_CONST_STRING("PIKE: loadExecutable found!\n"));
 								}
 
-								loadedInfo->LoadExecutableVirtualAddress		= symbolEntry->Value;
+								loadedInfo->LoadExecutableVirtualAddress	= symbolEntry->Value;
 							}
 						}
 #endif
