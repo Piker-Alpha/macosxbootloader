@@ -85,6 +85,8 @@ STATIC VOID EFIAPI ArchpVirtualAddressChanged(EFI_EVENT theEvent, VOID* theConte
 //
 VOID ArchSetupThunkCode0(UINT64 thunkOffset, MACH_O_LOADED_INFO* loadedInfo)
 {
+	UINT8 i																	= 0;
+
 	if(loadedInfo)
 	{
 		ArchpKernelIdlePML4													= MachFindSymbolVirtualAddressByName(loadedInfo, CHAR8_CONST_STRING("_IdlePML4")); //0x8c0ac8 + thunkOffset;
