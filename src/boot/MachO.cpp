@@ -1247,7 +1247,8 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 
 				case MACH_O_COMMAND_SYMTAB:
 				{
-					UINT64 step												= 0;
+					UINT64 ix												= 0;
+
 					UINT64 asld												= LdrGetASLRDisplacement();
 					SYMTAB_COMMAND* symbolTableCommand						= _CR(theCommand, SYMTAB_COMMAND, Header);
 					CHAR8 CONST* stringTable								= Add2Ptr(linkEditSegment, symbolTableCommand->StringTableOffset - linkEditSegmentOffset, CHAR8 CONST*);
@@ -1260,21 +1261,26 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 							symbolEntry->Value								+= LdrGetASLRDisplacement();
 						}
 
-#if (TARGET_OS == EL_CAPITAN)
+#if (TARGET_OS => YOSEMITE)
 						if(strcmp(CHAR8_CONST_STRING("loadExecutable"), stringTable + symbolEntry->StringIndex))
 						{
+							for (ix = 0; i x< 5; ix++)
+							{
+								CsPrintf(CHAR8_CONST_STRING("PIKE: loadExecutable found!\n"));
+							}
+
 							loadedInfo->LoadExecutableVirtualAddress		= symbolEntry->Value;
-							step++;
 						}
 #endif
 						else if(!strcmp(CHAR8_CONST_STRING("_IdlePML4"), stringTable + symbolEntry->StringIndex))
 						{
+							for (ix = 0; ix < 5; ix++)
+							{
+								CsPrintf(CHAR8_CONST_STRING("PIKE: _IdlePML4 found!\n"));
+							}
+
 							loadedInfo->IdlePML4VirtualAddress				= symbolEntry->Value;
-							step++;
 						}
-						
-						if (step == 2)
-							break;
 					}
 				}
 				break;
