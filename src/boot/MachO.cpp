@@ -1261,12 +1261,12 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 							symbolEntry->Value								+= LdrGetASLRDisplacement();
 						}
 
-#if (TARGET_OS => YOSEMITE)
+#if (TARGET_OS >= YOSEMITE)
 						if(BlTestBootMode(BOOT_MODE_FLUSH_CACHES))
 						{
 							if(strcmp(CHAR8_CONST_STRING("loadExecutable"), stringTable + symbolEntry->StringIndex))
 							{
-								for (ix = 0; i x< 5; ix++)
+								for (ix = 0; ix < 5; ix++)
 								{
 									CsPrintf(CHAR8_CONST_STRING("PIKE: loadExecutable found!\n"));
 								}
