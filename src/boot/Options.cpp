@@ -380,6 +380,8 @@ CHAR8* BlSetupKernelCommandLine(CHAR8 CONST* bootOptions, CHAR8 CONST* bootArgsV
 			BlpCopyArgs(retValue, CHAR8_CONST_STRING("-s"));
 		if(BlTestBootMode(BOOT_MODE_VERBOSE))
 			BlpCopyArgs(retValue, CHAR8_CONST_STRING("-v"));
+		if(BlTestBootMode(BOOT_MODE_FLUSH_CACHES))
+			BlpCopyArgs(retValue, CHAR8_CONST_STRING("-f"));
 		if(BlTestBootMode(BOOT_MODE_NET))
 			BlpCopyArgs(retValue, CHAR8_CONST_STRING("srv=1"));
 	}

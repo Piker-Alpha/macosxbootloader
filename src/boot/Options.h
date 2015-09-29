@@ -26,6 +26,7 @@
 #define BOOT_MODE_ASLR														0x004000
 #define BOOT_MODE_SKIP_BOARD_ID_CHECK										0x008000
 #define BOOT_MODE_SKIP_PANIC_DIALOG											0x010000
+#define BOOT_MODE_FLUSH_CACHES												0x020000
 
 //
 // detect hot key
