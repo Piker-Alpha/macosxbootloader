@@ -1264,18 +1264,21 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 #if (TARGET_OS >= YOSEMITE)
 						/* if(BlTestBootMode(BOOT_MODE_FLUSH_CACHES))
 						{ */
-							if(!strcmp(CHAR8_CONST_STRING("__ZN6OSKext14loadExecutableEv"), stringTable + symbolEntry->StringIndex))
+							if(symbolEntry->SectionIndex == 1) // __TEXT,__text
 							{
-								loadedInfo->LoadExecutableVirtualAddress	= symbolEntry->Value;
-
-								for (ix = 0; ix < 5; ix++)
+								if(!strcmp(CHAR8_CONST_STRING("__ZN6OSKext14loadExecutableEv"), stringTable + symbolEntry->StringIndex))
 								{
-									CsPrintf(CHAR8_CONST_STRING("PIKE: loadExecutable found (0x%llx)!\n"), symbolEntry->Value);
+									loadedInfo->LoadExecutableVirtualAddress = symbolEntry->Value;
+
+									for (ix = 0; ix < 5; ix++)
+									{
+										CsPrintf(CHAR8_CONST_STRING("PIKE: loadExecutable found (0x%llx)!\n"), symbolEntry->Value);
+									}
 								}
 							}
 						// }
 #endif
-						else if(!strcmp(CHAR8_CONST_STRING("_IdlePML4"), stringTable + symbolEntry->StringIndex))
+						if(!strcmp(CHAR8_CONST_STRING("_IdlePML4"), stringTable + symbolEntry->StringIndex))
 						{
 							loadedInfo->IdlePML4VirtualAddress				= symbolEntry->Value;
 
