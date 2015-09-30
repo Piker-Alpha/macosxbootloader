@@ -1264,7 +1264,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 #if (TARGET_OS >= YOSEMITE)
 						/* if(BlTestBootMode(BOOT_MODE_FLUSH_CACHES))
 						{ */
-							if(strcmp(CHAR8_CONST_STRING("loadExecutable"), stringTable + symbolEntry->StringIndex))
+							if(strstr(CHAR8_CONST_STRING("loadExecutable"), stringTable + symbolEntry->StringIndex))
 							{
 								loadedInfo->LoadExecutableVirtualAddress	= symbolEntry->Value;
 
