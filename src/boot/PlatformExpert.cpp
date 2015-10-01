@@ -157,7 +157,7 @@ EFI_STATUS PeSetupDeviceTree()
 			//
 			// build name
 			//
-			CHAR8 nodeName[0x40]											={0};
+			CHAR8 nodeName[0x40]											= {0};
 			EFI_GUID* g														= &theTable->VendorGuid;
 			CHAR8 CONST* guidFormat											= CHAR8_CONST_STRING("%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X");
 			snprintf(nodeName, ARRAYSIZE(nodeName) - 1, guidFormat, g->Data1, g->Data2, g->Data3, g->Data4[0], g->Data4[1], g->Data4[2], g->Data4[3], g->Data4[4], g->Data4[5], g->Data4[6], g->Data4[7]);
