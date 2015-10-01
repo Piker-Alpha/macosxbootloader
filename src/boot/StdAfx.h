@@ -22,6 +22,8 @@
 	#define LEGACY_GREY_SUPPORT												0
 #endif
 
+#define BOOT_BASE_EFI														1
+
 #define NOTHING
 #define BOOTAPI																__cdecl
 #define CHAR8_CONST_STRING(S)												static_cast<CHAR8 CONST*>(static_cast<VOID CONST*>(S))
