@@ -794,24 +794,30 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 	UINT32 attributes														= (EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS);
 	UINT32 csrActiveConfig													= CSR_ALLOW_APPLE_INTERNAL;
 	UINTN dataSize															= sizeof(UINT32);
-	
+
+#if (BOOT_BASE_EFI == 0)
 	if(BlTestBootMode(BOOT_MODE_FROM_RECOVER_BOOT_DIRECTORY | BOOT_MODE_EFI_NVRAM_RECOVERY_BOOT_MODE)) // Perhaps BOOT_MODE_BOOT_IS_NOT_ROOT also?
 	{
-#if DEBUG_NVRAM_CALL_CSPRINTF
+	#if DEBUG_NVRAM_CALL_CSPRINTF
 		for (i = 0; i < 5; i++)
 		{
 			CsPrintf(CHAR8_CONST_STRING("PIKE: BlInitCSRState(RecoveryOS detected)!\n"));
 		}
-#endif // #if DEBUG_NVRAM_CALL_CSPRINTF
+	#endif // #if DEBUG_NVRAM_CALL_CSPRINTF
+#endif // #if (BOOT_BASE_EFI == 0)
+
 		attributes															|= EFI_VARIABLE_NON_VOLATILE;
 		csrActiveConfig														= CSR_ALLOW_DEVICE_CONFIGURATION;
 		bootArgs->Flags														|= (kBootArgsFlagCSRActiveConfig + kBootArgsFlagCSRConfigMode + kBootArgsFlagCSRBoot);
+
+#if (BOOT_BASE_EFI == 0)
 	}
 	else
 	{
 		bootArgs->Flags														|= (kBootArgsFlagCSRActiveConfig + kBootArgsFlagCSRBoot);
 	}
-	
+#endif // #if (BOOT_BASE_EFI == 0)
+
 	//
 	// System Integrity Protection Capabilties.
 	//
@@ -889,7 +895,12 @@ EFI_STATUS BlAddBooterInfo(DEVICE_TREE_NODE* chosenNode)
 	//
 	// Static data for now. Should extract this from Apple's boot.efi
 	//
+#if BOOT_BASE_EFI
+	DevTreeAddProperty(chosenNode, CHAR8_CONST_STRING("booter-name"), "bootbase.efi", 12, FALSE);
+#else
 	DevTreeAddProperty(chosenNode, CHAR8_CONST_STRING("booter-name"), "boot.efi", 8, FALSE);
+#endif
+
 	DevTreeAddProperty(chosenNode, CHAR8_CONST_STRING("booter-version"), "version:307", 11, FALSE);
 	DevTreeAddProperty(chosenNode, CHAR8_CONST_STRING("booter-build-time"), "Fri Sep  4 15:34:00 PDT 2015", 28, FALSE);
 
