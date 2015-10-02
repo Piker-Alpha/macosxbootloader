@@ -1247,14 +1247,13 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 
 				case MACH_O_COMMAND_SYMTAB:
 				{
-					UINT64 ix												= 0;
-
+					UINT64 index											= 0;
 					UINT64 asld												= LdrGetASLRDisplacement();
 					SYMTAB_COMMAND* symbolTableCommand						= _CR(theCommand, SYMTAB_COMMAND, Header);
 					CHAR8 CONST* stringTable								= Add2Ptr(linkEditSegment, symbolTableCommand->StringTableOffset - linkEditSegmentOffset, CHAR8 CONST*);
 					SYMTAB_ENTRY64* symbolEntry								= Add2Ptr(linkEditSegment, symbolTableCommand->SymbolTableOffset - linkEditSegmentOffset, SYMTAB_ENTRY64*);
 						
-					for(ix = 0; ix < symbolTableCommand->SymbolCount; ix++, symbolEntry++)
+					for(; index < symbolTableCommand->SymbolCount; index++, symbolEntry++)
 					{
 						if(asld && (symbolEntry->Type <= 0x1f))
 						{
