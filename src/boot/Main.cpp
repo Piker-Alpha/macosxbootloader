@@ -524,6 +524,17 @@ EFI_STATUS EFIAPI EfiMain(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable)
 		CHAR8* filePath														= DevPathExtractFilePathName(bootFilePath, TRUE);
 		if(filePath)
 		{
+			//
+			// PIKE: Start filePath testing
+			//
+			for (UINT8 ii = 0; ii < 5; ii++)
+			{
+				CsPrintf(CHAR8_CONST_STRING("PIKE: EfiMain(%s)\n"), filePath);
+			}
+			//
+			// PIKE: End filePath testing
+			//
+
 			if(strstr(filePath, CHAR8_CONST_STRING("com.apple.recovery.boot")))
 			{
 				BlSetBootMode(BOOT_MODE_FROM_RECOVER_BOOT_DIRECTORY, BOOT_MODE_EFI_NVRAM_RECOVERY_BOOT_MODE | BOOT_MODE_BOOT_IS_NOT_ROOT);

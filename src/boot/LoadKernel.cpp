@@ -444,20 +444,6 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 		}
 		else
 		{
-			//
-			// PIKE: Start prelinkedkernel testing
-			//
-			UINT8 ii														= 0;
-			CHAR8* bDevicePath												= DevPathExtractFilePathName(bootDevicePath, TRUE);
-
-			for (; ii < 5; ii++)
-			{
-				CsPrintf(CHAR8_CONST_STRING("PIKE: LdrLoadKernelCache(%s)\n"), bDevicePath);
-			}
-			//
-			// PIKE: End prelinkedkernel testing
-			//
-
 			for(UINTN i = 0; i < 4; i ++)
 			{
 				//
