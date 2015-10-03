@@ -22,7 +22,7 @@
 	#define LEGACY_GREY_SUPPORT												0
 #endif
 
-#define BOOT_BASE_EFI														1
+#define BOOT_BASE_EFI														0
 
 #define NOTHING
 #define BOOTAPI																__cdecl
