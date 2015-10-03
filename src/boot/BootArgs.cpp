@@ -787,9 +787,9 @@ EFI_STATUS BlFinalizeBootArgs(BOOT_ARGS* bootArgs, CHAR8 CONST* kernelCommandLin
 //
 EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 {
-#if DEBUG_NVRAM_CALL_CSPRINTF
+// #if DEBUG_NVRAM_CALL_CSPRINTF
 	UINT8 i																	= 0;
-#endif // #if DEBUG_NVRAM_CALL_CSPRINTF
+// #endif // #if DEBUG_NVRAM_CALL_CSPRINTF
 	EFI_STATUS status														= EFI_SUCCESS;
 	UINT32 attributes														= (EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS);
 	UINT32 csrActiveConfig													= CSR_ALLOW_APPLE_INTERNAL;
@@ -798,12 +798,12 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 #if (BOOT_BASE_EFI == 0)
 	if(BlTestBootMode(BOOT_MODE_FROM_RECOVER_BOOT_DIRECTORY | BOOT_MODE_EFI_NVRAM_RECOVERY_BOOT_MODE)) // Perhaps BOOT_MODE_BOOT_IS_NOT_ROOT also?
 	{
-	#if DEBUG_NVRAM_CALL_CSPRINTF
+//	#if DEBUG_NVRAM_CALL_CSPRINTF
 		for (i = 0; i < 5; i++)
 		{
 			CsPrintf(CHAR8_CONST_STRING("PIKE: BlInitCSRState(RecoveryOS detected)!\n"));
 		}
-	#endif // #if DEBUG_NVRAM_CALL_CSPRINTF
+//	#endif // #if DEBUG_NVRAM_CALL_CSPRINTF
 #endif // #if (BOOT_BASE_EFI == 0)
 
 		attributes															|= EFI_VARIABLE_NON_VOLATILE;
