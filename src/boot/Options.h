@@ -27,6 +27,7 @@
 #define BOOT_MODE_SKIP_BOARD_ID_CHECK										0x008000
 #define BOOT_MODE_SKIP_PANIC_DIALOG											0x010000
 #define BOOT_MODE_FLUSH_CACHES												0x020000
+#define BOOT_MODE_IS_INSTALLER												0x040000
 
 //
 // detect hot key

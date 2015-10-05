@@ -522,18 +522,16 @@ EFI_STATUS EFIAPI EfiMain(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable)
 		// check recovery
 		//
 		CHAR8* filePath														= DevPathExtractFilePathName(bootFilePath, TRUE);
+
 		if(filePath)
 		{
 			//
-			// PIKE: Start filePath testing
+			// Installer detection
 			//
-			for (UINT8 ii = 0; ii < 5; ii++)
+			if (strstr(filePath, CHAR8_CONST_STRING("/.IABootFiles")) || strstr(filePath, CHAR8_CONST_STRING("/OS X Install Data")) )
 			{
-				CsPrintf(CHAR8_CONST_STRING("PIKE: EfiMain(%s)\n"), filePath);
+				BlSetBootMode(BOOT_MODE_IS_INSTALLER);
 			}
-			//
-			// PIKE: End filePath testing
-			//
 
 			if(strstr(filePath, CHAR8_CONST_STRING("com.apple.recovery.boot")))
 			{
