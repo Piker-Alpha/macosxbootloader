@@ -862,7 +862,7 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 		//
 		// Set System Integrity Protection ON by default
 		//
-		bootArgs->CsrActiveConfig											= (csrActiveConfig & 0x7f);
+		bootArgs->CsrActiveConfig											= (csrActiveConfig & 0x6f);
 #if DEBUG_NVRAM_CALL_CSPRINTF
 		for (i = 0; i < 5; i++)
 		{
@@ -875,7 +875,7 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 		//
 		// Set System Integrity Protection to the value found in NVRAM.
 		//
-		bootArgs->CsrActiveConfig											= (csrActiveConfig & 0x7f);
+		bootArgs->CsrActiveConfig											= (csrActiveConfig & 0x6f);
 #if DEBUG_NVRAM_CALL_CSPRINTF
 		for (i = 0; i < 5; i++)
 		{
