@@ -530,7 +530,7 @@ EFI_STATUS EFIAPI EfiMain(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable)
 			//
 			if (strstr(filePath, CHAR8_CONST_STRING("/.IABootFiles")) || strstr(filePath, CHAR8_CONST_STRING("/OS X Install Data")) )
 			{
-				BlSetBootMode(BOOT_MODE_IS_INSTALLER);
+				BlSetBootMode(BOOT_MODE_IS_INSTALLER, 0);
 			}
 
 			if(strstr(filePath, CHAR8_CONST_STRING("com.apple.recovery.boot")))

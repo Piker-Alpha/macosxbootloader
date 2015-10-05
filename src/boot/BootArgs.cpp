@@ -798,7 +798,7 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 	if(BlTestBootMode(BOOT_MODE_FROM_RECOVER_BOOT_DIRECTORY | BOOT_MODE_EFI_NVRAM_RECOVERY_BOOT_MODE | BOOT_MODE_IS_INSTALLER))
 	{
 #if DEBUG_NVRAM_CALL_CSPRINTF
-		if (BlTestBootMode(BOOT_MODE_INSTALLER))
+		if (BlTestBootMode(BOOT_MODE_IS_INSTALLER))
 		{
 			for (i = 0; i < 5; i++)
 			{
@@ -898,7 +898,7 @@ EFI_STATUS BlAddBooterInfo(DEVICE_TREE_NODE* chosenNode)
 	//
 	// Static data for now. Should extract this from Apple's boot.efi
 	//
-	if (BlTestBootMode(BOOT_MODE_IS_INSTALLER)
+	if (BlTestBootMode(BOOT_MODE_IS_INSTALLER))
 	{
 		DevTreeAddProperty(chosenNode, CHAR8_CONST_STRING("booter-name"), "bootbase.efi", 12, FALSE);
 	}
