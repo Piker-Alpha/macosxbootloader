@@ -1281,7 +1281,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 											{
 												CsPrintf(CHAR8_CONST_STRING("Found @ 0x%llx \n"), (UINT64)p - startAddress);
 											}
-											// *(UINT64 *)p = LOAD_EXECUTABLE_PATCH_UINT64;
+											*(UINT64 *)p = LOAD_EXECUTABLE_PATCH_UINT64;
 											break;
 										}
 									}
