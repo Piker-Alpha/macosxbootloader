@@ -360,6 +360,8 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 		if(EFI_ERROR(status = DevTreeAddProperty(rootNode, CHAR8_CONST_STRING("model"), "ACPI", 5, FALSE)))
 			try_leave(NOTHING);
 
+		DevTreeAddProperty(rootNode, CHAR8_CONST_STRING("board-id"), "Mac-F42C88C8", 13, FALSE)))
+
 		//
 		// get chosen node
 		//
