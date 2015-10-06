@@ -61,11 +61,6 @@ typedef struct _MACH_O_LOADED_INFO
 	//
 	//
 	UINT64																	IdlePML4VirtualAddress;
-	
-	//
-	//
-	//
-	UINT64																	LoadExecutableVirtualAddress;
 }MACH_O_LOADED_INFO;
 
 //

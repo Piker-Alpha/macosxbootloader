@@ -1261,18 +1261,36 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 						}
 
 #if (TARGET_OS >= YOSEMITE)
-						if(BlTestBootMode(BOOT_MODE_FLUSH_CACHES))
-						{
+						//if(BlTestBootMode(BOOT_MODE_FLUSH_CACHES))
+						//{
 							if(symbolEntry->SectionIndex == 1) // __TEXT,__text
 							{
 								if(!strcmp(CHAR8_CONST_STRING("__ZN6OSKext14loadExecutableEv"), stringTable + symbolEntry->StringIndex))
 								{
-									loadedInfo->LoadExecutableVirtualAddress = symbolEntry->Value;
+									UINT64 offset = (symbolEntry->Value - loadedInfo->ImageBaseVirtualAddress);
+									UINT64 startAddress = (loadedInfo->ImageBasePhysicalAddress + offset);
+									UINT64 endAddress = (startAddress + 0x200);
+
+									unsigned char * p = (unsigned char *)startAddress;
+
+									for (; p <= (unsigned char *)endAddress; p++)
+									{
+										if (*(UINT64 *)p == LOAD_EXECUTABLE_TARGET_UINT64)
+										{
+											for (ix = 0; ix < 5; ix++)
+											{
+												CsPrintf(CHAR8_CONST_STRING("Found @ 0x%llx \n"), (UINT64)p - startAddress);
+											}
+											// *(UINT64 *)p = LOAD_EXECUTABLE_PATCH_UINT64;
+											break;
+										}
+									}
 								}
 							}
-						}
+						//}
 #endif
-						else if(symbolEntry->SectionIndex == 15) // __DATA,__common
+						//else if(symbolEntry->SectionIndex == 15) // __DATA,__common
+						if(symbolEntry->SectionIndex == 15) // __DATA,__common
 						{
 							if(!strcmp(CHAR8_CONST_STRING("_IdlePML4"), stringTable + symbolEntry->StringIndex))
 							{

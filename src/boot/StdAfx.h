@@ -22,7 +22,8 @@
 	#define LEGACY_GREY_SUPPORT												0
 #endif
 
-#define BOOT_BASE_EFI														0
+#define LOAD_EXECUTABLE_TARGET_UINT64	0x487074db8548c389ULL
+#define LOAD_EXECUTABLE_PATCH_UINT64	0x4812ebdb8548c389ULL
 
 #define NOTHING
 #define BOOTAPI																__cdecl
