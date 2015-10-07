@@ -194,7 +194,7 @@ EFI_STATUS PeSetupDeviceTree()
 				//
 				// Get factory table length.
 				//
-				UINTN tableLength											= factoryEPS->TableLength;
+				UINTN tableLength											= factoryEPS->DMI.TableLength;
 				UINT64 newTableAddress										= 0;
 				//
 				// Allocate the replacement table.
@@ -206,7 +206,17 @@ EFI_STATUS PeSetupDeviceTree()
 				//
 				VOID * newSmbiosTable										= ArchConvertAddressToPointer(newTableAddress, VOID *);
 				memcpy(newSmbiosTable, &theTable->VendorTable, tableLength);
+				
+				SMBIOS_TABLE_STRUCTURE *newEPS = (SMBIOS_TABLE_STRUCTURE *) newSmbiosTable;
+				newEPS->DMI.TableAddress									= static_cast<UINT32>(ArchConvertPointerToAddress(newSmbiosTable));
+				//
+				// Fix checksums.
+				//
+				newEPS->DMI.Checksum										= 256 - Checksum8(&newEPS->DMI, sizeof(newEPS->DMI));
+				newEPS->Checksum											= 256 - Checksum8(newEPS, sizeof(* newEPS));
+
 				DevTreeAddProperty(theNode, CHAR8_CONST_STRING("table"), &newTableAddress, sizeof(newTableAddress), TRUE);
+				
 				for (ix = 0; ix < 5; ix++)
 				{
 					CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS table replaced!\n"));

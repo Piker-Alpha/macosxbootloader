@@ -293,8 +293,8 @@ EFI_STATUS BlDetectMemorySize()
 		if(memcmp(tableStructure->AnchorString, "_SM_", sizeof(tableStructure->AnchorString)))
 			break;
 
-		UINT8* startOfTable													= ArchConvertAddressToPointer(tableStructure->TableAddress, UINT8*);
-		UINT8* endOfTable													= startOfTable + tableStructure->TableLength;
+		UINT8* startOfTable													= ArchConvertAddressToPointer(tableStructure->DMI.TableAddress, UINT8*);
+		UINT8* endOfTable													= startOfTable + tableStructure->DMI.TableLength;
 
 		while(startOfTable + sizeof(SMBIOS_TABLE_HEADER) <= endOfTable)
 		{

@@ -31,3 +31,8 @@ VOID AcpiDetectNVSMemory();
 // adjust memory map for acpi nvs memory
 //
 UINTN AcpiAdjustMemoryMap(EFI_MEMORY_DESCRIPTOR* memoryMap, UINTN memoryMapSize, UINTN descriptorSize);
+
+//
+// checksum8 from AppleSMBIOS.kext
+//
+uint8_t Checksum8(void * start, unsigned int length);
