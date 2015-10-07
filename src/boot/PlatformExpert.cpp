@@ -18,6 +18,7 @@ STATIC CHAR8 PepModelName[0x41]												= {0};
 EFI_STATUS PeInitialize()
 {
 	DEVICE_TREE_NODE* platformNode											= DevTreeFindNode(CHAR8_CONST_STRING("/efi/platform"), TRUE);
+
 	if(!platformNode)
 		return EFI_OUT_OF_RESOURCES;
 
@@ -26,6 +27,7 @@ EFI_STATUS PeInitialize()
 
 	EFI_DATA_HUB_PROTOCOL* dataHubProtocol									= nullptr;
 	EFI_STATUS status														= EfiBootServices->LocateProtocol(&EfiDataHubProtocolGuid, nullptr, reinterpret_cast<VOID**>(&dataHubProtocol));
+
 	if(EFI_ERROR(status))
 		return EFI_SUCCESS;
 
@@ -35,6 +37,7 @@ EFI_STATUS PeInitialize()
 	{
 		EFI_DATA_RECORD_HEADER* recordHeader								= nullptr;
 		status																= dataHubProtocol->GetNextRecord(dataHubProtocol, &monotonicCount, 0, &recordHeader);
+
 		if(EFI_ERROR(status))
 			break;
 
@@ -46,6 +49,7 @@ EFI_STATUS PeInitialize()
 			APPLE_SYSTEM_INFO_DATA_RECORD* dataRecord						= static_cast<APPLE_SYSTEM_INFO_DATA_RECORD*>(static_cast<VOID*>(recordHeader + 1));
 			UINTN nameLength												= (dataRecord->NameLength / sizeof(CHAR16) * 3 + 1) * sizeof(CHAR8);
 			CHAR8* utf8NameBuffer											= static_cast<CHAR8*>(MmAllocatePool(nameLength));
+
 			if(!utf8NameBuffer)
 				break;
 
@@ -70,6 +74,7 @@ CHAR8 CONST* PeGetModelName()
 			try_leave(NOTHING);
 
 		DEVICE_TREE_NODE* platformNode										= DevTreeFindNode(CHAR8_CONST_STRING("/efi/platform"), FALSE);
+
 		if(platformNode)
 		{
 			UINT32 nameLength												= 0;
@@ -85,9 +90,11 @@ CHAR8 CONST* PeGetModelName()
 			else
 			{
 				EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE CONST* acpiFadt	= static_cast<EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE CONST*>(AcpiGetFixedAcpiDescriptionTable());
+
 				if(acpiFadt)
 				{
 					EFI_ACPI_DESCRIPTION_HEADER* acpiDsdt					= nullptr;
+
 					if(acpiFadt->Header.Revision >= EFI_ACPI_3_0_REVISION)
 						acpiDsdt											= ArchConvertAddressToPointer(acpiFadt->XDsdt, EFI_ACPI_DESCRIPTION_HEADER*);
 					else
@@ -99,6 +106,7 @@ CHAR8 CONST* PeGetModelName()
 						memcpy(tempBuffer, &acpiDsdt->OemTableId, sizeof(acpiDsdt->OemTableId));
 
 						CHAR8 CONST* oemTableId								= tempBuffer;
+
 						while(*oemTableId == ' ')
 							oemTableId										+= 1;
 
@@ -240,7 +248,8 @@ EFI_STATUS PeSetupDeviceTree()
 								startOfStringTable							+= strlen(reinterpret_cast<CHAR8*>(startOfStringTable)) + 1;
 							}
 
-							memcpy(startOfStringTable, (UINT8 *)"Mac-F42C88C8", 12);
+							memcpy(startOfStringTable, (UINT8 *)"Mac-F42C88C8", 13);
+
 							boardId											= BlpGetStringFromSMBIOSTable(startOfTable + table2->Hdr.Length, table2->ProductName);
 
 							for (ix = 0; ix < 5; ix++)
