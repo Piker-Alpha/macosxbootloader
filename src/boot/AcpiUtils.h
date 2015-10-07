@@ -35,4 +35,4 @@ UINTN AcpiAdjustMemoryMap(EFI_MEMORY_DESCRIPTOR* memoryMap, UINTN memoryMapSize,
 //
 // checksum8 from AppleSMBIOS.kext
 //
-uint8_t Checksum8(void * start, unsigned int length);
+UINT8 Checksum8(VOID * start, unsigned int length);
