@@ -283,6 +283,7 @@ UINT8* BlpGetStringFromSMBIOSTable(UINT8* startOfStringTable, UINT8 index)
 EFI_STATUS BlDetectMemorySize()
 {
 	EFI_CONFIGURATION_TABLE* theTable										= EfiSystemTable->ConfigurationTable;
+
 	for(UINTN i = 0; i < EfiSystemTable->NumberOfTableEntries; i ++, theTable ++)
 	{
 		if(memcmp(&theTable->VendorGuid, &EfiSmbiosTableGuid, sizeof(EfiSmbiosTableGuid)))
