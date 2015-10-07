@@ -266,5 +266,5 @@ UINT8 Checksum8(VOID *start, unsigned int length)
 		csum += *cp++;
 	}
 	
-	return csum;
+	return (csum % 256);
 }

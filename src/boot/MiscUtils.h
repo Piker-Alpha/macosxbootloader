@@ -58,6 +58,11 @@ EFI_STATUS BlFindPciDevice(UINTN segment, UINTN bus, UINTN device, UINTN func, U
 EFI_STATUS BlStartPciDevice(EFI_PCI_IO_PROTOCOL* pciIoProtocol, BOOLEAN decodeIo, BOOLEAN decodeMemory, BOOLEAN busMaster);
 
 //
+// Get string from SMBIOS table.
+//
+UINT8* BlpGetStringFromSMBIOSTable(UINT8* startOfStringTable, UINT8 index);
+
+//
 // detect memory size
 //
 EFI_STATUS BlDetectMemorySize();

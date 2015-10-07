@@ -209,11 +209,69 @@ EFI_STATUS PeSetupDeviceTree()
 				
 				SMBIOS_TABLE_STRUCTURE *newEPS = (SMBIOS_TABLE_STRUCTURE *) newSmbiosTable;
 				newEPS->DMI.TableAddress									= static_cast<UINT32>(ArchConvertPointerToAddress(newSmbiosTable));
+				
+				UINT8* startOfTable											= ArchConvertAddressToPointer(newEPS->DMI.TableAddress, UINT8*);
+				UINT8* endOfTable											= (startOfTable + tableLength);
+				
+				while(startOfTable + sizeof(SMBIOS_TABLE_HEADER) <= endOfTable)
+				{
+					SMBIOS_TABLE_HEADER* tableHeader						= reinterpret_cast<SMBIOS_TABLE_HEADER*>(startOfTable);
+					
+					if(tableHeader->Type == 2)
+					{
+						if(startOfTable + sizeof(SMBIOS_TABLE_TYPE2) > endOfTable)
+							break;
+
+						SMBIOS_TABLE_TYPE2* table2							= reinterpret_cast<SMBIOS_TABLE_TYPE2*>(startOfTable);
+
+						if (table2->ProductName)
+						{
+							UINT8* boardId									= BlpGetStringFromSMBIOSTable(startOfTable + table2->Hdr.Length, table2->ProductName);
+							
+							for (ix = 0; ix < 5; ix++)
+							{
+								CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS factory product name: %s\n"), boardId);
+							}
+
+							UINT8 *startOfStringTable						= (startOfTable + table2->Hdr.Length);
+
+							for(UINT8 si = 1; si < table2->ProductName && *startOfStringTable; si++)
+							{
+								startOfStringTable							+= strlen(reinterpret_cast<CHAR8*>(startOfStringTable)) + 1;
+							}
+
+							memcpy(startOfStringTable, (UINT8 *)"Mac-F42C88C8", 12);
+							boardId											= BlpGetStringFromSMBIOSTable(startOfTable + table2->Hdr.Length, table2->ProductName);
+
+							for (ix = 0; ix < 5; ix++)
+							{
+								CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS fake product name: %s\n"), boardId);
+							}
+
+							break;
+						}
+					}
+					startOfTable											+= tableHeader->Length;
+					
+					while(startOfTable < endOfTable)
+					{
+						if(startOfTable[0] || startOfTable + 1 >= endOfTable || startOfTable[1])
+						{
+							startOfTable									+= 1;
+						}
+						else
+						{
+							startOfTable									+= 2;
+							break;
+						}
+					}
+				}
+
 				//
 				// Fix checksums.
 				//
-				newEPS->DMI.Checksum										= 256 - Checksum8(&newEPS->DMI, sizeof(newEPS->DMI));
-				newEPS->Checksum											= 256 - Checksum8(newEPS, sizeof(* newEPS));
+				newEPS->DMI.Checksum										= Checksum8(&newEPS->DMI, sizeof(newEPS->DMI));
+				newEPS->Checksum											= Checksum8(newEPS, sizeof(* newEPS));
 
 				DevTreeAddProperty(theNode, CHAR8_CONST_STRING("table"), &newTableAddress, sizeof(newTableAddress), TRUE);
 				
