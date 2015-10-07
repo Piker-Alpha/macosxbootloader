@@ -152,6 +152,7 @@ EFI_STATUS PeSetupDeviceTree()
 		// add tables
 		//
 		EFI_CONFIGURATION_TABLE* theTable									= EfiSystemTable->ConfigurationTable;
+
 		for(UINTN i = 0; i < EfiSystemTable->NumberOfTableEntries; i ++, theTable ++)
 		{
 			//
@@ -166,6 +167,7 @@ EFI_STATUS PeSetupDeviceTree()
 			// insert node
 			//
 			DEVICE_TREE_NODE* theNode										= DevTreeAddChild(configTableNode, nodeName);
+
 			if(!theNode)
 				try_leave(status = EFI_OUT_OF_RESOURCES);
 
@@ -175,17 +177,56 @@ EFI_STATUS PeSetupDeviceTree()
 			DevTreeAddProperty(theNode, CHAR8_CONST_STRING("guid"), g, sizeof(EFI_GUID), FALSE);
 
 			//
-			// add table, (check 64bit kernel instead of EFI64?)
+			// Check for SMBIOS GUID.
 			//
-			if(ArchNeedEFI64Mode())
+			if(!memcmp(g, &EfiSmbiosTableGuid, sizeof(EFI_GUID)))
 			{
-				UINT64 address64											= ArchConvertPointerToAddress(theTable->VendorTable);
-				DevTreeAddProperty(theNode, CHAR8_CONST_STRING("table"), &address64, sizeof(address64), TRUE);
+				UINT8 ix													= 0;
+
+				for (; ix < 5; ix++)
+				{
+					CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS table found!\n"));
+				}
+				//
+				// Yes. Point to factory table.
+				//
+				SMBIOS_TABLE_STRUCTURE *factoryEPS = (SMBIOS_TABLE_STRUCTURE *) theTable->VendorTable;
+				//
+				// Get factory table length.
+				//
+				UINTN tableLength											= factoryEPS->TableLength;
+				UINT64 newTableAddress										= 0;
+				//
+				// Allocate the replacement table.
+				//
+				if(!MmAllocateKernelMemory(&tableLength, &newTableAddress))
+					try_leave(status = EFI_OUT_OF_RESOURCES);
+				//
+				// Setup replacement table.
+				//
+				VOID * newSmbiosTable										= ArchConvertAddressToPointer(newTableAddress, VOID *);
+				memcpy(newSmbiosTable, &theTable->VendorTable, tableLength);
+				DevTreeAddProperty(theNode, CHAR8_CONST_STRING("table"), &newTableAddress, sizeof(newTableAddress), TRUE);
+				for (ix = 0; ix < 5; ix++)
+				{
+					CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS table replaced!\n"));
+				}
 			}
 			else
 			{
-				UINT32 address32											= static_cast<UINT32>(ArchConvertPointerToAddress(theTable->VendorTable));
-				DevTreeAddProperty(theNode, CHAR8_CONST_STRING("table"), &address32, sizeof(address32), TRUE);
+				//
+				// add table, (check 64bit kernel instead of EFI64?)
+				//
+				if(ArchNeedEFI64Mode())
+				{
+					UINT64 address64											= ArchConvertPointerToAddress(theTable->VendorTable);
+					DevTreeAddProperty(theNode, CHAR8_CONST_STRING("table"), &address64, sizeof(address64), TRUE);
+				}
+				else
+				{
+					UINT32 address32											= static_cast<UINT32>(ArchConvertPointerToAddress(theTable->VendorTable));
+					DevTreeAddProperty(theNode, CHAR8_CONST_STRING("table"), &address32, sizeof(address32), TRUE);
+				}
 			}
 
 			//
