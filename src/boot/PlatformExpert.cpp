@@ -227,6 +227,11 @@ EFI_STATUS PeSetupDeviceTree()
 					
 					if(tableHeader->Type == 2)
 					{
+						for (ix = 0; ix < 5; ix++)
+						{
+							CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS kSMBTypeBaseBoard found\n");
+						}
+
 						if(startOfTable + sizeof(SMBIOS_TABLE_TYPE2) > endOfTable)
 							break;
 
@@ -234,6 +239,11 @@ EFI_STATUS PeSetupDeviceTree()
 
 						if (table2->ProductName)
 						{
+							for (ix = 0; ix < 5; ix++)
+							{
+								CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS ProductName found\n");
+							}
+
 							UINT8* boardId									= BlpGetStringFromSMBIOSTable(startOfTable + table2->Hdr.Length, table2->ProductName);
 							
 							for (ix = 0; ix < 5; ix++)
