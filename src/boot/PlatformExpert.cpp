@@ -224,7 +224,7 @@ EFI_STATUS PeSetupDeviceTree()
 				newEPS->DMI.TableAddress									= static_cast<UINT32>(ArchConvertPointerToAddress(newSmbiosTable));
 
 				UINT8* startOfTable											= ArchConvertAddressToPointer(newEPS->DMI.TableAddress, UINT8*);
-				UINT8* endOfTable											= (startOfTable + newEPS->DMI.TableLength);
+				UINT8* endOfTable											= startOfTable + tableLength;
 				
 				//
 				// Main loop, search for board info table.
