@@ -191,36 +191,44 @@ EFI_STATUS PeSetupDeviceTree()
 			{
 				UINT8 ix													= 0;
 
-				for (; ix < 5; ix++)
+				for (; ix < 3; ix++)
 				{
 					CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS table found!\n"));
 				}
 				//
-				// Yes. Point to factory table.
+				// Get pointer to the factory EPS (Entry Point Structure).
 				//
-				SMBIOS_TABLE_STRUCTURE *factoryEPS = (SMBIOS_TABLE_STRUCTURE *) theTable->VendorTable;
+				SMBIOS_TABLE_STRUCTURE *factoryEPS							= static_cast<SMBIOS_TABLE_STRUCTURE*>(theTable->VendorTable);
+
 				//
 				// Get factory table length.
 				//
 				UINTN tableLength											= factoryEPS->DMI.TableLength;
 				UINT64 newTableAddress										= 0;
+
 				//
-				// Allocate the replacement table.
+				// Allocate memory for the new EPS/SMBIOS table.
 				//
-				if(!MmAllocateKernelMemory(&tableLength, &newTableAddress))
-					try_leave(status = EFI_OUT_OF_RESOURCES);
+				MmAllocatePages(AllocateMaxAddress, EfiBootServicesData, EFI_SIZE_TO_PAGES(sizeof(SMBIOS_TABLE_STRUCTURE) + tableLength), &newTableAddress);
+
 				//
-				// Setup replacement table.
+				// Setup EPS/SMBIOS table replacement.
 				//
-				VOID * newSmbiosTable										= ArchConvertAddressToPointer(newTableAddress, VOID *);
-				memcpy(newSmbiosTable, &theTable->VendorTable, tableLength);
-				
-				SMBIOS_TABLE_STRUCTURE *newEPS = (SMBIOS_TABLE_STRUCTURE *) newSmbiosTable;
+				VOID * newEntryPoint										= ArchConvertAddressToPointer(newTableAddress, VOID *);
+				VOID * newSmbiosTable										= ArchConvertAddressToPointer(newTableAddress + sizeof(SMBIOS_TABLE_STRUCTURE), VOID *);
+
+				memcpy(newEntryPoint, &theTable->VendorTable, sizeof(SMBIOS_TABLE_STRUCTURE));
+				memcpy(newSmbiosTable, &factoryEPS->DMI.TableAddress, tableLength);
+
+				SMBIOS_TABLE_STRUCTURE *newEPS								= static_cast<SMBIOS_TABLE_STRUCTURE*>(newEntryPoint);
 				newEPS->DMI.TableAddress									= static_cast<UINT32>(ArchConvertPointerToAddress(newSmbiosTable));
-				
+
 				UINT8* startOfTable											= ArchConvertAddressToPointer(newEPS->DMI.TableAddress, UINT8*);
-				UINT8* endOfTable											= (startOfTable + tableLength);
+				UINT8* endOfTable											= (startOfTable + newEPS->DMI.TableAddress);
 				
+				//
+				// Main loop, search for board info table.
+				//
 				while(startOfTable + sizeof(SMBIOS_TABLE_HEADER) <= endOfTable)
 				{
 					SMBIOS_TABLE_HEADER* tableHeader						= reinterpret_cast<SMBIOS_TABLE_HEADER*>(startOfTable);
@@ -229,7 +237,7 @@ EFI_STATUS PeSetupDeviceTree()
 					{
 						for (ix = 0; ix < 5; ix++)
 						{
-							CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS kSMBTypeBaseBoard found\n");
+							CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS kSMBTypeBaseBoard found\n"));
 						}
 
 						if(startOfTable + sizeof(SMBIOS_TABLE_TYPE2) > endOfTable)
@@ -241,7 +249,7 @@ EFI_STATUS PeSetupDeviceTree()
 						{
 							for (ix = 0; ix < 5; ix++)
 							{
-								CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS ProductName found\n");
+								CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS ProductName found\n"));
 							}
 
 							UINT8* boardId									= BlpGetStringFromSMBIOSTable(startOfTable + table2->Hdr.Length, table2->ProductName);
@@ -294,7 +302,7 @@ EFI_STATUS PeSetupDeviceTree()
 
 				DevTreeAddProperty(theNode, CHAR8_CONST_STRING("table"), &newTableAddress, sizeof(newTableAddress), TRUE);
 				
-				for (ix = 0; ix < 5; ix++)
+				for (ix = 0; ix < 3; ix++)
 				{
 					CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS table replaced!\n"));
 				}
