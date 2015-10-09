@@ -203,27 +203,25 @@ EFI_STATUS PeSetupDeviceTree()
 				//
 				UINT16 tableLength											= factoryEPS->DMI.TableLength;
 				CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS tableLength 0x%x\n"), tableLength);
-				UINT64 newTableAddress										= 0;
+				UINT64 newVirtualAddress									= 0;
 
 				//
 				// Allocate memory for the new EPS/SMBIOS table.
 				//
 				UINTN bufferLength											= sizeof(SMBIOS_TABLE_STRUCTURE) + tableLength;
+				UINT64 newTableAddress										= MmAllocateKernelMemory(&bufferLength, &newVirtualAddress);
 
-				MmAllocateKernelMemory(&bufferLength, &newTableAddress);
 				CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS newTableAddress 0x%lx\n"), newTableAddress);
 
 				//
 				// Setup EPS/SMBIOS table replacement.
 				//
-				VOID * newEntryPoint										= ArchConvertAddressToPointer(newTableAddress, VOID *);
-				VOID * newSmbiosTable										= ArchConvertAddressToPointer(newTableAddress + sizeof(SMBIOS_TABLE_STRUCTURE), VOID *);
+				memcpy(&newTableAddress, &theTable->VendorTable, sizeof(SMBIOS_TABLE_STRUCTURE));
+				newTableAddress += sizeof(SMBIOS_TABLE_STRUCTURE);
+				memcpy(&newTableAddress, &factoryEPS->DMI.TableAddress, tableLength);
 
-				memcpy(newEntryPoint, &theTable->VendorTable, sizeof(SMBIOS_TABLE_STRUCTURE));
-				memcpy(newSmbiosTable, &factoryEPS->DMI.TableAddress, tableLength);
-
-				SMBIOS_TABLE_STRUCTURE *newEPS								= static_cast<SMBIOS_TABLE_STRUCTURE*>(newEntryPoint);
-				newEPS->DMI.TableAddress									= static_cast<UINT32>(ArchConvertPointerToAddress(newSmbiosTable));
+				SMBIOS_TABLE_STRUCTURE *newEPS								= ArchConvertAddressToPointer(newTableAddress, SMBIOS_TABLE_STRUCTURE*);
+				newEPS->DMI.TableAddress									= static_cast<UINT32>(newTableAddress);
 
 				CsPrintf(CHAR8_CONST_STRING("factoryEPS->DMI.TableAddress: 0x%x\n"), factoryEPS->DMI.TableAddress);
 				CsPrintf(CHAR8_CONST_STRING("factoryEPS->DMI.TableLength.: 0x%x\n"), factoryEPS->DMI.TableLength);
@@ -296,6 +294,8 @@ EFI_STATUS PeSetupDeviceTree()
 				//
 				newEPS->DMI.Checksum										= Checksum8(&newEPS->DMI, sizeof(newEPS->DMI));
 				newEPS->Checksum											= Checksum8(newEPS, sizeof(* newEPS));
+
+				// newTableAddress -= sizeof(SMBIOS_TABLE_STRUCTURE); ?
 
 				DevTreeAddProperty(theNode, CHAR8_CONST_STRING("table"), &newTableAddress, sizeof(newTableAddress), TRUE);
 				
