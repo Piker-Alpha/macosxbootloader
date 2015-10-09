@@ -219,7 +219,7 @@ EFI_STATUS PeSetupDeviceTree()
 				memcpy(&newTableAddress, &theTable->VendorTable, sizeof(SMBIOS_TABLE_STRUCTURE));
 
 				SMBIOS_TABLE_STRUCTURE *newEPS								= ArchConvertAddressToPointer(newTableAddress, SMBIOS_TABLE_STRUCTURE*);
-				newEPS->DMI.TableAddress									= static_cast<UINT32>(newTableAddress);
+				newEPS->DMI.TableAddress									= static_cast<UINT32>(newTableAddress + sizeof(SMBIOS_TABLE_STRUCTURE));
 
 				newTableAddress += sizeof(SMBIOS_TABLE_STRUCTURE);
 				memcpy(&newTableAddress, &factoryEPS->DMI.TableAddress, tableLength);
