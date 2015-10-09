@@ -187,7 +187,7 @@ EFI_STATUS PeSetupDeviceTree()
 			//
 			// Check for SMBIOS GUID.
 			//
-			if(memcmp(g, &EfiSmbiosTableGuid, sizeof(EFI_GUID)) == 0)
+			if(memcmp(&theTable->VendorGuid, &EfiSmbiosTableGuid, sizeof(EFI_GUID)) == 0)
 			{
 				UINT8 ix													= 0;
 
@@ -202,7 +202,7 @@ EFI_STATUS PeSetupDeviceTree()
 				// Get factory table length.
 				//
 				UINT16 tableLength											= factoryEPS->DMI.TableLength;
-				CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS tableLength 0x%lx\n"), tableLength);
+				CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS tableLength 0x%x\n"), tableLength);
 				UINT64 newTableAddress										= 0;
 
 				//
@@ -274,6 +274,7 @@ EFI_STATUS PeSetupDeviceTree()
 							break;
 						}
 					}
+
 					startOfTable											+= tableHeader->Length;
 					
 					while(startOfTable < endOfTable)
