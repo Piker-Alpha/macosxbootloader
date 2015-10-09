@@ -161,7 +161,7 @@ EFI_STATUS PeSetupDeviceTree()
 		//
 		EFI_CONFIGURATION_TABLE* theTable									= EfiSystemTable->ConfigurationTable;
 
-		for(UINTN i = 0; i < EfiSystemTable->NumberOfTableEntries; i ++, theTable ++)
+		for(UINTN i = 0; i < EfiSystemTable->NumberOfTableEntries; i++, theTable++)
 		{
 			//
 			// build name
@@ -187,7 +187,7 @@ EFI_STATUS PeSetupDeviceTree()
 			//
 			// Check for SMBIOS GUID.
 			//
-			if(memcmp(&theTable->VendorGuid, &EfiSmbiosTableGuid, sizeof(EFI_GUID)) == 0)
+			if(memcmp(&theTable->VendorGuid, &EfiSmbiosTableGuid, sizeof(EfiSmbiosTableGuid)) == 0)
 			{
 				UINT8 ix													= 0;
 
