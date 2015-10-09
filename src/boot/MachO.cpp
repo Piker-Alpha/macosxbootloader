@@ -1277,10 +1277,12 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 									{
 										if (*(UINT64 *)p == LOAD_EXECUTABLE_TARGET_UINT64)
 										{
+#if DEBUG_KERNEL_PATCHER
 											for (ix = 0; ix < 5; ix++)
 											{
 												CsPrintf(CHAR8_CONST_STRING("Found @ 0x%llx \n"), (UINT64)p - startAddress);
 											}
+#endif
 											*(UINT64 *)p = LOAD_EXECUTABLE_PATCH_UINT64;
 											break;
 										}
