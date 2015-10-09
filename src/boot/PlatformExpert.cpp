@@ -213,14 +213,14 @@ EFI_STATUS PeSetupDeviceTree()
 				CsPrintf(CHAR8_CONST_STRING("newEPSLength................: 0x%x\n"), newEPSLength);
 				CsPrintf(CHAR8_CONST_STRING("newEPSAddress...............: 0x%lx\n"), newEPSAddress);
 
-				memcpy(&newEPSAddress, &theTable->VendorTable, newEPSLength);
+				memcpy(ArchConvertAddressToPointer(newEPSAddress, VOID*), theTable->VendorTable, sizeof(SMBIOS_TABLE_STRUCTURE));
 
 				UINTN newTableLength										= tableLength;
 				UINT64 newTableAddress										= MmAllocateKernelMemory(&newTableLength, 0);
 
 				CsPrintf(CHAR8_CONST_STRING("newTableAddress.............: 0x%lx\n"), newTableAddress);
 
-				memcpy(&newTableAddress, &factoryEPS->DMI.TableAddress, newTableLength);
+				memcpy(ArchConvertAddressToPointer(newTableAddress, VOID*), ArchConvertAddressToPointer(factoryEPS->DMI.TableAddress, VOID*), newTableLength);
 
 				SMBIOS_TABLE_STRUCTURE *newEPS								= ArchConvertAddressToPointer(newEPSAddress, SMBIOS_TABLE_STRUCTURE*);
 				newEPS->DMI.TableAddress									= static_cast<UINT32>(newTableAddress);
