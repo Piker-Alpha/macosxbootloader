@@ -191,10 +191,8 @@ EFI_STATUS PeSetupDeviceTree()
 			{
 				UINT8 ix													= 0;
 
-				for (; ix < 3; ix++)
-				{
-					CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS table found!\n"));
-				}
+				CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS table found!\n"));
+
 				//
 				// Get pointer to the factory EPS (Entry Point Structure).
 				//
@@ -210,7 +208,9 @@ EFI_STATUS PeSetupDeviceTree()
 				//
 				// Allocate memory for the new EPS/SMBIOS table.
 				//
-				MmAllocateKernelMemory(sizeof(SMBIOS_TABLE_STRUCTURE) + tableLength), &newTableAddress);
+				UINTN bufferLength											= sizeof(SMBIOS_TABLE_STRUCTURE) + tableLength;
+
+				MmAllocateKernelMemory(&bufferLength, &newTableAddress);
 				CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS newTableAddress 0x%lx\n"), newTableAddress);
 
 				//
@@ -225,6 +225,12 @@ EFI_STATUS PeSetupDeviceTree()
 				SMBIOS_TABLE_STRUCTURE *newEPS								= static_cast<SMBIOS_TABLE_STRUCTURE*>(newEntryPoint);
 				newEPS->DMI.TableAddress									= static_cast<UINT32>(ArchConvertPointerToAddress(newSmbiosTable));
 
+				CsPrintf(CHAR8_CONST_STRING("factoryEPS->DMI.TableAddress: 0x%x\n"), factoryEPS->DMI.TableAddress);
+				CsPrintf(CHAR8_CONST_STRING("factoryEPS->DMI.TableLength.: 0x%x\n"), factoryEPS->DMI.TableLength);
+				
+				CsPrintf(CHAR8_CONST_STRING("newEPS->DMI.TableAddress....: 0x%x\n"), newEPS->DMI.TableAddress);
+				CsPrintf(CHAR8_CONST_STRING("newEPS->DMI.TableLength.....: 0x%x\n"), newEPS->DMI.TableLength);
+
 				UINT8* startOfTable											= ArchConvertAddressToPointer(newEPS->DMI.TableAddress, UINT8*);
 				UINT8* endOfTable											= startOfTable + tableLength;
 				
@@ -237,10 +243,7 @@ EFI_STATUS PeSetupDeviceTree()
 					
 					if(tableHeader->Type == 2)
 					{
-						for (ix = 0; ix < 5; ix++)
-						{
-							CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS kSMBTypeBaseBoard found\n"));
-						}
+						CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS kSMBTypeBaseBoard found\n"));
 
 						if(startOfTable + sizeof(SMBIOS_TABLE_TYPE2) > endOfTable)
 							break;
@@ -249,17 +252,11 @@ EFI_STATUS PeSetupDeviceTree()
 
 						if (table2->ProductName)
 						{
-							for (ix = 0; ix < 5; ix++)
-							{
-								CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS ProductName found\n"));
-							}
+							CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS ProductName found\n"));
 
 							UINT8* boardId									= BlpGetStringFromSMBIOSTable(startOfTable + table2->Hdr.Length, table2->ProductName);
 							
-							for (ix = 0; ix < 5; ix++)
-							{
-								CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS factory product name: %s\n"), boardId);
-							}
+							CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS factory product name: %s\n"), boardId);
 
 							UINT8 *startOfStringTable						= (startOfTable + table2->Hdr.Length);
 
@@ -272,10 +269,7 @@ EFI_STATUS PeSetupDeviceTree()
 
 							boardId											= BlpGetStringFromSMBIOSTable(startOfTable + table2->Hdr.Length, table2->ProductName);
 
-							for (ix = 0; ix < 5; ix++)
-							{
-								CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS fake product name: %s\n"), boardId);
-							}
+							CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS fake product name: %s\n"), boardId);
 
 							break;
 						}
