@@ -220,7 +220,7 @@ EFI_STATUS PeSetupDeviceTree()
 
 				CsPrintf(CHAR8_CONST_STRING("newTableAddress.............: 0x%lx\n"), newTableAddress);
 
-				memcpy(ArchConvertAddressToPointer(newTableAddress, VOID*), ArchConvertAddressToPointer(factoryEPS->DMI.TableAddress, VOID*), newTableLength);
+				memcpy(ArchConvertAddressToPointer(newTableAddress, VOID*), ArchConvertAddressToPointer(factoryEPS->DMI.TableAddress, VOID*), tableLength);
 
 				SMBIOS_TABLE_STRUCTURE *newEPS								= ArchConvertAddressToPointer(newEPSAddress, SMBIOS_TABLE_STRUCTURE*);
 				newEPS->DMI.TableAddress									= static_cast<UINT32>(newTableAddress);
