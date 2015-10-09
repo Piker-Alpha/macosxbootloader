@@ -295,7 +295,7 @@ EFI_STATUS PeSetupDeviceTree()
 				newEPS->DMI.Checksum										= Checksum8(&newEPS->DMI, sizeof(newEPS->DMI));
 				newEPS->Checksum											= Checksum8(newEPS, sizeof(* newEPS));
 
-				// newTableAddress -= sizeof(SMBIOS_TABLE_STRUCTURE); ?
+				newTableAddress -= sizeof(SMBIOS_TABLE_STRUCTURE);
 
 				DevTreeAddProperty(theNode, CHAR8_CONST_STRING("table"), &newTableAddress, sizeof(newTableAddress), TRUE);
 				
