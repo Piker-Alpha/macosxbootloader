@@ -203,14 +203,14 @@ EFI_STATUS PeSetupDeviceTree()
 				//
 				// Get factory table length.
 				//
-				UINTN tableLength											= factoryEPS->DMI.TableLength;
+				UINT16 tableLength											= factoryEPS->DMI.TableLength;
 				CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS tableLength 0x%lx\n"), tableLength);
 				UINT64 newTableAddress										= 0;
 
 				//
 				// Allocate memory for the new EPS/SMBIOS table.
 				//
-				MmAllocatePages(AllocateMaxAddress, EfiBootServicesData, EFI_SIZE_TO_PAGES(sizeof(SMBIOS_TABLE_STRUCTURE) + tableLength), &newTableAddress);
+				MmAllocateKernelMemory(sizeof(SMBIOS_TABLE_STRUCTURE) + tableLength), &newTableAddress);
 				CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS newTableAddress 0x%lx\n"), newTableAddress);
 
 				//
