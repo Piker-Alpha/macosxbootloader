@@ -203,26 +203,27 @@ EFI_STATUS PeSetupDeviceTree()
 				//
 				UINT16 tableLength											= factoryEPS->DMI.TableLength;
 				CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS tableLength 0x%x\n"), tableLength);
-				UINT64 newVirtualAddress									= 0;
 
 				//
-				// Allocate memory for the new EPS/SMBIOS table.
+				// Setup new EPS.
 				//
-				UINTN bufferLength											= sizeof(SMBIOS_TABLE_STRUCTURE) + tableLength;
-				UINT64 newTableAddress										= MmAllocateKernelMemory(&bufferLength, &newVirtualAddress);
+				UINTN newEPSLength											= sizeof(SMBIOS_TABLE_STRUCTURE);
+				UINT64 newEPSAddress										= MmAllocateKernelMemory(&newEPSLength, 0);
 
-				CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS newTableAddress 0x%lx\n"), newTableAddress);
+				CsPrintf(CHAR8_CONST_STRING("newEPSLength................: 0x%x\n"), newEPSLength);
+				CsPrintf(CHAR8_CONST_STRING("newEPSAddress...............: 0x%lx\n"), newEPSAddress);
 
-				//
-				// Setup EPS/SMBIOS table replacement.
-				//
-				memcpy(&newTableAddress, &theTable->VendorTable, sizeof(SMBIOS_TABLE_STRUCTURE));
+				memcpy(&newEPSAddress, &theTable->VendorTable, newEPSLength);
 
-				SMBIOS_TABLE_STRUCTURE *newEPS								= ArchConvertAddressToPointer(newTableAddress, SMBIOS_TABLE_STRUCTURE*);
-				newEPS->DMI.TableAddress									= static_cast<UINT32>(newTableAddress + sizeof(SMBIOS_TABLE_STRUCTURE));
+				UINTN newTableLength										= tableLength;
+				UINT64 newTableAddress										= MmAllocateKernelMemory(&newTableLength, 0);
 
-				newTableAddress += sizeof(SMBIOS_TABLE_STRUCTURE);
-				memcpy(&newTableAddress, &factoryEPS->DMI.TableAddress, tableLength);
+				CsPrintf(CHAR8_CONST_STRING("newTableAddress.............: 0x%lx\n"), newTableAddress);
+
+				memcpy(&newTableAddress, &factoryEPS->DMI.TableAddress, newTableLength);
+
+				SMBIOS_TABLE_STRUCTURE *newEPS								= ArchConvertAddressToPointer(newEPSAddress, SMBIOS_TABLE_STRUCTURE*);
+				newEPS->DMI.TableAddress									= static_cast<UINT32>(newTableAddress);
 
 				CsPrintf(CHAR8_CONST_STRING("factoryEPS->DMI.TableAddress: 0x%x\n"), factoryEPS->DMI.TableAddress);
 				CsPrintf(CHAR8_CONST_STRING("factoryEPS->DMI.TableLength.: 0x%x\n"), factoryEPS->DMI.TableLength);
@@ -296,9 +297,7 @@ EFI_STATUS PeSetupDeviceTree()
 				newEPS->DMI.Checksum										= Checksum8(&newEPS->DMI, sizeof(newEPS->DMI));
 				newEPS->Checksum											= Checksum8(newEPS, sizeof(* newEPS));
 
-				newTableAddress -= sizeof(SMBIOS_TABLE_STRUCTURE);
-
-				DevTreeAddProperty(theNode, CHAR8_CONST_STRING("table"), &newTableAddress, sizeof(newTableAddress), TRUE);
+				DevTreeAddProperty(theNode, CHAR8_CONST_STRING("table"), &newEPSAddress, sizeof(newEPSAddress), TRUE);
 				
 				for (ix = 0; ix < 3; ix++)
 				{
