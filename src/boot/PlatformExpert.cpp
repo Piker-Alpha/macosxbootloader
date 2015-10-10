@@ -225,7 +225,7 @@ EFI_STATUS PeSetupDeviceTree()
 				//SMBIOS_ENTRY_POINT_STRUCTURE *newEPS						= ArchConvertAddressToPointer(newEPSAddress, SMBIOS_ENTRY_POINT_STRUCTURE*);
 				//newEPS->DMI.TableAddress									= static_cast<UINT32>(newTableAddress);
 
-				CsPrintf(CHAR8_CONST_STRING("factoryEPS[%p]->\n"), theTable->VendorTable);
+				CsPrintf(CHAR8_CONST_STRING("factoryEPS[0x%lx]->\n"), ArchConvertPointerToAddress(theTable->VendorTable));
 
 				CHAR8* anchorString											= static_cast<CHAR8*>(MmAllocatePool(4));
 				snprintf(anchorString, 4, CHAR8_CONST_STRING("%s"), factoryEPS->AnchorString);
