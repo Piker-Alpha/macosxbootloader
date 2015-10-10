@@ -189,9 +189,9 @@ EFI_STATUS PeSetupDeviceTree()
 			//
 			if(memcmp(&theTable->VendorGuid, &EfiSmbiosTableGuid, sizeof(EfiSmbiosTableGuid)) == 0)
 			{
-				UINT8 ix													= 0;
+				//UINT8 ix													= 0;
 
-				CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS table found!\n"));
+				CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS table GUID found!\n"));
 
 				//
 				// Get pointer to the factory EPS (Entry Point Structure).
@@ -201,37 +201,57 @@ EFI_STATUS PeSetupDeviceTree()
 				//
 				// Get factory table length.
 				//
-				UINT16 tableLength											= factoryEPS->DMI.TableLength;
-				CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS tableLength 0x%x\n"), tableLength);
+				// UINT16 tableLength											= factoryEPS->DMI.TableLength;
+				// CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS tableLength 0x%x\n"), tableLength);
 
 				//
 				// Setup new EPS.
 				//
-				UINTN newEPSLength											= sizeof(SMBIOS_ENTRY_POINT_STRUCTURE);
-				UINT64 newEPSAddress										= MmAllocateKernelMemory(&newEPSLength, 0);
+				// UINTN newEPSLength											= sizeof(SMBIOS_ENTRY_POINT_STRUCTURE);
+				// UINT64 newEPSAddress										= MmAllocateKernelMemory(&newEPSLength, 0);
 
-				CsPrintf(CHAR8_CONST_STRING("newEPSLength................: 0x%x\n"), newEPSLength);
-				CsPrintf(CHAR8_CONST_STRING("newEPSAddress...............: 0x%lx\n"), newEPSAddress);
+				// CsPrintf(CHAR8_CONST_STRING("newEPSLength................: 0x%x\n"), newEPSLength);
+				// CsPrintf(CHAR8_CONST_STRING("newEPSAddress...............: 0x%lx\n"), newEPSAddress);
 
-				memcpy(ArchConvertAddressToPointer(newEPSAddress, VOID*), theTable->VendorTable, sizeof(SMBIOS_ENTRY_POINT_STRUCTURE));
+				//memcpy(ArchConvertAddressToPointer(newEPSAddress, VOID*), theTable->VendorTable, sizeof(SMBIOS_ENTRY_POINT_STRUCTURE));
 
-				UINTN newTableLength										= tableLength;
-				UINT64 newTableAddress										= MmAllocateKernelMemory(&newTableLength, 0);
+				//UINTN newTableLength										= tableLength;
+				//UINT64 newTableAddress										= MmAllocateKernelMemory(&newTableLength, 0);
 
-				CsPrintf(CHAR8_CONST_STRING("newTableAddress.............: 0x%lx\n"), newTableAddress);
+				//CsPrintf(CHAR8_CONST_STRING("newTableAddress.............: 0x%lx\n"), newTableAddress);
 
-				memcpy(ArchConvertAddressToPointer(newTableAddress, VOID*), ArchConvertAddressToPointer(factoryEPS->DMI.TableAddress, VOID*), tableLength);
+				//memcpy(ArchConvertAddressToPointer(newTableAddress, VOID*), ArchConvertAddressToPointer(factoryEPS->DMI.TableAddress, VOID*), tableLength);
 
-				SMBIOS_ENTRY_POINT_STRUCTURE *newEPS						= ArchConvertAddressToPointer(newEPSAddress, SMBIOS_ENTRY_POINT_STRUCTURE*);
-				newEPS->DMI.TableAddress									= static_cast<UINT32>(newTableAddress);
+				//SMBIOS_ENTRY_POINT_STRUCTURE *newEPS						= ArchConvertAddressToPointer(newEPSAddress, SMBIOS_ENTRY_POINT_STRUCTURE*);
+				//newEPS->DMI.TableAddress									= static_cast<UINT32>(newTableAddress);
 
-				CsPrintf(CHAR8_CONST_STRING("factoryEPS->DMI.TableAddress: 0x%x\n"), factoryEPS->DMI.TableAddress);
-				CsPrintf(CHAR8_CONST_STRING("factoryEPS->DMI.TableLength.: 0x%x\n"), factoryEPS->DMI.TableLength);
+				CsPrintf(CHAR8_CONST_STRING("factoryEPS->\n"));
+
+				CHAR8* anchorString											= static_cast<CHAR8*>(MmAllocatePool(4));
+				snprintf(anchorString, 4, CHAR8_CONST_STRING("%s"), factoryEPS->AnchorString);
+				MmFreePool(anchorString);
+
+				CsPrintf(CHAR8_CONST_STRING("AnchorString................: %s\n"), anchorString);
+				CsPrintf(CHAR8_CONST_STRING("Checksum....................: 0x%x\n"), factoryEPS->Checksum);
+				CsPrintf(CHAR8_CONST_STRING("EntryPointLength............: 0x%x\n"), factoryEPS->EntryPointLength);
+				CsPrintf(CHAR8_CONST_STRING("MajorVersion................: 0x%x\n"), factoryEPS->MajorVersion);
+				CsPrintf(CHAR8_CONST_STRING("MinorVersion................: 0x%x\n"), factoryEPS->MinorVersion);
+				CsPrintf(CHAR8_CONST_STRING("MaxStructureSize............: 0x%x\n"), factoryEPS->MaxStructureSize);
+				CsPrintf(CHAR8_CONST_STRING("EntryPointRevision..........: 0x%x\n"), factoryEPS->EntryPointRevision);
+				CsPrintf(CHAR8_CONST_STRING("FormattedArea...............: 0x%x\n"), factoryEPS->FormattedArea);
+
+				anchorString												= static_cast<CHAR8*>(MmAllocatePool(5));
+				snprintf(anchorString, 5, CHAR8_CONST_STRING("%s"), factoryEPS->DMI.AnchorString);
+				MmFreePool(anchorString);
 				
-				CsPrintf(CHAR8_CONST_STRING("newEPS->DMI.TableAddress....: 0x%x\n"), newEPS->DMI.TableAddress);
-				CsPrintf(CHAR8_CONST_STRING("newEPS->DMI.TableLength.....: 0x%x\n"), newEPS->DMI.TableLength);
+				CsPrintf(CHAR8_CONST_STRING("DMI.AnchorString............: %s\n"), anchorString);
+				CsPrintf(CHAR8_CONST_STRING("DMI.Checksum................: 0x%x\n"), factoryEPS->DMI.Checksum);
+				CsPrintf(CHAR8_CONST_STRING("DMI.TableLength.............: 0x%x\n"), factoryEPS->DMI.TableLength);
+				CsPrintf(CHAR8_CONST_STRING("DMI.TableAddress............: 0x%x\n"), factoryEPS->DMI.TableAddress);
+				CsPrintf(CHAR8_CONST_STRING("DMI.NumberOfSmbiosStructures: 0x%x\n"), factoryEPS->DMI.NumberOfSmbiosStructures);
+				CsPrintf(CHAR8_CONST_STRING("DMI.SmbiosBcdRevision.......: 0x%x\n"), factoryEPS->DMI.SmbiosBcdRevision);
 
-				UINT8* startOfTable											= ArchConvertAddressToPointer(newEPS->DMI.TableAddress, UINT8*);
+				/* UINT8* startOfTable											= ArchConvertAddressToPointer(newEPS->DMI.TableAddress, UINT8*);
 				UINT8* endOfTable											= startOfTable + tableLength;
 				
 				//
@@ -294,15 +314,18 @@ EFI_STATUS PeSetupDeviceTree()
 				//
 				// Fix checksums.
 				//
-				newEPS->DMI.Checksum										= Checksum8(&newEPS->DMI, sizeof(newEPS->DMI));
-				newEPS->Checksum											= Checksum8(newEPS, sizeof(* newEPS));
+				// newEPS->DMI.Checksum										= Checksum8(&newEPS->DMI, sizeof(newEPS->DMI));
+				// newEPS->Checksum											= Checksum8(newEPS, sizeof(* newEPS));
 
 				DevTreeAddProperty(theNode, CHAR8_CONST_STRING("table"), &newEPSAddress, sizeof(newEPSAddress), TRUE);
 				
 				for (ix = 0; ix < 3; ix++)
 				{
 					CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS table replaced!\n"));
-				}
+				} */
+				
+				UINT64 address												= ArchConvertPointerToAddress(theTable->VendorTable);
+				DevTreeAddProperty(theNode, CHAR8_CONST_STRING("table"), &address, sizeof(address), TRUE);
 			}
 			else
 			{
