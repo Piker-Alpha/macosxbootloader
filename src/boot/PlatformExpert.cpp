@@ -265,7 +265,7 @@ EFI_STATUS PeSetupDeviceTree()
 								startOfStringTable							+= strlen(reinterpret_cast<CHAR8*>(startOfStringTable)) + 1;
 							}
 
-							memcpy(startOfStringTable, (UINT8 *)"Mac-F42C88C8", 13);
+							// memcpy(startOfStringTable, (UINT8 *)"Mac-F42C88C8", 13);
 
 							boardId											= BlpGetStringFromSMBIOSTable(startOfTable + table2->Hdr.Length, table2->ProductName);
 
