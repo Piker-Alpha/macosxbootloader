@@ -71,7 +71,7 @@ typedef struct {
 	UINT8				EntryPointRevision;
 	UINT8				FormattedArea[5];
 	DMIEntryPoint		DMI;
-} SMBIOS_TABLE_STRUCTURE;
+} SMBIOS_ENTRY_POINT_STRUCTURE;
 
 typedef struct {
   UINT8                 Type;

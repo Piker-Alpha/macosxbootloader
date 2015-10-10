@@ -289,7 +289,7 @@ EFI_STATUS BlDetectMemorySize()
 		if(memcmp(&theTable->VendorGuid, &EfiSmbiosTableGuid, sizeof(EfiSmbiosTableGuid)))
 			continue;
 
-		SMBIOS_TABLE_STRUCTURE* tableStructure								= static_cast<SMBIOS_TABLE_STRUCTURE*>(theTable->VendorTable);
+		SMBIOS_ENTRY_POINT_STRUCTURE* tableStructure						= static_cast<SMBIOS_ENTRY_POINT_STRUCTURE*>(theTable->VendorTable);
 		if(memcmp(tableStructure->AnchorString, "_SM_", sizeof(tableStructure->AnchorString)))
 			break;
 

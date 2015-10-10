@@ -196,7 +196,7 @@ EFI_STATUS PeSetupDeviceTree()
 				//
 				// Get pointer to the factory EPS (Entry Point Structure).
 				//
-				SMBIOS_TABLE_STRUCTURE *factoryEPS							= static_cast<SMBIOS_TABLE_STRUCTURE*>(theTable->VendorTable);
+				SMBIOS_ENTRY_POINT_STRUCTURE *factoryEPS					= static_cast<SMBIOS_ENTRY_POINT_STRUCTURE*>(theTable->VendorTable);
 
 				//
 				// Get factory table length.
@@ -207,13 +207,13 @@ EFI_STATUS PeSetupDeviceTree()
 				//
 				// Setup new EPS.
 				//
-				UINTN newEPSLength											= sizeof(SMBIOS_TABLE_STRUCTURE);
+				UINTN newEPSLength											= sizeof(SMBIOS_ENTRY_POINT_STRUCTURE);
 				UINT64 newEPSAddress										= MmAllocateKernelMemory(&newEPSLength, 0);
 
 				CsPrintf(CHAR8_CONST_STRING("newEPSLength................: 0x%x\n"), newEPSLength);
 				CsPrintf(CHAR8_CONST_STRING("newEPSAddress...............: 0x%lx\n"), newEPSAddress);
 
-				memcpy(ArchConvertAddressToPointer(newEPSAddress, VOID*), theTable->VendorTable, sizeof(SMBIOS_TABLE_STRUCTURE));
+				memcpy(ArchConvertAddressToPointer(newEPSAddress, VOID*), theTable->VendorTable, sizeof(SMBIOS_ENTRY_POINT_STRUCTURE));
 
 				UINTN newTableLength										= tableLength;
 				UINT64 newTableAddress										= MmAllocateKernelMemory(&newTableLength, 0);
@@ -222,7 +222,7 @@ EFI_STATUS PeSetupDeviceTree()
 
 				memcpy(ArchConvertAddressToPointer(newTableAddress, VOID*), ArchConvertAddressToPointer(factoryEPS->DMI.TableAddress, VOID*), tableLength);
 
-				SMBIOS_TABLE_STRUCTURE *newEPS								= ArchConvertAddressToPointer(newEPSAddress, SMBIOS_TABLE_STRUCTURE*);
+				SMBIOS_ENTRY_POINT_STRUCTURE *newEPS						= ArchConvertAddressToPointer(newEPSAddress, SMBIOS_ENTRY_POINT_STRUCTURE*);
 				newEPS->DMI.TableAddress									= static_cast<UINT32>(newTableAddress);
 
 				CsPrintf(CHAR8_CONST_STRING("factoryEPS->DMI.TableAddress: 0x%x\n"), factoryEPS->DMI.TableAddress);
