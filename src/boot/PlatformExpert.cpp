@@ -285,9 +285,9 @@ EFI_STATUS PeSetupDeviceTree()
 								startOfStringTable							+= strlen(reinterpret_cast<CHAR8*>(startOfStringTable)) + 1;
 							}
 
-							// memcpy((CHAR8 *)startOfStringTable, (CHAR8 *)"Mac-F42C88C8", 12);
-							startOfStringTable = Add2Ptr(startOfStringTable, 4, UINT8*);
-							*(UINT64 *)startOfStringTable					= BOARD_ID_REPLACEMENT;
+							memcpy((CHAR8 *)startOfStringTable, (CHAR8 *)"Mac-F42C88C8", 12);
+							startOfStringTable								= Add2Ptr(startOfStringTable, 12, UINT8*);
+							startOfStringTable								= 0x00;
 
 							boardId											= BlpGetStringFromSMBIOSTable(startOfTable + table2->Hdr.Length, table2->ProductName);
 
@@ -319,13 +319,12 @@ EFI_STATUS PeSetupDeviceTree()
 				factoryEPS->DMI.Checksum										= Checksum8(&factoryEPS->DMI, sizeof(factoryEPS->DMI));
 				factoryEPS->Checksum											= Checksum8(factoryEPS, sizeof(* factoryEPS));
 
-				/* DevTreeAddProperty(theNode, CHAR8_CONST_STRING("table"), &newEPSAddress, sizeof(newEPSAddress), TRUE);
-				
-				for (ix = 0; ix < 3; ix++)
-				{
-					CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS table replaced!\n"));
-				} */
-				
+				CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS board-id replaced?\n"));
+				CsPrintf(CHAR8_CONST_STRING("Checksum....................: 0x%x\n"), factoryEPS->Checksum);
+				CsPrintf(CHAR8_CONST_STRING("DMI.Checksum................: 0x%x\n"), factoryEPS->DMI.Checksum);
+
+				// DevTreeAddProperty(theNode, CHAR8_CONST_STRING("table"), &newEPSAddress, sizeof(newEPSAddress), TRUE);
+
 				UINT64 address												= ArchConvertPointerToAddress(theTable->VendorTable);
 				DevTreeAddProperty(theNode, CHAR8_CONST_STRING("table"), &address, sizeof(address), TRUE);
 			}
