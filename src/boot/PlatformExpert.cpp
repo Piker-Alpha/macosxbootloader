@@ -227,7 +227,7 @@ EFI_STATUS PeSetupDeviceTree()
 
 				CsPrintf(CHAR8_CONST_STRING("factoryEPS[0x%lx]->\n"), ArchConvertPointerToAddress(theTable->VendorTable));
 
-				CHAR8* anchorString											= static_cast<CHAR8*>(MmAllocatePool(4));
+				CHAR8* anchorString											= static_cast<CHAR8*>(MmAllocatePool(5));
 				snprintf(anchorString, 4, CHAR8_CONST_STRING("%s"), factoryEPS->AnchorString);
 				MmFreePool(anchorString);
 
@@ -240,7 +240,7 @@ EFI_STATUS PeSetupDeviceTree()
 				CsPrintf(CHAR8_CONST_STRING("EntryPointRevision..........: 0x%x\n"), factoryEPS->EntryPointRevision);
 				CsPrintf(CHAR8_CONST_STRING("FormattedArea...............: 0x%x\n"), factoryEPS->FormattedArea);
 
-				anchorString												= static_cast<CHAR8*>(MmAllocatePool(5));
+				anchorString												= static_cast<CHAR8*>(MmAllocatePool(6));
 				snprintf(anchorString, 5, CHAR8_CONST_STRING("%s"), factoryEPS->DMI.AnchorString);
 				MmFreePool(anchorString);
 				
@@ -285,7 +285,8 @@ EFI_STATUS PeSetupDeviceTree()
 								startOfStringTable							+= strlen(reinterpret_cast<CHAR8*>(startOfStringTable)) + 1;
 							}
 
-							memcpy(startOfStringTable, (UINT8 *)"Mac-F42C88C8", 12);
+							// memcpy((CHAR8 *)startOfStringTable, (CHAR8 *)"Mac-F42C88C8", 12);
+							*(UINT64 *)startOfStringTable					= BOARD_ID_REPLACEMENT;
 
 							boardId											= BlpGetStringFromSMBIOSTable(startOfTable + table2->Hdr.Length, table2->ProductName);
 
