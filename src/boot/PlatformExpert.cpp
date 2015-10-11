@@ -286,6 +286,7 @@ EFI_STATUS PeSetupDeviceTree()
 							}
 
 							// memcpy((CHAR8 *)startOfStringTable, (CHAR8 *)"Mac-F42C88C8", 12);
+							startOfStringTable = Add2Ptr(startOfStringTable, 4, UINT8*);
 							*(UINT64 *)startOfStringTable					= BOARD_ID_REPLACEMENT;
 
 							boardId											= BlpGetStringFromSMBIOSTable(startOfTable + table2->Hdr.Length, table2->ProductName);
