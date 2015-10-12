@@ -292,7 +292,7 @@ EFI_STATUS PeSetupDeviceTree()
 					}
 				}
 
-				//
+				/*
 				// Fix EPD->DMI checksum; comment this out if it corrupts the ioreg data!
 				//
 				factoryEPS->DMI.Checksum										= 0;
@@ -309,6 +309,7 @@ EFI_STATUS PeSetupDeviceTree()
 				CsPrintf(CHAR8_CONST_STRING("Checksum....................: 0x%x\n"), factoryEPS->Checksum);
 				CsPrintf(CHAR8_CONST_STRING("DMI.Checksum................: 0x%x\n"), factoryEPS->DMI.Checksum);
 #endif
+				*/
 			}
 #endif
 			//
