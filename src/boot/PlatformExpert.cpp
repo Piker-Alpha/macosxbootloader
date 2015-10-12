@@ -136,35 +136,35 @@ EFI_STATUS PeSetupDeviceTree()
 	__try
 	{
 		//
-		// get chosen node
+		// Get chosen node.
 		//
 		DEVICE_TREE_NODE* chosenNode										= DevTreeFindNode(CHAR8_CONST_STRING("/chosen"), TRUE);
 		if(!chosenNode)
 			try_leave(status = EFI_OUT_OF_RESOURCES);
 
 		//
-		// get machine signature
+		// Get machine signature.
 		//
 		UINT32 machineSignature												= 0;
 		if(!EFI_ERROR(AcpiGetMachineSignature(&machineSignature)))
 			DevTreeAddProperty(chosenNode, CHAR8_CONST_STRING("machine-signature"), &machineSignature, sizeof(machineSignature), TRUE);
 
 		//
-		// get /efi/configuration-table node
+		// Get /efi/configuration-table node.
 		//
 		DEVICE_TREE_NODE* configTableNode									= DevTreeFindNode(CHAR8_CONST_STRING("/efi/configuration-table"), TRUE);
 		if(!configTableNode)
 			try_leave(status = EFI_OUT_OF_RESOURCES);
 
 		//
-		// add tables
+		// Add tables.
 		//
 		EFI_CONFIGURATION_TABLE* theTable									= EfiSystemTable->ConfigurationTable;
 
 		for(UINTN i = 0; i < EfiSystemTable->NumberOfTableEntries; i++, theTable++)
 		{
 			//
-			// build name
+			// Build table name.
 			//
 			CHAR8 nodeName[0x40]											= {0};
 			EFI_GUID* g														= &theTable->VendorGuid;
@@ -172,7 +172,7 @@ EFI_STATUS PeSetupDeviceTree()
 			snprintf(nodeName, ARRAYSIZE(nodeName) - 1, guidFormat, g->Data1, g->Data2, g->Data3, g->Data4[0], g->Data4[1], g->Data4[2], g->Data4[3], g->Data4[4], g->Data4[5], g->Data4[6], g->Data4[7]);
 
 			//
-			// insert node
+			// Insert node.
 			//
 			DEVICE_TREE_NODE* theNode										= DevTreeAddChild(configTableNode, nodeName);
 
@@ -180,19 +180,16 @@ EFI_STATUS PeSetupDeviceTree()
 				try_leave(status = EFI_OUT_OF_RESOURCES);
 
 			//
-			// add guid
+			// Add GUID.
 			//
 			DevTreeAddProperty(theNode, CHAR8_CONST_STRING("guid"), g, sizeof(EFI_GUID), FALSE);
 
+#if DO_REPLACE_BOARD_ID
 			//
 			// Check for SMBIOS GUID.
 			//
 			if(memcmp(&theTable->VendorGuid, &EfiSmbiosTableGuid, sizeof(EfiSmbiosTableGuid)) == 0)
 			{
-				//UINT8 ix													= 0;
-
-				CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS table GUID found!\n"));
-
 				//
 				// Get pointer to the factory EPS (Entry Point Structure).
 				//
@@ -202,31 +199,8 @@ EFI_STATUS PeSetupDeviceTree()
 				// Get factory table length.
 				//
 				UINT16 tableLength											= factoryEPS->DMI.TableLength;
-				// CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS tableLength 0x%x\n"), tableLength);
 
-				//
-				// Setup new EPS.
-				//
-				// UINTN newEPSLength											= sizeof(SMBIOS_ENTRY_POINT_STRUCTURE);
-				// UINT64 newEPSAddress										= MmAllocateKernelMemory(&newEPSLength, 0);
-
-				// CsPrintf(CHAR8_CONST_STRING("newEPSLength................: 0x%x\n"), newEPSLength);
-				// CsPrintf(CHAR8_CONST_STRING("newEPSAddress...............: 0x%lx\n"), newEPSAddress);
-
-				//memcpy(ArchConvertAddressToPointer(newEPSAddress, VOID*), theTable->VendorTable, sizeof(SMBIOS_ENTRY_POINT_STRUCTURE));
-
-				//UINTN newTableLength										= tableLength;
-				//UINT64 newTableAddress										= MmAllocateKernelMemory(&newTableLength, 0);
-
-				//CsPrintf(CHAR8_CONST_STRING("newTableAddress.............: 0x%lx\n"), newTableAddress);
-
-				//memcpy(ArchConvertAddressToPointer(newTableAddress, VOID*), ArchConvertAddressToPointer(factoryEPS->DMI.TableAddress, VOID*), tableLength);
-
-				//SMBIOS_ENTRY_POINT_STRUCTURE *newEPS						= ArchConvertAddressToPointer(newEPSAddress, SMBIOS_ENTRY_POINT_STRUCTURE*);
-				//newEPS->DMI.TableAddress									= static_cast<UINT32>(newTableAddress);
-
-				CsPrintf(CHAR8_CONST_STRING("factoryEPS[0x%lx]->\n"), ArchConvertPointerToAddress(theTable->VendorTable));
-
+#if DEBUG_BOARD_ID_CSPRINTF
 				CHAR8* anchorString											= static_cast<CHAR8*>(MmAllocatePool(5));
 				snprintf(anchorString, 4, CHAR8_CONST_STRING("%s"), factoryEPS->AnchorString);
 				MmFreePool(anchorString);
@@ -250,7 +224,7 @@ EFI_STATUS PeSetupDeviceTree()
 				CsPrintf(CHAR8_CONST_STRING("DMI.TableAddress............: 0x%x\n"), factoryEPS->DMI.TableAddress);
 				CsPrintf(CHAR8_CONST_STRING("DMI.NumberOfSmbiosStructures: 0x%x\n"), factoryEPS->DMI.NumberOfSmbiosStructures);
 				CsPrintf(CHAR8_CONST_STRING("DMI.SmbiosBcdRevision.......: 0x%x\n"), factoryEPS->DMI.SmbiosBcdRevision);
-
+#endif
 				UINT8* startOfTable											= ArchConvertAddressToPointer(factoryEPS->DMI.TableAddress, UINT8*);
 				UINT8* endOfTable											= startOfTable + tableLength;
 				
@@ -263,8 +237,9 @@ EFI_STATUS PeSetupDeviceTree()
 					
 					if(tableHeader->Type == 2)
 					{
+#if DEBUG_BOARD_ID_CSPRINTF
 						CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS kSMBTypeBaseBoard found\n"));
-
+#endif
 						if(startOfTable + sizeof(SMBIOS_TABLE_TYPE2) > endOfTable)
 							break;
 
@@ -272,12 +247,11 @@ EFI_STATUS PeSetupDeviceTree()
 
 						if (table2->ProductName)
 						{
-							CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS ProductName found\n"));
-
 							UINT8* boardId									= BlpGetStringFromSMBIOSTable(startOfTable + table2->Hdr.Length, table2->ProductName);
-							
-							CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS factory product name: %s\n"), boardId);
-
+#if DEBUG_BOARD_ID_CSPRINTF
+							CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS board-id found\n"));
+							CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS factory board-id: %s\n"), boardId);
+#endif
 							UINT8 *startOfStringTable						= (startOfTable + table2->Hdr.Length);
 
 							for(UINT8 si = 1; si < table2->ProductName && *startOfStringTable; si++)
@@ -285,14 +259,19 @@ EFI_STATUS PeSetupDeviceTree()
 								startOfStringTable							+= strlen(reinterpret_cast<CHAR8*>(startOfStringTable)) + 1;
 							}
 
-							memcpy((CHAR8 *)startOfStringTable, (CHAR8 *)"Mac-F42C88C8", 12);
+							memcpy((CHAR8 *)startOfStringTable, (CHAR8 *)BOARD_ID_REPLACEMENT, strlen(BOARD_ID_REPLACEMENT));
+
+							//
+							// Ehm. Do we still need this?
+							//
 							startOfStringTable								= Add2Ptr(startOfStringTable, 12, UINT8*);
 							startOfStringTable								= 0x00;
 
+#if DEBUG_BOARD_ID_CSPRINTF
 							boardId											= BlpGetStringFromSMBIOSTable(startOfTable + table2->Hdr.Length, table2->ProductName);
 
-							CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS fake product name: %s\n"), boardId);
-
+							CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS fake board-id: %s\n"), boardId);
+#endif
 							break;
 						}
 					}
@@ -314,39 +293,40 @@ EFI_STATUS PeSetupDeviceTree()
 				}
 
 				//
-				// Fix checksums.
+				// Fix EPD->DMI checksum.
 				//
+				factoryEPS->DMI.Checksum										= 0;
 				factoryEPS->DMI.Checksum										= Checksum8(&factoryEPS->DMI, sizeof(factoryEPS->DMI));
+
+				//
+				// Fix EPS checksum.
+				//
+				factoryEPS->Checksum											= 0;
 				factoryEPS->Checksum											= Checksum8(factoryEPS, sizeof(* factoryEPS));
 
-				CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS board-id replaced?\n"));
+#if DEBUG_BOARD_ID_CSPRINTF
+				CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS board-id replaced\nRecalculated checksums:\n"));
 				CsPrintf(CHAR8_CONST_STRING("Checksum....................: 0x%x\n"), factoryEPS->Checksum);
 				CsPrintf(CHAR8_CONST_STRING("DMI.Checksum................: 0x%x\n"), factoryEPS->DMI.Checksum);
-
-				// DevTreeAddProperty(theNode, CHAR8_CONST_STRING("table"), &newEPSAddress, sizeof(newEPSAddress), TRUE);
-
-				UINT64 address												= ArchConvertPointerToAddress(theTable->VendorTable);
-				DevTreeAddProperty(theNode, CHAR8_CONST_STRING("table"), &address, sizeof(address), TRUE);
+#endif
+			}
+#endif
+			//
+			// add table, (check 64bit kernel instead of EFI64?)
+			//
+			if(ArchNeedEFI64Mode())
+			{
+				UINT64 address64											= ArchConvertPointerToAddress(theTable->VendorTable);
+				DevTreeAddProperty(theNode, CHAR8_CONST_STRING("table"), &address64, sizeof(address64), TRUE);
 			}
 			else
 			{
-				//
-				// add table, (check 64bit kernel instead of EFI64?)
-				//
-				if(ArchNeedEFI64Mode())
-				{
-					UINT64 address64											= ArchConvertPointerToAddress(theTable->VendorTable);
-					DevTreeAddProperty(theNode, CHAR8_CONST_STRING("table"), &address64, sizeof(address64), TRUE);
-				}
-				else
-				{
-					UINT32 address32											= static_cast<UINT32>(ArchConvertPointerToAddress(theTable->VendorTable));
-					DevTreeAddProperty(theNode, CHAR8_CONST_STRING("table"), &address32, sizeof(address32), TRUE);
-				}
+				UINT32 address32											= static_cast<UINT32>(ArchConvertPointerToAddress(theTable->VendorTable));
+				DevTreeAddProperty(theNode, CHAR8_CONST_STRING("table"), &address32, sizeof(address32), TRUE);
 			}
 
 			//
-			// add alias
+			// Add ACPI aliases.
 			//
 			if(!memcmp(g, &EfiAcpi20TableGuid, sizeof(EFI_GUID)))
 				DevTreeAddProperty(theNode, CHAR8_CONST_STRING("alias"), "ACPI_20", 8, FALSE);
@@ -358,6 +338,7 @@ EFI_STATUS PeSetupDeviceTree()
 		// get /efi/runtime-services node
 		//
 		DEVICE_TREE_NODE* runtimeServicesNode								= DevTreeFindNode(CHAR8_CONST_STRING("/efi/runtime-services"), TRUE);
+
 		if(!runtimeServicesNode)
 			try_leave(status = EFI_OUT_OF_RESOURCES);
 
