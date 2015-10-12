@@ -259,12 +259,12 @@ EFI_STATUS PeSetupDeviceTree()
 								startOfStringTable							+= strlen(reinterpret_cast<CHAR8*>(startOfStringTable)) + 1;
 							}
 
-							memcpy((CHAR8 *)startOfStringTable, (CHAR8 *)BOARD_ID_REPLACEMENT, strlen(BOARD_ID_REPLACEMENT));
+							memcpy((CHAR8 *)startOfStringTable, (CHAR8 *)BOARD_ID_REPLACEMENT, strlen((CHAR8 *)BOARD_ID_REPLACEMENT));
 
 							//
 							// Ehm. Do we still need this?
 							//
-							startOfStringTable								= Add2Ptr(startOfStringTable, 12, UINT8*);
+							startOfStringTable								= Add2Ptr(startOfStringTable, strlen((CHAR8 *)BOARD_ID_REPLACEMENT), UINT8*);
 							startOfStringTable								= 0x00;
 
 #if DEBUG_BOARD_ID_CSPRINTF
@@ -293,13 +293,13 @@ EFI_STATUS PeSetupDeviceTree()
 				}
 
 				//
-				// Fix EPD->DMI checksum.
+				// Fix EPD->DMI checksum; comment this out if it corrupts the ioreg data!
 				//
 				factoryEPS->DMI.Checksum										= 0;
 				factoryEPS->DMI.Checksum										= Checksum8(&factoryEPS->DMI, sizeof(factoryEPS->DMI));
 
 				//
-				// Fix EPS checksum.
+				// Fix EPS checksum; comment this out if it corrupts the ioreg data!
 				//
 				factoryEPS->Checksum											= 0;
 				factoryEPS->Checksum											= Checksum8(factoryEPS, sizeof(* factoryEPS));
