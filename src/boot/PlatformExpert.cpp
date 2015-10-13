@@ -291,25 +291,6 @@ EFI_STATUS PeSetupDeviceTree()
 						}
 					}
 				}
-
-				/*
-				// Fix EPD->DMI checksum; comment this out if it corrupts the ioreg data!
-				//
-				factoryEPS->DMI.Checksum										= 0;
-				factoryEPS->DMI.Checksum										= Checksum8(&factoryEPS->DMI, sizeof(factoryEPS->DMI));
-
-				//
-				// Fix EPS checksum; comment this out if it corrupts the ioreg data!
-				//
-				factoryEPS->Checksum											= 0;
-				factoryEPS->Checksum											= Checksum8(factoryEPS, sizeof(* factoryEPS));
-
-#if DEBUG_BOARD_ID_CSPRINTF
-				CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS board-id replaced\nRecalculated checksums:\n"));
-				CsPrintf(CHAR8_CONST_STRING("Checksum....................: 0x%x\n"), factoryEPS->Checksum);
-				CsPrintf(CHAR8_CONST_STRING("DMI.Checksum................: 0x%x\n"), factoryEPS->DMI.Checksum);
-#endif
-				*/
 			}
 #endif
 			//
