@@ -261,14 +261,13 @@ EFI_STATUS PeSetupDeviceTree()
 							}
 
 							// memcpy((CHAR8 *)startOfStringTable, (CHAR8 *)BOARD_ID_REPLACEMENT, strlen((CHAR8 *)BOARD_ID_REPLACEMENT));
-							memcpy((CHAR8 *)startOfStringTable, (CHAR8 *)"Mac-F42C88C8", 12));
+							memcpy((CHAR8 *)startOfStringTable, (CHAR8 *)BOARD_ID_REPLACEMENT, 12);
 
 							//
 							// Ehm. Do we still need this?
 							//
 							// startOfStringTable							= Add2Ptr(startOfStringTable, strlen((CHAR8 *)BOARD_ID_REPLACEMENT), UINT8*);
 							startOfStringTable								= Add2Ptr(startOfStringTable, 12, UINT8*);
-
 							startOfStringTable								= 0x00;
 
 #if DEBUG_BOARD_ID_CSPRINTF
@@ -333,8 +332,6 @@ EFI_STATUS PeSetupDeviceTree()
 		//
 		if(ArchNeedEFI64Mode())
 		{
-			CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS ArchNeedEFI64Mode()\n"));
-
 			UINT64 address64												= ArchConvertPointerToAddress(EfiSystemTable->RuntimeServices);
 			DevTreeAddProperty(runtimeServicesNode, CHAR8_CONST_STRING("table"), &address64, sizeof(address64), TRUE);
 		}
