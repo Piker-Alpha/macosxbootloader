@@ -247,8 +247,9 @@ EFI_STATUS PeSetupDeviceTree()
 
 						if (table2->ProductName)
 						{
-							UINT8* boardId									= BlpGetStringFromSMBIOSTable(startOfTable + table2->Hdr.Length, table2->ProductName);
 #if DEBUG_BOARD_ID_CSPRINTF
+							UINT8* boardId									= BlpGetStringFromSMBIOSTable(startOfTable + table2->Hdr.Length, table2->ProductName);
+
 							CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS board-id found\n"));
 							CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS factory board-id: %s\n"), boardId);
 #endif
