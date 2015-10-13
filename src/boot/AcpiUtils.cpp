@@ -258,13 +258,13 @@ UINTN AcpiAdjustMemoryMap(EFI_MEMORY_DESCRIPTOR* memoryMap, UINTN memoryMapSize,
 UINT8 Checksum8(VOID *start, unsigned int length)
 {
 	UINT8 csum																= 0;
-	UINT8 * cp																= (uint8_t *) start;
+	UINT8 * cp																= (UINT8 *) start;
 	unsigned int i															= 0;
 	
 	for (; i < length; i++)
 	{
 		csum += *cp++;
 	}
-	
-	return (256 - csum);
+
+	return ((255 - csum) + 1);
 }
