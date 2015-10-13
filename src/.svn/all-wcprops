@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 19
+/svn/!svn/ver/1/src
+END
+release.props
+K 25
+svn:wc:ra_dav:version-url
+V 33
+/svn/!svn/ver/1/src/release.props
+END
+debug.props
+K 25
+svn:wc:ra_dav:version-url
+V 31
+/svn/!svn/ver/1/src/debug.props
+END
+common.props
+K 25
+svn:wc:ra_dav:version-url
+V 32
+/svn/!svn/ver/1/src/common.props
+END
+boot.sln
+K 25
+svn:wc:ra_dav:version-url
+V 28
+/svn/!svn/ver/1/src/boot.sln
+END
