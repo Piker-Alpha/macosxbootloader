@@ -29,7 +29,7 @@
 
 #if DO_REPLACE_BOARD_ID
 	#define BOARD_ID_REPLACEMENT											"Mac-F42C88C8"
-	#define DEBUG_BOARD_ID_CSPRINTF											1
+	#define DEBUG_BOARD_ID_CSPRINTF											0
 #endif
 
 #define NOTHING
