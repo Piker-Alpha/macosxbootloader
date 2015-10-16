@@ -260,12 +260,12 @@ EFI_STATUS PeSetupDeviceTree()
 								startOfStringTable							+= strlen(reinterpret_cast<CHAR8*>(startOfStringTable)) + 1;
 							}
 
-							if(memcmp((CHAR8 *)boardId, (CHAR8 *)MACPRO_31, strlen((CHAR8 *)MACPRO_31)) == 0)
+							if(memcmp((CHAR8 *)boardId, (CHAR8 *)"Mac-F42C88C8", strlen((CHAR8 *)MACPRO_31)) == 0)
 							{
 								boardIdLength								= strlen((CHAR8 *)MACPRO_31);
 								memcpy((CHAR8 *)startOfStringTable, (CHAR8 *)MACPRO_31, boardIdLength);
 							}
-							else if(memcmp((CHAR8 *)boardId, (CHAR8 *)MACBOOKPRO_31, strlen((CHAR8 *)MACBOOKPRO_31)) == 0)
+							else if(memcmp((CHAR8 *)boardId, (CHAR8 *)"Mac-F42187C8", strlen((CHAR8 *)MACBOOKPRO_31)) == 0)
 							{
 								boardIdLength								= strlen((CHAR8 *)MACBOOKPRO_31);
 								memcpy((CHAR8 *)startOfStringTable, (CHAR8 *)MACBOOKPRO_31, boardIdLength);
