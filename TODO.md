@@ -2,7 +2,7 @@
 OS X 10.11 El Capitan TODO list:
 --------------------------------
 
-Phase 1: Status - Completed (on 26 September 2015)
+Phase 1: Status - Completed (in 2015)
 
 ```
 1.) Load the prelinkedkernel for safe boot mode i.e. when -x is used (status: Done).
@@ -38,11 +38,18 @@ Phase 2: Status - Completed (on 27 September 2015)
 6.) Select normal boot – no more verbose boots (status: Done).
 ```
 
-Phase 3: Status - Work In Progress (started on 28 September 2015)
+Phase 3: Status - Completed (on 16 October 2015)
 
 ```
-1.) Fix flush cache i.e. when -f is used.
+1.) Fix flush cache i.e. when -f is used (status: Done).
     - Have patch ready. Waiting for a confirmation of my previous commit.
+
+2.) Add Installer detection (status: Done).
+    - This feature enables you to use one file for boot.efi and bootbase.efi
+
+3.) Add board-id replacement (status: Done).
+    - This feature enables you to download El Capitan from the App Store and install OS X form the Application folder without the need to mod the DMGs.
+
 ```
 
 OS X 10.10 Yosemite TODO list:
