@@ -462,7 +462,7 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 						strcpy(kernelCachePathName, (CONST CHAR8*)"System\\Library\\Caches\\com.apple.kext.caches\\Startup\\kernelcache");
 						break;
 					case 3:
-						kernelCachePathName[0]							= 0;
+						kernelCachePathName[0]								= 0;
 						break;
 				}
 
