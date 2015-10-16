@@ -247,26 +247,38 @@ EFI_STATUS PeSetupDeviceTree()
 
 						if (table2->ProductName)
 						{
-#if DEBUG_BOARD_ID_CSPRINTF
 							UINT8* boardId									= BlpGetStringFromSMBIOSTable(startOfTable + table2->Hdr.Length, table2->ProductName);
-
+#if DEBUG_BOARD_ID_CSPRINTF
 							CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS board-id found\n"));
 							CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS factory board-id: %s\n"), boardId);
 #endif
 							UINT8 *startOfStringTable						= (startOfTable + table2->Hdr.Length);
-
+							UINTN boardIdLength								= 0;
+							
 							for(UINT8 si = 1; si < table2->ProductName && *startOfStringTable; si++)
 							{
 								startOfStringTable							+= strlen(reinterpret_cast<CHAR8*>(startOfStringTable)) + 1;
 							}
 
-							memcpy((CHAR8 *)startOfStringTable, (CHAR8 *)BOARD_ID_REPLACEMENT, strlen((CHAR8 *)BOARD_ID_REPLACEMENT));
+							if(memcmp((CHAR8 *)boardId, (CHAR8 *)MACPRO_31, strlen((CHAR8 *)MACPRO_31)) == 0)
+							{
+								boardIdLength								= strlen((CHAR8 *)MACPRO_31);
+								memcpy((CHAR8 *)startOfStringTable, (CHAR8 *)MACPRO_31, boardIdLength);
+							}
+							else if(memcmp((CHAR8 *)boardId, (CHAR8 *)MACBOOKPRO_31, strlen((CHAR8 *)MACBOOKPRO_31)) == 0)
+							{
+								boardIdLength								= strlen((CHAR8 *)MACBOOKPRO_31);
+								memcpy((CHAR8 *)startOfStringTable, (CHAR8 *)MACBOOKPRO_31, boardIdLength);
+							}
 
 							//
-							// Ehm. Do we still need this?
+							// Do we still need this?
 							//
-							startOfStringTable								= Add2Ptr(startOfStringTable, strlen((CHAR8 *)BOARD_ID_REPLACEMENT), UINT8*);
-							startOfStringTable								= 0x00;
+							if (boardIdLength)
+							{
+								startOfStringTable							= Add2Ptr(startOfStringTable, boardIdLength, UINT8*);
+								startOfStringTable							= 0x00;
+							}
 
 #if DEBUG_BOARD_ID_CSPRINTF
 							boardId											= BlpGetStringFromSMBIOSTable(startOfTable + table2->Hdr.Length, table2->ProductName);

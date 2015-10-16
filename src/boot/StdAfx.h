@@ -28,9 +28,13 @@
 #define DO_REPLACE_BOARD_ID													1
 
 #if DO_REPLACE_BOARD_ID
-	#define BOARD_ID_REPLACEMENT											"Mac-F42C88C8"
+	#define MACPRO_31														"Mac-F42C88C8"
+	#define MACBOOKPRO_31													"Mac-F4238BC8"
+
 	#define DEBUG_BOARD_ID_CSPRINTF											0
 #endif
+
+
 
 #define NOTHING
 #define BOOTAPI																__cdecl
