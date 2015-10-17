@@ -444,7 +444,7 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 		}
 		else
 		{
-			for(UINTN i = 0; i < 4; i ++)
+			for(UINTN i = 0; i < 5; i ++)
 			{
 				//
 				// build path
@@ -459,9 +459,12 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 						strcpy(kernelCachePathName, (CONST CHAR8*)"System\\Library\\Prelinkedkernels\\prelinkedkernel");
 						break;
 					case 2:
-						strcpy(kernelCachePathName, (CONST CHAR8*)"System\\Library\\Caches\\com.apple.kext.caches\\Startup\\kernelcache");
+						strcpy(kernelCachePathName, (CONST CHAR8*)"System\\Library\\Caches\\com.apple.kext.caches\\Startup\\prelinkedkernel");
 						break;
 					case 3:
+						strcpy(kernelCachePathName, (CONST CHAR8*)"System\\Library\\Caches\\com.apple.kext.caches\\Startup\\kernelcache");
+						break;
+					case 4:
 						kernelCachePathName[0]								= 0;
 						break;
 				}
