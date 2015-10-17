@@ -252,33 +252,34 @@ EFI_STATUS PeSetupDeviceTree()
 							CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS board-id found\n"));
 							CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS factory board-id: %s\n"), boardId);
 #endif
-							UINT8 *startOfStringTable						= (startOfTable + table2->Hdr.Length);
-							UINTN boardIdLength								= 0;
 							
-							for(UINT8 si = 1; si < table2->ProductName && *startOfStringTable; si++)
+							if (memcmp((CHAR8 *)boardId, (CHAR8 *)"Mac-F4208DC8", 12) == 0) // MacPro1,1
 							{
-								startOfStringTable							+= strlen(reinterpret_cast<CHAR8*>(startOfStringTable)) + 1;
+								memcpy((CHAR8 *)boardId, (CHAR8 *)MACPRO_31, 12);
+#if DEBUG_BOARD_ID_CSPRINTF
+								CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS board-id: %s replaced with: %s\n"), (CHAR8 *)boardId, (CHAR8 *)MACPRO_31);
+#endif
 							}
-
-							if(memcmp((CHAR8 *)boardId, (CHAR8 *)"Mac-F42C88C8", strlen((CHAR8 *)MACPRO_31)) == 0)
+							else if (memcmp((CHAR8 *)boardId, (CHAR8 *)"Mac-F4208DA9", 12) == 0) // MacPro2,1
 							{
-								boardIdLength								= strlen((CHAR8 *)MACPRO_31);
-								memcpy((CHAR8 *)startOfStringTable, (CHAR8 *)MACPRO_31, boardIdLength);
+								memcpy((CHAR8 *)boardId, (CHAR8 *)MACPRO_31, 12);
+#if DEBUG_BOARD_ID_CSPRINTF
+								CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS board-id: %s replaced with: %s\n"), (CHAR8 *)boardId, (CHAR8 *)MACPRO_31);
+#endif
 							}
-							else if(memcmp((CHAR8 *)boardId, (CHAR8 *)"Mac-F42187C8", strlen((CHAR8 *)MACBOOKPRO_31)) == 0)
+							else if (memcmp((CHAR8 *)boardId, (CHAR8 *)"Mac-F42187C8", 12) == 0)// MacBookPro2,2
 							{
-								boardIdLength								= strlen((CHAR8 *)MACBOOKPRO_31);
-								memcpy((CHAR8 *)startOfStringTable, (CHAR8 *)MACBOOKPRO_31, boardIdLength);
+								memcpy((CHAR8 *)boardId, (CHAR8 *)MACBOOKPRO_31, 12);
+#if DEBUG_BOARD_ID_CSPRINTF
+								CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS board-id: %s replaced with: %s\n"), (CHAR8 *)boardId, (CHAR8 *)MACBOOKPRO_31);
+#endif
 							}
 
 							//
 							// Do we still need this?
 							//
-							if (boardIdLength)
-							{
-								startOfStringTable							= Add2Ptr(startOfStringTable, boardIdLength, UINT8*);
-								startOfStringTable							= 0x00;
-							}
+							boardId											= Add2Ptr(boardId, 12, UINT8*);
+							boardId											= 0x00;
 
 #if DEBUG_BOARD_ID_CSPRINTF
 							boardId											= BlpGetStringFromSMBIOSTable(startOfTable + table2->Hdr.Length, table2->ProductName);
