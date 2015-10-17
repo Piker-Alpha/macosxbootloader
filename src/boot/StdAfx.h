@@ -31,7 +31,7 @@
 	#define MACPRO_31														"Mac-F42C88C8"
 	#define MACBOOKPRO_31													"Mac-F4238BC8"
 
-	#define DEBUG_BOARD_ID_CSPRINTF											0
+	#define DEBUG_BOARD_ID_CSPRINTF											1
 #endif
 
 
