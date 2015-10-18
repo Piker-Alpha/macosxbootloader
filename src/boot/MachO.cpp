@@ -1249,56 +1249,74 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 				{
 					UINT64 index											= 0;
 					UINT64 asld												= LdrGetASLRDisplacement();
+					UINT64 offset											= 0;
+					UINT64 startAddress										= 0;
+					UINT64 endAddress										= 0;
+					unsigned char * p										= nullptr;
 					SYMTAB_COMMAND* symbolTableCommand						= _CR(theCommand, SYMTAB_COMMAND, Header);
 					CHAR8 CONST* stringTable								= Add2Ptr(linkEditSegment, symbolTableCommand->StringTableOffset - linkEditSegmentOffset, CHAR8 CONST*);
 					SYMTAB_ENTRY64* symbolEntry								= Add2Ptr(linkEditSegment, symbolTableCommand->SymbolTableOffset - linkEditSegmentOffset, SYMTAB_ENTRY64*);
 						
-					for(; index < symbolTableCommand->SymbolCount; index++, symbolEntry++)
+					for (; index < symbolTableCommand->SymbolCount; index++, symbolEntry++)
 					{
-						if(asld && (symbolEntry->Type <= 0x1f))
+						if (asld && (symbolEntry->Type <= 0x1f))
 						{
 							symbolEntry->Value								+= LdrGetASLRDisplacement();
 						}
 
 #if (TARGET_OS >= YOSEMITE)
-						//if(BlTestBootMode(BOOT_MODE_FLUSH_CACHES))
-						//{
-							if(symbolEntry->SectionIndex == 1) // __TEXT,__text
+						if (symbolEntry->SectionIndex == 1) // __TEXT,__text
+						{
+							if(!strcmp(CHAR8_CONST_STRING("__ZN6OSKext14loadExecutableEv"), stringTable + symbolEntry->StringIndex))
 							{
-								if(!strcmp(CHAR8_CONST_STRING("__ZN6OSKext14loadExecutableEv"), stringTable + symbolEntry->StringIndex))
+								offset									= (symbolEntry->Value - loadedInfo->ImageBaseVirtualAddress);
+								startAddress							= (loadedInfo->ImageBasePhysicalAddress + offset);
+								endAddress								= (startAddress + 0x200);
+								p										= (unsigned char *)startAddress;
+
+								for (; p <= (unsigned char *)endAddress; p++)
 								{
-									UINT64 offset = (symbolEntry->Value - loadedInfo->ImageBaseVirtualAddress);
-									UINT64 startAddress = (loadedInfo->ImageBasePhysicalAddress + offset);
-									UINT64 endAddress = (startAddress + 0x200);
-
-									unsigned char * p = (unsigned char *)startAddress;
-
-									for (; p <= (unsigned char *)endAddress; p++)
+									if (*(UINT64 *)p == LOAD_EXECUTABLE_TARGET_UINT64)
 									{
-										if (*(UINT64 *)p == LOAD_EXECUTABLE_TARGET_UINT64)
-										{
 #if DEBUG_KERNEL_PATCHER
-											for (ix = 0; ix < 5; ix++)
-											{
-												CsPrintf(CHAR8_CONST_STRING("Found @ 0x%llx \n"), (UINT64)p - startAddress);
-											}
+										CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: Found symbol @ 0x%llx \n"), (UINT64)p - startAddress);
 #endif
-											*(UINT64 *)p = LOAD_EXECUTABLE_PATCH_UINT64;
-											break;
-										}
+										*(UINT64 *)p = LOAD_EXECUTABLE_PATCH_UINT64;
+										break;
 									}
 								}
 							}
-						//}
-#endif
-						//else if(symbolEntry->SectionIndex == 15) // __DATA,__common
-						if(symbolEntry->SectionIndex == 15) // __DATA,__common
+						}
+						else if (symbolEntry->SectionIndex == 15) // __DATA,__common
 						{
-							if(!strcmp(CHAR8_CONST_STRING("_IdlePML4"), stringTable + symbolEntry->StringIndex))
+							if (!strcmp(CHAR8_CONST_STRING("_IdlePML4"), stringTable + symbolEntry->StringIndex))
 							{
 								loadedInfo->IdlePML4VirtualAddress			= symbolEntry->Value;
 							}
 						}
+						else if (symbolEntry->SectionIndex == 25) // __KLD,__text
+						{
+							if (!strcmp(CHAR8_CONST_STRING("__ZN12KLDBootstrap21readStartupExtensionsEv"), stringTable + symbolEntry->StringIndex))
+							{
+								offset										= (symbolEntry->Value - loadedInfo->ImageBaseVirtualAddress);
+								startAddress								= (loadedInfo->ImageBasePhysicalAddress + offset);
+								endAddress									= (startAddress + 0x3d);
+								p											= (unsigned char *)startAddress;
+								
+								for (; p <= (unsigned char *)endAddress; p++)
+								{
+									if (*(UINT16 *)p == READ_STARTUP_EXTENSIONS_TARGET_UINT16)
+									{
+#if DEBUG_KERNEL_PATCHER
+										CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: Found symbol @ 0x%llx \n"), (UINT16)p - startAddress);
+#endif
+										*(UINT16 *)p = READ_STARTUP_EXTENSIONS_PATCH_UINT16;
+										break;
+									}
+								}
+							}
+						}
+#endif
 					}
 				}
 				break;
@@ -1310,7 +1328,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 					//
 					THREAD_COMMAND* threadCommand							= _CR(theCommand, THREAD_COMMAND, Header);
 
-					if(threadCommand->ThreadStateFlavor != THREAD_STATE_FLAVOR_X64)
+					if (threadCommand->ThreadStateFlavor != THREAD_STATE_FLAVOR_X64)
 						try_leave(CsPrintf(CHAR8_CONST_STRING("Only 64-bit version of LC_UNIXTHREAD is supported.\n")); status = EFI_LOAD_ERROR);
 					else
 						loadedInfo->EntryPointVirtualAddress				= threadCommand->ThreadState.X64.Rip + LdrGetASLRDisplacement();

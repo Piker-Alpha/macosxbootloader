@@ -9,6 +9,7 @@
 
 #define DEBUG_LDRP_CALL_CSPRINTF											0
 #define DEBUG_NVRAM_CALL_CSPRINTF											0
+#define DEBUG_KERNEL_PATCHER												1
 
 #define OS_LEGACY															6
 #define YOSEMITE															10
@@ -24,6 +25,9 @@
 
 #define LOAD_EXECUTABLE_TARGET_UINT64										0x487074db8548c389ULL
 #define LOAD_EXECUTABLE_PATCH_UINT64										0x4812ebdb8548c389ULL
+
+#define READ_STARTUP_EXTENSIONS_TARGET_UINT16								0x05eb
+#define READ_STARTUP_EXTENSIONS_PATCH_UINT16								0x9090
 
 #define DO_REPLACE_BOARD_ID													1
 
