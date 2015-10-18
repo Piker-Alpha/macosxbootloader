@@ -456,7 +456,7 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 							strcpy(kernelCachePathName, LdrpKernelCachePathName);
 						break;
 					case 1:
-						strcpy(kernelCachePathName, (CONST CHAR8*)"System\\Library\\Prelinkedkernels\\prelinkedkernel");
+						strcpy(kernelCachePathName, (CONST CHAR8*)"System\\Library\\PrelinkedKernels\\prelinkedkernel");
 						break;
 					case 2:
 						strcpy(kernelCachePathName, (CONST CHAR8*)"System\\Library\\Caches\\com.apple.kext.caches\\Startup\\prelinkedkernel");
