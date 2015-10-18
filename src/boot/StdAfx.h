@@ -9,7 +9,7 @@
 
 #define DEBUG_LDRP_CALL_CSPRINTF											0
 #define DEBUG_NVRAM_CALL_CSPRINTF											0
-#define DEBUG_KERNEL_PATCHER												1
+#define DEBUG_KERNEL_PATCHER												0
 
 #define OS_LEGACY															6
 #define YOSEMITE															10

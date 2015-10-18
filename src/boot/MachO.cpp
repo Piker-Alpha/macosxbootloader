@@ -1269,10 +1269,10 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 						{
 							if(!strcmp(CHAR8_CONST_STRING("__ZN6OSKext14loadExecutableEv"), stringTable + symbolEntry->StringIndex))
 							{
-								offset									= (symbolEntry->Value - loadedInfo->ImageBaseVirtualAddress);
-								startAddress							= (loadedInfo->ImageBasePhysicalAddress + offset);
-								endAddress								= (startAddress + 0x200);
-								p										= (unsigned char *)startAddress;
+								offset										= (symbolEntry->Value - loadedInfo->ImageBaseVirtualAddress);
+								startAddress								= (loadedInfo->ImageBasePhysicalAddress + offset);
+								endAddress									= (startAddress + 0x200);
+								p											= (unsigned char *)startAddress;
 
 								for (; p <= (unsigned char *)endAddress; p++)
 								{
@@ -1294,7 +1294,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 								loadedInfo->IdlePML4VirtualAddress			= symbolEntry->Value;
 							}
 						}
-						else if (symbolEntry->SectionIndex == 25) // __KLD,__text
+						/* else if (symbolEntry->SectionIndex == 25) // __KLD,__text
 						{
 							if (!strcmp(CHAR8_CONST_STRING("__ZN12KLDBootstrap21readStartupExtensionsEv"), stringTable + symbolEntry->StringIndex))
 							{
@@ -1308,14 +1308,14 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 									if (*(UINT16 *)p == READ_STARTUP_EXTENSIONS_TARGET_UINT16)
 									{
 #if DEBUG_KERNEL_PATCHER
-										CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: Found symbol @ 0x%llx \n"), (UINT16)p - startAddress);
+										CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: Found symbol @ 0x%llx \n"), (UINT64)p - startAddress);
 #endif
 										*(UINT16 *)p = READ_STARTUP_EXTENSIONS_PATCH_UINT16;
 										break;
 									}
 								}
 							}
-						}
+						} */
 #endif
 					}
 				}
