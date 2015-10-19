@@ -21,23 +21,7 @@ Note: For more information about the development phases, please visit the [TODO 
 Download
 --------
 
-All downloads should be done from this project page. All other sources are unsupported.
-
-Download your copy of the prebuild (32-bit) version of boot.efi for El Capitan (compiled on Microsoft Windows 10 with Microsoft Visual Studio 2015) with a [black background and white Apple logo](https://raw.githubusercontent.com/Piker-Alpha/macosxbootloader/El-Capitan/Prebuilt/boot.efi) now, and verify the download by entering (either one) in a terminal window:
-
-```
-openssl md5  boot.efi = b57d13b87226d72a31bf0aa527bc5f1f
-openssl sha1 boot.efi = e8b2f26fa5b11fb0552ce4cf7c2740dbd5e4c9e6
-```
-
-Or download the one for legacy hardware, with a [grey background and logo] (https://raw.githubusercontent.com/Piker-Alpha/macosxbootloader/El-Capitan/Prebuilt/boot_grey.efi) for your Mac Pro and verify the download by entering (either one) in a terminal window:
-
-```
-openssl md5  boot.efi = 94d217c24ce967446cbbc177fcae5c3f
-openssl sha1 boot.efi = 7de31ecfcb52ddcde764ee523fe68d5c5b052056
-```
-
-Note: If the output is different, then your copy of boot.efi should not be used!
+Prebuilt copies of boot.efi can be downloaded from the [project download page](http://piker-alpha.github.io/macosxbootloader/).
 
 
 Compilation
