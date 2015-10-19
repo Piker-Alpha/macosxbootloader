@@ -1013,13 +1013,13 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 		UINT64 machOffset													= 0;
 		UINTN machLength													= 0;
 
-		if(EFI_ERROR(status = MachLoadThinFatFile(fileHandle, &machOffset, &machLength)))
+		if (EFI_ERROR(status = MachLoadThinFatFile(fileHandle, &machOffset, &machLength)))
 			try_leave(NOTHING);
 
 		//
 		// Check length
 		//
-		if(!machLength)
+		if (!machLength)
 			try_leave(status = EFI_NOT_FOUND);
 
 		//
@@ -1028,37 +1028,37 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 		MACH_HEADER64 machHeader											= {0};
 		UINTN readLength													= 0;
 
-		if(EFI_ERROR(status = IoReadFile(fileHandle, &machHeader, sizeof(MACH_HEADER), &readLength, FALSE)))
+		if (EFI_ERROR(status = IoReadFile(fileHandle, &machHeader, sizeof(MACH_HEADER), &readLength, FALSE)))
 			try_leave(NOTHING);
 
 		//
 		// Check length
 		//
-		if(readLength != sizeof(MACH_HEADER))
+		if (readLength != sizeof(MACH_HEADER))
 			try_leave(status = EFI_LOAD_ERROR);
 
 		//
 		// Check signature
 		//
-		if(machHeader.Magic != MH_MAGIC_64)
+		if (machHeader.Magic != MH_MAGIC_64)
 			try_leave(CsPrintf(CHAR8_CONST_STRING("Booting from 32-bit kernelcache is not supported.\n")); status = EFI_LOAD_ERROR);
 
 		//
 		// Read 64bit header
 		//
-		if(EFI_ERROR(status = IoReadFile(fileHandle, &machHeader.Reserved, sizeof(machHeader.Reserved), &readLength, FALSE)))
+		if (EFI_ERROR(status = IoReadFile(fileHandle, &machHeader.Reserved, sizeof(machHeader.Reserved), &readLength, FALSE)))
 			try_leave(NOTHING);
 
 		//
 		// Length check
 		//
-		if(readLength != sizeof(machHeader.Reserved))
+		if (readLength != sizeof(machHeader.Reserved))
 			try_leave(status = EFI_LOAD_ERROR);
 
 		//
 		// Check ASLR
 		//
-		if(BlTestBootMode(BOOT_MODE_ASLR) && !(machHeader.Flags & MH_PIE))
+		if (BlTestBootMode(BOOT_MODE_ASLR) && !(machHeader.Flags & MH_PIE))
 			LdrSetupASLR(FALSE, 0);
 
 		//
@@ -1066,19 +1066,19 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 		//
 		commandsBuffer														= MmAllocatePool(machHeader.CommandsLength);
 
-		if(!commandsBuffer)
+		if (!commandsBuffer)
 			try_leave(status = EFI_OUT_OF_RESOURCES);
 
 		//
 		// Read commands
 		//
-		if(EFI_ERROR(status = IoReadFile(fileHandle, commandsBuffer, machHeader.CommandsLength, &readLength, FALSE)))
+		if (EFI_ERROR(status = IoReadFile(fileHandle, commandsBuffer, machHeader.CommandsLength, &readLength, FALSE)))
 			try_leave(NOTHING);
 
 		//
 		// Length check
 		//
-		if(readLength != machHeader.CommandsLength)
+		if (readLength != machHeader.CommandsLength)
 			try_leave(status = EFI_LOAD_ERROR);
 
 		//
@@ -1088,6 +1088,9 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 		VOID* linkEditSegment												= nullptr;
 		UINT32 ix															= 0;
 		UINT64 linkEditSegmentOffset										= 0;
+#if (TARGET_OS >= YOSEMITE)
+		UINT64 kldSegmentVirtualAddress										= 0;
+#endif
 		LOAD_COMMAND_HEADER* theCommand										= static_cast<LOAD_COMMAND_HEADER*>(commandsBuffer);
 
 		for(UINT32 i = 0; i < machHeader.CommandsCount; i ++, theCommand = Add2Ptr(theCommand, theCommand->CommandLength, LOAD_COMMAND_HEADER*))
@@ -1127,7 +1130,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 					UINT64 virtualAddress									= segmentVirtualAddress;
 					UINT64 physicalAddress									= useKernelMemory ? MmAllocateKernelMemory(&allocatedLength, &virtualAddress) : MmAllocateLoaderData(&allocatedLength, &virtualAddress);
 
-					if(!physicalAddress)
+					if (!physicalAddress)
 						try_leave(status = EFI_OUT_OF_RESOURCES);
 
 					//
@@ -1135,19 +1138,19 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 					//
 					UINTN fileLength										= static_cast<UINTN>(segmentVirtualSize > segmentFileSize ? segmentFileSize : segmentVirtualSize);
 
-					if(fileLength && EFI_ERROR(status = IoReadFile(fileHandle, ArchConvertAddressToPointer(physicalAddress, VOID*), fileLength, &readLength, FALSE)))
+					if (fileLength && EFI_ERROR(status = IoReadFile(fileHandle, ArchConvertAddressToPointer(physicalAddress, VOID*), fileLength, &readLength, FALSE)))
 						try_leave(NOTHING);
 
 					//
 					// Zero out
 					//
-					if(readLength != allocatedLength)
+					if (readLength != allocatedLength)
 						EfiBootServices->SetMem(Add2Ptr(physicalAddress, readLength, VOID*), allocatedLength - readLength, 0);
 
 					//
 					// __TEXT segment
 					//
-					if(!strcmp(segmentCommand64->Name, CHAR8_CONST_STRING("__TEXT")))
+					if (!strcmp(segmentCommand64->Name, CHAR8_CONST_STRING("__TEXT")))
 					{
 						//
 						// Save mach header
@@ -1158,7 +1161,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 						//
 						// Relocation for ASLR
 						//
-						if(LdrGetASLRDisplacement())
+						if (LdrGetASLRDisplacement())
 						{
 
 							SEGMENT_COMMAND64* theSegment64					= MachpGetFirstSegment64(Add2Ptr(physicalAddress, 0, MACH_HEADER64*));
@@ -1182,28 +1185,36 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 					//
 					// __DATA segment
 					//
-					if(!dataSegment && !strcmp(segmentCommand64->Name, CHAR8_CONST_STRING("__DATA")))
+					if (!dataSegment && !strcmp(segmentCommand64->Name, CHAR8_CONST_STRING("__DATA")))
 						dataSegment											= ArchConvertAddressToPointer(physicalAddress, VOID*);
 
 					//
 					// __LINKEDIT segment
 					//
-					if(!linkEditSegment && !strcmp(segmentCommand64->Name, CHAR8_CONST_STRING("__LINKEDIT")))
+					if (!linkEditSegment && !strcmp(segmentCommand64->Name, CHAR8_CONST_STRING("__LINKEDIT")))
 					{
 						linkEditSegment										= ArchConvertAddressToPointer(physicalAddress, VOID*);
 						linkEditSegmentOffset								= segmentFileOffset;
 					}
-
+#if (TARGET_OS >= YOSEMITE)
+					//
+					// __KLD segment
+					//
+					if (!strcmp(segmentCommand64->Name, CHAR8_CONST_STRING("__KLD")))
+					{
+						kldSegmentVirtualAddress							= segmentVirtualAddress;
+					}
+#endif
 					//
 					// Update min/max
 					//
-					if(!loadedInfo->MinVirtualAddress || virtualAddress < loadedInfo->MinVirtualAddress)
+					if (!loadedInfo->MinVirtualAddress || virtualAddress < loadedInfo->MinVirtualAddress)
 					{
 						loadedInfo->MinVirtualAddress						= virtualAddress;
 						loadedInfo->MinPhysicalAddress						= LdrStaticVirtualToPhysical(loadedInfo->MinVirtualAddress);
 					}
 
-					if(!loadedInfo->MaxVirtualAddress || loadedInfo->MaxVirtualAddress < virtualAddress + allocatedLength)
+					if (!loadedInfo->MaxVirtualAddress || loadedInfo->MaxVirtualAddress < virtualAddress + allocatedLength)
 					{
 						loadedInfo->MaxVirtualAddress						= virtualAddress + allocatedLength;
 						loadedInfo->MaxPhysicalAddress						= LdrStaticVirtualToPhysical(loadedInfo->MaxVirtualAddress);
@@ -1215,9 +1226,9 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 				{
 					DYSYMTAB_COMMAND* dynamicSymbolTableCommand				= _CR(theCommand, DYSYMTAB_COMMAND, Header);
 
-					if(dynamicSymbolTableCommand->LocalRelocationCount && LdrGetASLRDisplacement())
+					if (dynamicSymbolTableCommand->LocalRelocationCount && LdrGetASLRDisplacement())
 					{
-						if(!dataSegment || !linkEditSegment)
+						if (!dataSegment || !linkEditSegment)
 							try_leave(status = EFI_LOAD_ERROR);
 						
 						RELOCATION_INFO* relocationInfo						= Add2Ptr(linkEditSegment, dynamicSymbolTableCommand->LocalRelocationOffset - linkEditSegmentOffset, RELOCATION_INFO*);
@@ -1235,7 +1246,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 							//			This tells dyld to adjust the pointer sized (8-byte) piece of data by the amount
 							//			the containing image was loaded from its base address (e.g. slide).
 							//
-							if(relocationInfo->Type || relocationInfo->Length != 3 || relocationInfo->PCRelative || relocationInfo->External)
+							if (relocationInfo->Type || relocationInfo->Length != 3 || relocationInfo->PCRelative || relocationInfo->External)
 								try_leave(status = EFI_LOAD_ERROR);
 							
 							UINT64* address									= Add2Ptr(dataSegment, static_cast<INT64>(relocationInfo->SectionOffset), UINT64*);
@@ -1294,28 +1305,28 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 								loadedInfo->IdlePML4VirtualAddress			= symbolEntry->Value;
 							}
 						}
-						/* else if (symbolEntry->SectionIndex == 25) // __KLD,__text
+						else if (symbolEntry->SectionIndex == 25) // __KLD,__text
 						{
 							if (!strcmp(CHAR8_CONST_STRING("__ZN12KLDBootstrap21readStartupExtensionsEv"), stringTable + symbolEntry->StringIndex))
 							{
-								offset										= (symbolEntry->Value - loadedInfo->ImageBaseVirtualAddress);
+								offset										= (symbolEntry->Value - kldSegmentVirtualAddress);
 								startAddress								= (loadedInfo->ImageBasePhysicalAddress + offset);
-								endAddress									= (startAddress + 0x3d);
+								endAddress									= (startAddress + 0x3f);
 								p											= (unsigned char *)startAddress;
 								
 								for (; p <= (unsigned char *)endAddress; p++)
 								{
-									if (*(UINT16 *)p == READ_STARTUP_EXTENSIONS_TARGET_UINT16)
+									if (*(UINT64 *)p == READ_STARTUP_EXTENSIONS_TARGET_UINT64)
 									{
 #if DEBUG_KERNEL_PATCHER
 										CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: Found symbol @ 0x%llx \n"), (UINT64)p - startAddress);
 #endif
-										*(UINT16 *)p = READ_STARTUP_EXTENSIONS_PATCH_UINT16;
+										*(UINT64 *)p = READ_STARTUP_EXTENSIONS_PATCH_UINT64;
 										break;
 									}
 								}
 							}
-						} */
+						}
 #endif
 					}
 				}
@@ -1346,7 +1357,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 	}
 	__finally
 	{
-		if(commandsBuffer)
+		if (commandsBuffer)
 			MmFreePool(commandsBuffer);
 	}
 
