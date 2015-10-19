@@ -1307,13 +1307,18 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 						}
 						else if (symbolEntry->SectionIndex == 25) // __KLD,__text
 						{
+#if DEBUG_KERNEL_PATCHER
+							CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: __KLD,__text found!\n"));
+#endif
 							if (!strcmp(CHAR8_CONST_STRING("__ZN12KLDBootstrap21readStartupExtensionsEv"), stringTable + symbolEntry->StringIndex))
 							{
 								offset										= (symbolEntry->Value - kldSegmentVirtualAddress);
 								startAddress								= (loadedInfo->ImageBasePhysicalAddress + offset);
 								endAddress									= (startAddress + 0x3f);
 								p											= (unsigned char *)startAddress;
-								
+#if DEBUG_KERNEL_PATCHER
+								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: offset[0x%llx], startAddress[0x%llx]\n"), offset, startAddress);
+#endif
 								for (; p <= (unsigned char *)endAddress; p++)
 								{
 									if (*(UINT64 *)p == READ_STARTUP_EXTENSIONS_TARGET_UINT64)
