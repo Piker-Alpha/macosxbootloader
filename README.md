@@ -1,7 +1,7 @@
 Introduction
 ------------
 
-This Github project is a new and updated branch of the [Yosemite tree](https://github.com/Piker-Alpha/macosxbootloader/tree/master)
+This Github project is a new and updated branch of the [Yosemite tree](https://github.com/Piker-Alpha/macosxbootloader/tree/master) and is now targetted at OS X 10.11 El Capitan.
 
 
 Goals
@@ -10,39 +10,31 @@ Goals
 This project aims to add support for El Capitan (OS X 10.11) for unsupported Mac hardware with a 32-bit only EFI implementation. Like for example the first and second generation Mac Pro models. Though it should work well with any other model with a 32-bit EFI implementation.
 
 
-Development
------------
-
-This project is maintained by [Pike R. Alpha](https://pikeralpha.wordpress.com)
-
-
 Current State
 -------------
 
-The current state of this project is: Phase 1 and 2 Completed (OS X 10.11 El Capitan is now supported).
+The current state of this project is: Phase 1, 2 and 3 completed (OS X 10.11 El Capitan is now fully supported).
 
-Note:
-
-A second development phase began on Saturday 26 September 2015 and was completed on Sunday 27 September 2015. A third development phase is also planned, to finish it up. See also our [TODO list](https://github.com/Piker-Alpha/macosxbootloader/blob/El-Capitan/TODO.md).
+Note: For more information about the development phases, please visit the [TODO list](https://github.com/Piker-Alpha/macosxbootloader/blob/El-Capitan/TODO.md).
 
 
 Download
 --------
 
-First. All downloads should be done from the following links. All other sources are unsupported. 
+All downloads should be done from this project page. All other sources are unsupported.
 
 Download your copy of the prebuild (32-bit) version of boot.efi for El Capitan (compiled on Microsoft Windows 10 with Microsoft Visual Studio 2015) with a [black background and white Apple logo](https://raw.githubusercontent.com/Piker-Alpha/macosxbootloader/El-Capitan/Prebuilt/boot.efi) now, and verify the download by entering (either one) in a terminal window:
 
 ```
-openssl md5  boot.efi = 4db3cf800b8888337a70448c9ed370a4
-openssl sha1 boot.efi = 91456d827b1e656ea72ec0d78fea39273ab48dd8
+openssl md5  boot.efi = b57d13b87226d72a31bf0aa527bc5f1f
+openssl sha1 boot.efi = e8b2f26fa5b11fb0552ce4cf7c2740dbd5e4c9e6
 ```
 
 Or download the one for legacy hardware, with a [grey background and logo] (https://raw.githubusercontent.com/Piker-Alpha/macosxbootloader/El-Capitan/Prebuilt/boot_grey.efi) for your Mac Pro and verify the download by entering (either one) in a terminal window:
 
 ```
-openssl md5  boot.efi = 1218d85076b8e2bb9d711f5aaf617a6d
-openssl sha1 boot.efi = 4853bf4bed4a9727ab572ebccf1baf0d7eb6c048
+openssl md5  boot.efi = 94d217c24ce967446cbbc177fcae5c3f
+openssl sha1 boot.efi = 7de31ecfcb52ddcde764ee523fe68d5c5b052056
 ```
 
 Note: If the output is different, then your copy of boot.efi should not be used!
@@ -96,3 +88,5 @@ Disclaimer
 ----------
 
 Copyright (c) 2014-2015, by Pike R. Alpha – All right reserved.
+
+Macosxbootloader is maintained by Pike R. Alpha.
