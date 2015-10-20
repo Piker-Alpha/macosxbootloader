@@ -1088,10 +1088,6 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 		VOID* linkEditSegment												= nullptr;
 		UINT32 ix															= 0;
 		UINT64 linkEditSegmentOffset										= 0;
-#if (TARGET_OS >= YOSEMITE)
-		UINT64 kldSegmentVirtualAddress										= 0;
-		UINT64 kldSegmentOffset												= 0;
-#endif
 		LOAD_COMMAND_HEADER* theCommand										= static_cast<LOAD_COMMAND_HEADER*>(commandsBuffer);
 
 		for(UINT32 i = 0; i < machHeader.CommandsCount; i ++, theCommand = Add2Ptr(theCommand, theCommand->CommandLength, LOAD_COMMAND_HEADER*))
@@ -1197,16 +1193,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 						linkEditSegment										= ArchConvertAddressToPointer(physicalAddress, VOID*);
 						linkEditSegmentOffset								= segmentFileOffset;
 					}
-#if (TARGET_OS >= YOSEMITE)
-					//
-					// __KLD segment
-					//
-					if (!strcmp(segmentCommand64->Name, CHAR8_CONST_STRING("__KLD")))
-					{
-						kldSegmentVirtualAddress							= segmentVirtualAddress;
-						kldSegmentOffset									= segmentFileOffset;
-					}
-#endif
+
 					//
 					// Update min/max
 					//
@@ -1260,14 +1247,21 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 
 				case MACH_O_COMMAND_SYMTAB:
 				{
+					UINT8 loadExecutablePatched								= 0;
+					UINT8 readStartExtensionsPatched						= 0;
+
 					UINT64 index											= 0;
 					UINT64 asld												= LdrGetASLRDisplacement();
 					UINT64 offset											= 0;
 					UINT64 startAddress										= 0;
 					UINT64 endAddress										= 0;
+
 					unsigned char * p										= nullptr;
+
 					SYMTAB_COMMAND* symbolTableCommand						= _CR(theCommand, SYMTAB_COMMAND, Header);
+
 					CHAR8 CONST* stringTable								= Add2Ptr(linkEditSegment, symbolTableCommand->StringTableOffset - linkEditSegmentOffset, CHAR8 CONST*);
+
 					SYMTAB_ENTRY64* symbolEntry								= Add2Ptr(linkEditSegment, symbolTableCommand->SymbolTableOffset - linkEditSegmentOffset, SYMTAB_ENTRY64*);
 						
 					for (; index < symbolTableCommand->SymbolCount; index++, symbolEntry++)
@@ -1278,7 +1272,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 						}
 
 #if (TARGET_OS >= YOSEMITE)
-						if (symbolEntry->SectionIndex == 1) // __TEXT,__text
+						if (!loadExecutablePatched && symbolEntry->SectionIndex == 1) // __TEXT,__text
 						{
 							if(!strcmp(CHAR8_CONST_STRING("__ZN6OSKext14loadExecutableEv"), stringTable + symbolEntry->StringIndex))
 							{
@@ -1295,7 +1289,11 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 										CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: Found symbol @ 0x%llx \n"), (UINT64)p - startAddress);
 #endif
 										*(UINT64 *)p = LOAD_EXECUTABLE_PATCH_UINT64;
-										break;
+										//
+										// We're done here.
+										//
+										p									= (unsigned char *)endAddress;
+										loadExecutablePatched				= 1;
 									}
 								}
 							}
@@ -1307,12 +1305,12 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 								loadedInfo->IdlePML4VirtualAddress			= symbolEntry->Value;
 							}
 						}
-						else if (symbolEntry->SectionIndex == 25) // __KLD,__text
+						else if (!readStartExtensionsPatched && symbolEntry->SectionIndex == 25) // __KLD,__text
 						{
 							if (!strcmp(CHAR8_CONST_STRING("__ZN12KLDBootstrap21readStartupExtensionsEv"), stringTable + symbolEntry->StringIndex))
 							{
-								offset										= (symbolEntry->Value - kldSegmentVirtualAddress);
-								startAddress								= (loadedInfo->ImageBasePhysicalAddress + kldSegmentOffset + offset);
+								offset										= (symbolEntry->Value - loadedInfo->ImageBaseVirtualAddress);
+								startAddress								= (loadedInfo->ImageBasePhysicalAddress + offset);
 								endAddress									= (startAddress + 0x3f);
 								p											= (unsigned char *)startAddress;
 #if DEBUG_KERNEL_PATCHER
@@ -1326,7 +1324,11 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 										CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: Found symbol @ 0x%llx \n"), (UINT64)p - startAddress);
 #endif
 										*(UINT64 *)p = READ_STARTUP_EXTENSIONS_PATCH_UINT64;
-										break;
+										//
+										// We're done here.
+										//
+										p									= (unsigned char *)endAddress;
+										readStartExtensionsPatched			= 1;
 									}
 								}
 							}
