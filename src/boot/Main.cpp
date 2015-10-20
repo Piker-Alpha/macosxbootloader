@@ -531,11 +531,6 @@ EFI_STATUS EFIAPI EfiMain(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable)
 		//
 		CHAR8* filePath														= DevPathExtractFilePathName(bootFilePath, TRUE);
 
-		for (UINT8 si = 0; si < 5; si++)
-		{
-			CsPrintf(CHAR8_CONST_STRING("PIKE: Main.cpp filePath = %s\n"), filePath);
-		}
-
 		if (filePath)
 		{
 			//
