@@ -624,7 +624,7 @@ EFI_STATUS EFIAPI EfiMain(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable)
 		}
 
 		//
-		// load kernel cache
+		// load prelinkedkernel/kernel cache
 		//
 		MACH_O_LOADED_INFO kernelInfo										= {0};
 		status																= LdrLoadKernelCache(&kernelInfo, bootDevicePath);
