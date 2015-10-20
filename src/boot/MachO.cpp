@@ -1090,6 +1090,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 		UINT64 linkEditSegmentOffset										= 0;
 #if (TARGET_OS >= YOSEMITE)
 		UINT64 kldSegmentVirtualAddress										= 0;
+		UINT64 kldSegmentOffset												= 0;
 #endif
 		LOAD_COMMAND_HEADER* theCommand										= static_cast<LOAD_COMMAND_HEADER*>(commandsBuffer);
 
@@ -1203,6 +1204,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 					if (!strcmp(segmentCommand64->Name, CHAR8_CONST_STRING("__KLD")))
 					{
 						kldSegmentVirtualAddress							= segmentVirtualAddress;
+						kldSegmentOffset									= segmentFileOffset;
 					}
 #endif
 					//
@@ -1307,13 +1309,10 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 						}
 						else if (symbolEntry->SectionIndex == 25) // __KLD,__text
 						{
-#if DEBUG_KERNEL_PATCHER
-							CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: __KLD,__text found!\n"));
-#endif
 							if (!strcmp(CHAR8_CONST_STRING("__ZN12KLDBootstrap21readStartupExtensionsEv"), stringTable + symbolEntry->StringIndex))
 							{
 								offset										= (symbolEntry->Value - kldSegmentVirtualAddress);
-								startAddress								= (loadedInfo->ImageBasePhysicalAddress + offset);
+								startAddress								= (loadedInfo->ImageBasePhysicalAddress + kldSegmentOffset + offset);
 								endAddress									= (startAddress + 0x3f);
 								p											= (unsigned char *)startAddress;
 #if DEBUG_KERNEL_PATCHER
