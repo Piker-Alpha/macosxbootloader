@@ -1321,7 +1321,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 							if (!strcmp(CHAR8_CONST_STRING("__ZN12KLDBootstrap21readStartupExtensionsEv"), stringTable + symbolEntry->StringIndex))
 							{
 								offset										= (symbolEntry->Value - kldSegmentVirtualAddress); // 0x950
-								startAddress								= (loadedInfo->ImageBasePhysicalAddress + kldSegmentOffset + offset);
+								startAddress								= (kldSegmentVirtualAddress + kldSegmentOffset + offset);
 								endAddress									= (startAddress + 0x3f);
 								p											= (unsigned char *)startAddress;
 // #if DEBUG_KERNEL_PATCHER
