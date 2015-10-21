@@ -1247,8 +1247,8 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 
 				case MACH_O_COMMAND_SYMTAB:
 				{
-					UINT8 loadExecutablePatched								= 0;
-					UINT8 readStartExtensionsPatched						= 0;
+					BOOLEAN loadExecutablePatched							= FALSE;
+					BOOLEAN readStartExtensionsPatched						= FALSE;
 
 					UINT64 index											= 0;
 					UINT64 asld												= LdrGetASLRDisplacement();
@@ -1272,7 +1272,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 						}
 
 #if (TARGET_OS >= YOSEMITE)
-						if (!loadExecutablePatched && symbolEntry->SectionIndex == 1) // __TEXT,__text
+						if ((loadExecutablePatched == FALSE) && (symbolEntry->SectionIndex == 1)) // __TEXT,__text
 						{
 							if(!strcmp(CHAR8_CONST_STRING("__ZN6OSKext14loadExecutableEv"), stringTable + symbolEntry->StringIndex))
 							{
@@ -1293,7 +1293,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 										// We're done here.
 										//
 										p									= (unsigned char *)endAddress;
-										loadExecutablePatched				= 1;
+										loadExecutablePatched				= TRUE;
 									}
 								}
 							}
@@ -1305,7 +1305,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 								loadedInfo->IdlePML4VirtualAddress			= symbolEntry->Value;
 							}
 						}
-						else if (!readStartExtensionsPatched && symbolEntry->SectionIndex == 25) // __KLD,__text
+						else if ((readStartExtensionsPatched == FALSE) && (symbolEntry->SectionIndex == 25)) // __KLD,__text
 						{
 							if (!strcmp(CHAR8_CONST_STRING("__ZN12KLDBootstrap21readStartupExtensionsEv"), stringTable + symbolEntry->StringIndex))
 							{
@@ -1328,7 +1328,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 										// We're done here.
 										//
 										p									= (unsigned char *)endAddress;
-										readStartExtensionsPatched			= 1;
+										readStartExtensionsPatched			= TRUE;
 									}
 								}
 							}
