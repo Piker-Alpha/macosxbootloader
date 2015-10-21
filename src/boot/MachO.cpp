@@ -1088,6 +1088,8 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 		VOID* linkEditSegment												= nullptr;
 		UINT32 ix															= 0;
 		UINT64 linkEditSegmentOffset										= 0;
+		UINT64 kldSegmentVirtualAddress										= 0;
+		UINT64 kldSegmentOffset												= 0;
 		LOAD_COMMAND_HEADER* theCommand										= static_cast<LOAD_COMMAND_HEADER*>(commandsBuffer);
 
 		for(UINT32 i = 0; i < machHeader.CommandsCount; i ++, theCommand = Add2Ptr(theCommand, theCommand->CommandLength, LOAD_COMMAND_HEADER*))
@@ -1184,6 +1186,15 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 					//
 					if (!dataSegment && !strcmp(segmentCommand64->Name, CHAR8_CONST_STRING("__DATA")))
 						dataSegment											= ArchConvertAddressToPointer(physicalAddress, VOID*);
+
+					//
+					// __KLD segment
+					//
+					if (!strcmp(segmentCommand64->Name, CHAR8_CONST_STRING("__KLD")))
+					{
+						kldSegmentVirtualAddress							= segmentVirtualAddress;
+						kldSegmentOffset									= segmentFileOffset;
+					}
 
 					//
 					// __LINKEDIT segment
@@ -1290,10 +1301,10 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 #endif
 										*(UINT64 *)p = LOAD_EXECUTABLE_PATCH_UINT64;
 										//
-										// We're done here.
+										// Done.
 										//
-										p									= (unsigned char *)endAddress;
 										loadExecutablePatched				= TRUE;
+										break;
 									}
 								}
 							}
@@ -1309,8 +1320,8 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 						{
 							if (!strcmp(CHAR8_CONST_STRING("__ZN12KLDBootstrap21readStartupExtensionsEv"), stringTable + symbolEntry->StringIndex))
 							{
-								offset										= (symbolEntry->Value - loadedInfo->ImageBaseVirtualAddress);
-								startAddress								= (loadedInfo->ImageBasePhysicalAddress + offset);
+								offset										= (symbolEntry->Value - kldSegmentVirtualAddress); // 0x950
+								startAddress								= (loadedInfo->ImageBasePhysicalAddress + kldSegmentOffset + offset);
 								endAddress									= (startAddress + 0x3f);
 								p											= (unsigned char *)startAddress;
 // #if DEBUG_KERNEL_PATCHER
@@ -1325,10 +1336,10 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 // #endif
 										*(UINT64 *)p = READ_STARTUP_EXTENSIONS_PATCH_UINT64;
 										//
-										// We're done here.
+										// Done.
 										//
-										p									= (unsigned char *)endAddress;
 										readStartExtensionsPatched			= TRUE;
+										break;
 									}
 								}
 							}
