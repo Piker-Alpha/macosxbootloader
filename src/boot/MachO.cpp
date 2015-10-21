@@ -1313,16 +1313,16 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 								startAddress								= (loadedInfo->ImageBasePhysicalAddress + offset);
 								endAddress									= (startAddress + 0x3f);
 								p											= (unsigned char *)startAddress;
-#if DEBUG_KERNEL_PATCHER
+// #if DEBUG_KERNEL_PATCHER
 								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: offset[0x%llx], startAddress[0x%llx]\n"), offset, startAddress);
-#endif
+// #endif
 								for (; p <= (unsigned char *)endAddress; p++)
 								{
 									if (*(UINT64 *)p == READ_STARTUP_EXTENSIONS_TARGET_UINT64)
 									{
-#if DEBUG_KERNEL_PATCHER
+// #if DEBUG_KERNEL_PATCHER
 										CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: Found symbol @ 0x%llx \n"), (UINT64)p - startAddress);
-#endif
+// #endif
 										*(UINT64 *)p = READ_STARTUP_EXTENSIONS_PATCH_UINT64;
 										//
 										// We're done here.
