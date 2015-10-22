@@ -1092,6 +1092,8 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 		UINT64 kldSegmentOffset												= 0;
 		LOAD_COMMAND_HEADER* theCommand										= static_cast<LOAD_COMMAND_HEADER*>(commandsBuffer);
 
+		CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: ASLRDisplacement 0x%llx \n"), LdrGetASLRDisplacement());
+
 		for(UINT32 i = 0; i < machHeader.CommandsCount; i ++, theCommand = Add2Ptr(theCommand, theCommand->CommandLength, LOAD_COMMAND_HEADER*))
 		{
 			//
@@ -1157,6 +1159,9 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 						loadedInfo->ImageBasePhysicalAddress				= physicalAddress;
 						loadedInfo->ImageBaseVirtualAddress					= virtualAddress;
 
+						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: physicalAddress: 0x%llx \n"), physicalAddress);
+						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: virtualAddress.: 0x%llx \n"), virtualAddress);
+
 						//
 						// Relocation for ASLR
 						//
@@ -1194,6 +1199,9 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 					{
 						kldSegmentVirtualAddress							= segmentVirtualAddress;
 						kldSegmentOffset									= segmentFileOffset;
+						
+						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: kldSegmentVirtualAddress: 0x%llx \n"), kldSegmentVirtualAddress);
+						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: kldSegmentOffset........: 0x%llx \n"), kldSegmentOffset);
 					}
 
 					//
@@ -1321,8 +1329,8 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 							if (!strcmp(CHAR8_CONST_STRING("__ZN12KLDBootstrap21readStartupExtensionsEv"), stringTable + symbolEntry->StringIndex))
 							{
 								offset										= (symbolEntry->Value - kldSegmentVirtualAddress); // 0x950
-								startAddress								= (kldSegmentVirtualAddress + kldSegmentOffset + offset);
-								endAddress									= (startAddress + 0x3f);
+								startAddress								= (loadedInfo->ImageBasePhysicalAddress);
+								endAddress									= (startAddress + machLength);
 								p											= (unsigned char *)startAddress;
 // #if DEBUG_KERNEL_PATCHER
 								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: offset[0x%llx], startAddress[0x%llx]\n"), offset, startAddress);
