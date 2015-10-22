@@ -1015,6 +1015,8 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 
 		if (EFI_ERROR(status = MachLoadThinFatFile(fileHandle, &machOffset, &machLength)))
 			try_leave(NOTHING);
+		
+		CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: machLength 0x%llx \n"), machLength);
 
 		//
 		// Check length
@@ -1340,7 +1342,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 									if (*(UINT64 *)p == READ_STARTUP_EXTENSIONS_TARGET_UINT64)
 									{
 // #if DEBUG_KERNEL_PATCHER
-										CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: Found symbol @ 0x%llx \n"), (UINT64)p - startAddress);
+										CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: Found symbol @ 0x%llx\n"), (UINT64)p - startAddress);
 // #endif
 										*(UINT64 *)p = READ_STARTUP_EXTENSIONS_PATCH_UINT64;
 										//
@@ -1350,6 +1352,8 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 										break;
 									}
 								}
+
+								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: Done @ [0x%llx]\n"), (UINT64)p);
 							}
 						}
 #endif
