@@ -84,7 +84,7 @@ STATIC EFI_DEVICE_PATH_PROTOCOL* LdrpRamDiskFilePath						= nullptr;
 //
 STATIC UINT64 LdrpComputeASLRDisplacement(UINT8 slideValue)
 {
-	if(!(slideValue & 0x80))
+	if (!(slideValue & 0x80))
 		return static_cast<UINT64>(slideValue) << 21;
 
 	UINT32 eaxValue															= 0;
@@ -122,16 +122,16 @@ STATIC UINT8 LdrpRandom()
 	while(TRUE)
 	{
 		UINTN randomValue													= 0;
-		if(supportHardwareRandom)
+		if (supportHardwareRandom)
 		{
 			randomValue														= ArchHardwareRandom();
-			if(randomValue)
+			if (randomValue)
 				return static_cast<UINT8>(randomValue);
 		}
 
 		UINT64 cpuTick														= ArchGetCpuTick();
 		randomValue															= (cpuTick & 0xff) ^ ((cpuTick >> 8) & 0xff);
-		if(randomValue)
+		if (randomValue)
 			return static_cast<UINT8>(randomValue);
 	}
 	return 0;
@@ -163,7 +163,7 @@ STATIC EFI_STATUS LdrpKernelCacheValid(CHAR8 CONST* cachePathName, BOOLEAN* kern
 		//
 		// open cache file
 		//
-		if(EFI_ERROR(IoOpenFile(cachePathName, nullptr, &cacheFile, IO_OPEN_MODE_NORMAL)))
+		if (EFI_ERROR(IoOpenFile(cachePathName, nullptr, &cacheFile, IO_OPEN_MODE_NORMAL)))
 			try_leave(LdrpKernelCachePathName ? status = EFI_NOT_FOUND : EFI_SUCCESS);
 #if DEBUG_LDRP_CALL_CSPRINTF
 		CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(2).\n"));
@@ -171,7 +171,7 @@ STATIC EFI_STATUS LdrpKernelCacheValid(CHAR8 CONST* cachePathName, BOOLEAN* kern
 		//
 		// get cache file info
 		//
-		if(EFI_ERROR(status = IoGetFileInfo(&cacheFile, &cacheInfo)))
+		if (EFI_ERROR(status = IoGetFileInfo(&cacheFile, &cacheInfo)))
 			try_leave(NOTHING);
 #if DEBUG_LDRP_CALL_CSPRINTF
 		CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(3).\n"));
@@ -179,7 +179,7 @@ STATIC EFI_STATUS LdrpKernelCacheValid(CHAR8 CONST* cachePathName, BOOLEAN* kern
 		//
 		// check cache file info
 		//
-		if(!cacheInfo || (cacheInfo->Attribute & EFI_FILE_DIRECTORY))
+		if (!cacheInfo || (cacheInfo->Attribute & EFI_FILE_DIRECTORY))
 			try_leave(status = EFI_NOT_FOUND);
 #if DEBUG_LDRP_CALL_CSPRINTF
 		CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(4).\n"));
@@ -187,7 +187,7 @@ STATIC EFI_STATUS LdrpKernelCacheValid(CHAR8 CONST* cachePathName, BOOLEAN* kern
 		//
 		// kernel cache override
 		//
-		if(LdrpKernelCacheOverride)
+		if (LdrpKernelCacheOverride)
 			try_leave(*kernelCacheValid = TRUE);
 #if DEBUG_LDRP_CALL_CSPRINTF
 		CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(5).\n"));
@@ -195,7 +195,7 @@ STATIC EFI_STATUS LdrpKernelCacheValid(CHAR8 CONST* cachePathName, BOOLEAN* kern
 		//
 		// open kernel file
 		//
-		if(!EFI_ERROR(IoOpenFile(LdrpKernelPathName, nullptr, &kernelFile, IO_OPEN_MODE_NORMAL)))
+		if (!EFI_ERROR(IoOpenFile(LdrpKernelPathName, nullptr, &kernelFile, IO_OPEN_MODE_NORMAL)))
 		{
 #if DEBUG_LDRP_CALL_CSPRINTF
 			CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(6).\n"));
@@ -203,7 +203,7 @@ STATIC EFI_STATUS LdrpKernelCacheValid(CHAR8 CONST* cachePathName, BOOLEAN* kern
 			//
 			// get kernel file info
 			//
-			if(EFI_ERROR(status = IoGetFileInfo(&kernelFile, &kernelInfo)))
+			if (EFI_ERROR(status = IoGetFileInfo(&kernelFile, &kernelInfo)))
 				try_leave(NOTHING);
 #if DEBUG_LDRP_CALL_CSPRINTF
 			CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(7).\n"));
@@ -211,7 +211,7 @@ STATIC EFI_STATUS LdrpKernelCacheValid(CHAR8 CONST* cachePathName, BOOLEAN* kern
 			//
 			// check kernel file info
 			//
-			if(!kernelInfo || (kernelInfo->Attribute & EFI_FILE_DIRECTORY))
+			if (!kernelInfo || (kernelInfo->Attribute & EFI_FILE_DIRECTORY))
 				try_leave(status = EFI_NOT_FOUND);
 #if DEBUG_LDRP_CALL_CSPRINTF
 			CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(8).\n"));
@@ -222,7 +222,7 @@ STATIC EFI_STATUS LdrpKernelCacheValid(CHAR8 CONST* cachePathName, BOOLEAN* kern
 		//
 		// open extensions
 		//
-		if(!EFI_ERROR(IoOpenFile(CHAR8_CONST_STRING("System\\Library\\Extensions"), nullptr, &extensionsFile, IO_OPEN_MODE_NORMAL)))
+		if (!EFI_ERROR(IoOpenFile(CHAR8_CONST_STRING("System\\Library\\Extensions"), nullptr, &extensionsFile, IO_OPEN_MODE_NORMAL)))
 		{
 #if DEBUG_LDRP_CALL_CSPRINTF
 			CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(9).\n"));
@@ -230,7 +230,7 @@ STATIC EFI_STATUS LdrpKernelCacheValid(CHAR8 CONST* cachePathName, BOOLEAN* kern
 			//
 			// get extensions file info
 			//
-			if(EFI_ERROR(status = IoGetFileInfo(&extensionsFile, &extensionsInfo)))
+			if (EFI_ERROR(status = IoGetFileInfo(&extensionsFile, &extensionsInfo)))
 				try_leave(NOTHING);
 #if DEBUG_LDRP_CALL_CSPRINTF
 			CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(A).\n"));
@@ -239,7 +239,7 @@ STATIC EFI_STATUS LdrpKernelCacheValid(CHAR8 CONST* cachePathName, BOOLEAN* kern
 			//
 			// check extensions info
 			//
-			if(!extensionsInfo || !(extensionsInfo->Attribute & EFI_FILE_DIRECTORY))
+			if (!extensionsInfo || !(extensionsInfo->Attribute & EFI_FILE_DIRECTORY))
 				try_leave(status = EFI_NOT_FOUND);
 #if DEBUG_LDRP_CALL_CSPRINTF
 			CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(B).\n"));
@@ -248,7 +248,7 @@ STATIC EFI_STATUS LdrpKernelCacheValid(CHAR8 CONST* cachePathName, BOOLEAN* kern
 			//
 			// get bigger
 			//
-			if(!checkerInfo || BlCompareTime(&checkerInfo->ModificationTime, &extensionsInfo->ModificationTime) < 0)
+			if (!checkerInfo || BlCompareTime(&checkerInfo->ModificationTime, &extensionsInfo->ModificationTime) < 0)
 				checkerInfo													= extensionsInfo;
 		}
 #if DEBUG_LDRP_CALL_CSPRINTF
@@ -258,7 +258,7 @@ STATIC EFI_STATUS LdrpKernelCacheValid(CHAR8 CONST* cachePathName, BOOLEAN* kern
 		//
 		// check time
 		//
-		if(!checkerInfo)
+		if (!checkerInfo)
 			try_leave(*kernelCacheValid = TRUE);
 #if DEBUG_LDRP_CALL_CSPRINTF
 		CsPrintf(CHAR8_CONST_STRING("PIKE: in LdrpKernelCacheValid(D).\n"));
@@ -273,7 +273,7 @@ STATIC EFI_STATUS LdrpKernelCacheValid(CHAR8 CONST* cachePathName, BOOLEAN* kern
 		//
 		// compare time
 		//
-		if(memcmp(&modifyTime, &cacheInfo->ModificationTime, sizeof(modifyTime)))
+		if (memcmp(&modifyTime, &cacheInfo->ModificationTime, sizeof(modifyTime)))
 			status															= EFI_NOT_FOUND;
 		else
 		{
@@ -285,13 +285,13 @@ STATIC EFI_STATUS LdrpKernelCacheValid(CHAR8 CONST* cachePathName, BOOLEAN* kern
 	}
 	__finally
 	{
-		if(cacheInfo)
+		if (cacheInfo)
 			MmFreePool(cacheInfo);
 
-		if(kernelInfo)
+		if (kernelInfo)
 			MmFreePool(kernelInfo);
 
-		if(extensionsInfo)
+		if (extensionsInfo)
 			MmFreePool(extensionsInfo);
 
 		IoCloseFile(&cacheFile);
@@ -307,9 +307,9 @@ STATIC EFI_STATUS LdrpKernelCacheValid(CHAR8 CONST* cachePathName, BOOLEAN* kern
 //
 VOID LdrSetupASLR(BOOLEAN enableASLR, UINT8 slideValue)
 {
-	if(enableASLR)
+	if (enableASLR)
 	{
-		if(!slideValue)
+		if (!slideValue)
 			slideValue														= LdrpRandom();
 
 		BlSetBootMode(BOOT_MODE_ASLR, 0);
@@ -397,7 +397,7 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 		//
 		// check mode
 		//
-		if(BlTestBootMode(BOOT_MODE_ALT_KERNEL))
+		if (BlTestBootMode(BOOT_MODE_ALT_KERNEL))
 			try_leave(status = EFI_NOT_FOUND);
 
 		//
@@ -410,10 +410,10 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 		CHAR8 CONST* fileName												= LdrpKernelPathName ? LdrpKernelPathName : LdrpKernelCachePathName;
 		UINTN fileNameLength												= strlen(fileName);
 
-		if(modelNameLength > 0x40)
+		if (modelNameLength > 0x40)
 			modelNameLength													= 0x40;
 
-		if(devicePathLength > 0x100)
+		if (devicePathLength > 0x100)
 			devicePathLength												= 0x100;
 
 		UINTN leftLength													= sizeof(tempBuffer) - modelNameLength - devicePathLength;
@@ -437,9 +437,9 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 		BOOLEAN netBoot														= IoBootingFromNet();
 		CHAR8 kernelCachePathName[1024]										= {0};
 
-		if(netBoot)
+		if (netBoot)
 		{
-			if(LdrpKernelCachePathName)
+			if (LdrpKernelCachePathName)
 				strcpy(kernelCachePathName, LdrpKernelCachePathName);
 		}
 		else
@@ -452,7 +452,7 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 				switch(i)
 				{
 					case 0:
-						if(LdrpKernelCachePathName)
+						if (LdrpKernelCachePathName)
 							strcpy(kernelCachePathName, LdrpKernelCachePathName);
 						break;
 					case 1:
@@ -472,17 +472,17 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 				//
 				// check name
 				//
-				if(kernelCachePathName[0])
+				if (kernelCachePathName[0])
 				{
 					//
 					// check valid
 					//
 					BOOLEAN kernelCacheValid								= FALSE;
 
-					if(EFI_ERROR(status = LdrpKernelCacheValid(kernelCachePathName, &kernelCacheValid)))
+					if (EFI_ERROR(status = LdrpKernelCacheValid(kernelCachePathName, &kernelCacheValid)))
 						try_leave(NOTHING);
 
-					if(kernelCacheValid)
+					if (kernelCacheValid)
 						break;
 				}
 				status														= EFI_NOT_FOUND;
@@ -492,19 +492,19 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 		//
 		// unable to build file path
 		//
-		if(EFI_ERROR(status))
+		if (EFI_ERROR(status))
 			try_leave(NOTHING);
 
 		//
 		// open file
 		//
-		if(EFI_ERROR(status = IoOpenFile(kernelCachePathName, LdrpKernelCacheFilePath, &fileHandle, IO_OPEN_MODE_NORMAL)))
+		if (EFI_ERROR(status = IoOpenFile(kernelCachePathName, LdrpKernelCacheFilePath, &fileHandle, IO_OPEN_MODE_NORMAL)))
 			try_leave(NOTHING);
 
 		//
 		// load as thin fat file
 		//
-		if(EFI_ERROR(status = MachLoadThinFatFile(&fileHandle, nullptr, nullptr)))
+		if (EFI_ERROR(status = MachLoadThinFatFile(&fileHandle, nullptr, nullptr)))
 			try_leave(NOTHING);
 
 		//
@@ -512,42 +512,43 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 		//
 		STATIC COMPRESSED_KERNEL_CACHE_HEADER fileHeader					= {0};
 		UINTN readLength													= 0;
-		if(EFI_ERROR(status = IoReadFile(&fileHandle, &fileHeader, sizeof(fileHeader), &readLength, FALSE)))
+
+		if (EFI_ERROR(status = IoReadFile(&fileHandle, &fileHeader, sizeof(fileHeader), &readLength, FALSE)))
 			try_leave(NOTHING);
 
 		//
 		// check length
 		//
-		if(readLength != sizeof(fileHeader))
+		if (readLength != sizeof(fileHeader))
 			try_leave(status = EFI_NOT_FOUND);
 
 		//
 		// check signature
 		//
-		if(fileHeader.Signature == SWAP_BE32_TO_HOST(KERNEL_CACHE_MAGIC))
+		if (fileHeader.Signature == SWAP_BE32_TO_HOST(KERNEL_CACHE_MAGIC))
 		{
 			//
 			// check compressed type
 			//
-			if(fileHeader.CompressType != SWAP_BE32_TO_HOST(KERNEL_CACHE_LZSS) && fileHeader.CompressType != SWAP_BE32_TO_HOST(KERNEL_CACHE_LZVN))
+			if (fileHeader.CompressType != SWAP_BE32_TO_HOST(KERNEL_CACHE_LZSS) && fileHeader.CompressType != SWAP_BE32_TO_HOST(KERNEL_CACHE_LZVN))
 				try_leave(status = EFI_NOT_FOUND);
 
 			//
 			// disable ASLR
 			//
-			if(!fileHeader.SupportASLR)
+			if (!fileHeader.SupportASLR)
 				LdrSetupASLR(FALSE, 0);
 
 			//
 			// check platform name
 			//
-			if(fileHeader.PlatformName[0] && memcmp(tempBuffer, fileHeader.PlatformName, sizeof(fileHeader.PlatformName)))
+			if (fileHeader.PlatformName[0] && memcmp(tempBuffer, fileHeader.PlatformName, sizeof(fileHeader.PlatformName)))
 				try_leave(status = EFI_NOT_FOUND);
 
 			//
 			// check root path
 			//
-			if(fileHeader.RootPath[0] && memcmp(tempBuffer + sizeof(fileHeader.PlatformName), fileHeader.RootPath, sizeof(fileHeader.RootPath)))
+			if (fileHeader.RootPath[0] && memcmp(tempBuffer + sizeof(fileHeader.PlatformName), fileHeader.RootPath, sizeof(fileHeader.RootPath)))
 				try_leave(status = EFI_NOT_FOUND);
 
 			//
@@ -555,19 +556,20 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 			//
 			UINT32 compressedSize											= SWAP_BE32_TO_HOST(fileHeader.CompressedSize);
 			compressedBuffer												= MmAllocatePool(compressedSize);
-			if(!compressedBuffer)
+
+			if (!compressedBuffer)
 				try_leave(status = EFI_OUT_OF_RESOURCES);
 
 			//
 			// read in
 			//
-			if(EFI_ERROR(status = IoReadFile(&fileHandle, compressedBuffer, compressedSize, &readLength, FALSE)))
+			if (EFI_ERROR(status = IoReadFile(&fileHandle, compressedBuffer, compressedSize, &readLength, FALSE)))
 				try_leave(NOTHING);
 
 			//
 			// check length
 			//
-			if(readLength != compressedSize)
+			if (readLength != compressedSize)
 				try_leave(status = EFI_NOT_FOUND);
 
 			//
@@ -575,27 +577,28 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 			//
 			UINT32 uncompressedSize											= SWAP_BE32_TO_HOST(fileHeader.UncompressedSize);
 			uncompressedBuffer												= MmAllocatePool(uncompressedSize);
-			if(!uncompressedBuffer)
+
+			if (!uncompressedBuffer)
 				try_leave(status = EFI_OUT_OF_RESOURCES);
 
 			//
 			// decompress it
 			//
-			if(fileHeader.CompressType == SWAP_BE32_TO_HOST(KERNEL_CACHE_LZSS))
+			if (fileHeader.CompressType == SWAP_BE32_TO_HOST(KERNEL_CACHE_LZSS))
 			{
 #if DEBUG_LDRP_CALL_CSPRINTF
 				CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlDecompressLZSS().\n"));
 #endif
-				if(EFI_ERROR(status = BlDecompressLZSS(compressedBuffer, compressedSize, uncompressedBuffer, uncompressedSize, &readLength)))
+				if (EFI_ERROR(status = BlDecompressLZSS(compressedBuffer, compressedSize, uncompressedBuffer, uncompressedSize, &readLength)))
 					try_leave(NOTHING);
 			}
 #if (TARGET_OS >= YOSEMITE)
-			else if(fileHeader.CompressType == SWAP_BE32_TO_HOST(KERNEL_CACHE_LZVN))
+			else if (fileHeader.CompressType == SWAP_BE32_TO_HOST(KERNEL_CACHE_LZVN))
 			{
 	#if DEBUG_LDRP_CALL_CSPRINTF
 				CsPrintf(CHAR8_CONST_STRING("PIKE: Calling BlDecompressLZVN().\n"));
 	#endif
-				if(EFI_ERROR(status = BlDecompressLZVN(compressedBuffer, compressedSize, uncompressedBuffer, uncompressedSize, &readLength)))
+				if (EFI_ERROR(status = BlDecompressLZVN(compressedBuffer, compressedSize, uncompressedBuffer, uncompressedSize, &readLength)))
 				{
 	#if DEBUG_LDRP_CALL_CSPRINTF
 					CsPrintf(CHAR8_CONST_STRING("PIKE: BlDecompressLZVN() returned: %d!\n"), status);
@@ -608,7 +611,7 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 			//
 			// length check
 			//
-			if(readLength != uncompressedSize)
+			if (readLength != uncompressedSize)
 			{
 #if DEBUG_LDRP_CALL_CSPRINTF
 				CsPrintf(CHAR8_CONST_STRING("PIKE: readLength(%d) != uncompressedSize(%d).\n"), readLength, uncompressedSize);
@@ -619,7 +622,8 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 			// check adler32
 			//
 			tempValue														= BlAdler32(uncompressedBuffer, uncompressedSize);
-			if(tempValue != SWAP_BE32_TO_HOST(fileHeader.Adler32Value))
+
+			if (tempValue != SWAP_BE32_TO_HOST(fileHeader.Adler32Value))
 			{
 #if DEBUG_LDRP_CALL_CSPRINTF
 				CsPrintf(CHAR8_CONST_STRING("PIKE: adler32(%d) != %d!\n"), SWAP_BE32_TO_HOST(fileHeader.Adler32Value), tempValue);
@@ -651,19 +655,20 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 		//
 		// load mach-o
 		//
-		if(EFI_ERROR(status = MachLoadMachO(&fileHandle, TRUE, loadedInfo)))
+		if (EFI_ERROR(status = MachLoadMachO(&fileHandle, TRUE, loadedInfo)))
 			try_leave(NOTHING);
 
 		DEVICE_TREE_NODE* chosenNode										= DevTreeFindNode(CHAR8_CONST_STRING("/chosen"), TRUE);
-		if(chosenNode)
+
+		if (chosenNode)
 			DevTreeAddProperty(chosenNode, CHAR8_CONST_STRING("boot-kernelcache-adler32"), &tempValue, sizeof(tempValue), TRUE);
 	}
 	__finally
 	{
-		if(compressedBuffer)
+		if (compressedBuffer)
 			MmFreePool(compressedBuffer);
 
-		if(uncompressedBuffer)
+		if (uncompressedBuffer)
 			MmFreePool(uncompressedBuffer);
 
 		IoCloseFile(&fileHandle);
@@ -681,7 +686,8 @@ EFI_STATUS LdrLoadKernel(MACH_O_LOADED_INFO* loadedInfo)
 {
 	EFI_STATUS status														= EFI_SUCCESS;
 	IO_FILE_HANDLE fileHandle												= {0};
-	if(EFI_ERROR(status = IoOpenFile(LdrpKernelPathName, LdrpKernelFilePath, &fileHandle, IO_OPEN_MODE_KERNEL)))
+
+	if (EFI_ERROR(status = IoOpenFile(LdrpKernelPathName, LdrpKernelFilePath, &fileHandle, IO_OPEN_MODE_KERNEL)))
 		return status;
 
 	status																	= MachLoadMachO(&fileHandle, TRUE, loadedInfo);
@@ -702,28 +708,31 @@ EFI_STATUS LdrLoadRamDisk()
 
 	__try
 	{
-		if(EFI_ERROR(status = IoOpenFile(LdrpRamDiskPathName, LdrpRamDiskFilePath, &fileHandle, IO_OPEN_MODE_RAMDISK)))
+		if (EFI_ERROR(status = IoOpenFile(LdrpRamDiskPathName, LdrpRamDiskFilePath, &fileHandle, IO_OPEN_MODE_RAMDISK)))
 			try_leave(NOTHING);
 
 		UINTN bufferLength													= 0;
-		if(EFI_ERROR(status = MachLoadThinFatFile(&fileHandle, nullptr, &bufferLength)))
+
+		if (EFI_ERROR(status = MachLoadThinFatFile(&fileHandle, nullptr, &bufferLength)))
 			try_leave(NOTHING);
 
 		UINTN allocatedLength												= bufferLength;
 		physicalAddress														= MmAllocateKernelMemory(&allocatedLength, &virtualAddress);
-		if(!physicalAddress)
+
+		if (!physicalAddress)
 			try_leave(status = EFI_OUT_OF_RESOURCES);
 
 		UINTN readLength													= 0;
-		if(EFI_ERROR(status = IoReadFile(&fileHandle, ArchConvertAddressToPointer(physicalAddress, VOID*), bufferLength, &readLength, FALSE)))
+
+		if (EFI_ERROR(status = IoReadFile(&fileHandle, ArchConvertAddressToPointer(physicalAddress, VOID*), bufferLength, &readLength, FALSE)))
 			try_leave(NOTHING);
 
-		if(!EFI_ERROR(status = BlAddMemoryRangeNode(CHAR8_CONST_STRING("RAMDisk"), physicalAddress, readLength)))
+		if (!EFI_ERROR(status = BlAddMemoryRangeNode(CHAR8_CONST_STRING("RAMDisk"), physicalAddress, readLength)))
 			physicalAddress													= 0;
 	}
 	__finally
 	{
-		if(physicalAddress)
+		if (physicalAddress)
 			MmFreeKernelMemory(virtualAddress, physicalAddress);
 
 		IoCloseFile(&fileHandle);
