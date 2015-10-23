@@ -1088,6 +1088,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 		VOID* linkEditSegment												= nullptr;
 		UINT32 ix															= 0;
 		UINT64 linkEditSegmentOffset										= 0;
+		UINT64 kldSegmentPhysicalAddress									= 0;
 		UINT64 kldSegmentVirtualAddress										= 0;
 		UINT64 kldSegmentOffset												= 0;
 		UINT64 kldSegmentFileSize											= 0;
@@ -1198,13 +1199,15 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 					//
 					if (!strcmp(segmentCommand64->Name, CHAR8_CONST_STRING("__KLD")))
 					{
+						kldSegmentPhysicalAddress							= physicalAddress;
 						kldSegmentVirtualAddress							= segmentVirtualAddress;
 						kldSegmentOffset									= segmentFileOffset;
 						kldSegmentFileSize									= segmentFileSize;
-						
-						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: kldSegmentVirtualAddress: 0x%llx \n"), kldSegmentVirtualAddress);
-						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: kldSegmentOffset........: 0x%llx \n"), kldSegmentOffset);
-						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: kldSegmentFileSize......: 0x%llx \n"), kldSegmentFileSize);
+
+						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: kldSegmentPhysicalAddress: 0x%llx \n"), kldSegmentPhysicalAddress);
+						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: kldSegmentVirtualAddress.: 0x%llx \n"), kldSegmentVirtualAddress);
+						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: kldSegmentOffset.........: 0x%llx \n"), kldSegmentOffset);
+						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: kldSegmentFileSize.......: 0x%llx \n"), kldSegmentFileSize);
 					}
 
 					//
@@ -1332,8 +1335,8 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 							if (!strcmp(CHAR8_CONST_STRING("__ZN12KLDBootstrap21readStartupExtensionsEv"), stringTable + symbolEntry->StringIndex))
 							{
 								offset										= (symbolEntry->Value - kldSegmentVirtualAddress); // 0x950
-								startAddress								= kldSegmentVirtualAddress;
-								endAddress									= (kldSegmentVirtualAddress + kldSegmentFileSize);
+								startAddress								= kldSegmentPhysicalAddress;
+								endAddress									= (startAddress + kldSegmentFileSize);
 								p											= (unsigned char *)startAddress;
 // #if DEBUG_KERNEL_PATCHER
 								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: offset[0x%llx], startAddress[0x%llx]\n"), offset, startAddress);
@@ -1345,7 +1348,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 // #if DEBUG_KERNEL_PATCHER
 										CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: Found symbol @ 0x%llx\n"), (UINT64)p - startAddress);
 // #endif
-										*(UINT64 *)p = READ_STARTUP_EXTENSIONS_PATCH_UINT64;
+										*(UINT64 *)p = ;
 										//
 										// Done.
 										//
