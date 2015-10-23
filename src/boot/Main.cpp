@@ -359,8 +359,8 @@ STATIC EFI_STATUS BlpRunAppleBoot(CHAR8 CONST* bootFileName)
 EFI_STATUS EFIAPI EfiMain(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable)
 {
 	EFI_STATUS status														= EFI_SUCCESS;
-	IO_FILE_HANDLE installationFile											= {0};
-	EFI_FILE_INFO* installationInfo											= nullptr;
+	IO_FILE_HANDLE installationFolder										= {0};
+	EFI_FILE_INFO* installationFolderInfo									= nullptr;
 	__try
 	{
 		//
@@ -551,25 +551,27 @@ EFI_STATUS EFIAPI EfiMain(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable)
 		//
 		// Legacy installer detection.
 		//
-		if (!EFI_ERROR(IoOpenFile(CHAR8_CONST_STRING("System\\Installation\\CDIS"), nullptr, &installationFile, IO_OPEN_MODE_NORMAL)))
+		if (!EFI_ERROR(IoOpenFile(CHAR8_CONST_STRING("System\\Installation\\CDIS"), nullptr, &installationFolder, IO_OPEN_MODE_NORMAL)))
 		{
 			//
 			// Get CDIS file info.
 			//
-			if (!EFI_ERROR(IoGetFileInfo(&installationFile, &installationInfo)))
+			if (!EFI_ERROR(IoGetFileInfo(&installationFolder, &installationFolderInfo)))
 			{
 				//
 				// Check CDIS info (must be a directory).
 				//
-				if (installationInfo || (installationInfo->Attribute & EFI_FILE_DIRECTORY))
-					BlSetBootMode(BOOT_MODE_IS_INSTALLER, 0);
+				if (installationFolderInfo)
+				{
+					if (installationFolderInfo->Attribute & EFI_FILE_DIRECTORY)
+						BlSetBootMode(BOOT_MODE_IS_INSTALLER, 0);
+				
+					MmFreePool(installationFolderInfo);
+				}
 			}
-
-			if (installationInfo)
-				MmFreePool(installationInfo);
 		}
 
-		IoCloseFile(&installationFile);
+		IoCloseFile(&installationFolder);
 
 		//
 		// show panic dialog
