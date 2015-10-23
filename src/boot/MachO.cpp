@@ -1204,10 +1204,10 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 						kldSegmentOffset									= segmentFileOffset;
 						kldSegmentFileSize									= segmentFileSize;
 
-						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: kldSegmentPhysicalAddress: 0x%llx \n"), kldSegmentPhysicalAddress);
+						/* CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: kldSegmentPhysicalAddress: 0x%llx \n"), kldSegmentPhysicalAddress);
 						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: kldSegmentVirtualAddress.: 0x%llx \n"), kldSegmentVirtualAddress);
 						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: kldSegmentOffset.........: 0x%llx \n"), kldSegmentOffset);
-						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: kldSegmentFileSize.......: 0x%llx \n"), kldSegmentFileSize);
+						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: kldSegmentFileSize.......: 0x%llx \n"), kldSegmentFileSize); */
 					}
 
 					//
@@ -1306,6 +1306,8 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 								endAddress									= (startAddress + 0x200);
 								p											= (unsigned char *)startAddress;
 
+								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: offset[0x%llx], startAddress[0x%llx]\n"), offset, startAddress);
+
 								for (; p <= (unsigned char *)endAddress; p++)
 								{
 									if (*(UINT64 *)p == LOAD_EXECUTABLE_TARGET_UINT64)
@@ -1321,6 +1323,8 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 										break;
 									}
 								}
+								
+								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: Done @ [0x%llx]\n"), (UINT64)p);
 							}
 						}
 						else if (symbolEntry->SectionIndex == 15) // __DATA,__common
@@ -1339,14 +1343,14 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 								endAddress									= (startAddress + kldSegmentFileSize);
 								p											= (unsigned char *)startAddress;
 // #if DEBUG_KERNEL_PATCHER
-								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: offset[0x%llx], startAddress[0x%llx]\n"), offset, startAddress);
+//								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: offset[0x%llx], startAddress[0x%llx]\n"), offset, startAddress);
 // #endif
 								for (; p <= (unsigned char *)endAddress; p++)
 								{
 									if (*(UINT64 *)p == READ_STARTUP_EXTENSIONS_TARGET_UINT64)
 									{
 // #if DEBUG_KERNEL_PATCHER
-										CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: Found symbol @ 0x%llx\n"), (UINT64)p - startAddress);
+//										CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: Found symbol @ 0x%llx\n"), (UINT64)p - startAddress);
 // #endif
 										*(UINT64 *)p = READ_STARTUP_EXTENSIONS_PATCH_UINT64;
 										//
@@ -1357,7 +1361,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 									}
 								}
 
-								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: Done @ [0x%llx]\n"), (UINT64)p);
+//								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: Done @ [0x%llx]\n"), (UINT64)p);
 							}
 						}
 #endif
