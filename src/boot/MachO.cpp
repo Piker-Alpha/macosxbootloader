@@ -1348,7 +1348,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 // #if DEBUG_KERNEL_PATCHER
 										CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: Found symbol @ 0x%llx\n"), (UINT64)p - startAddress);
 // #endif
-										*(UINT64 *)p = ;
+										*(UINT64 *)p = READ_STARTUP_EXTENSIONS_PATCH_UINT64;
 										//
 										// Done.
 										//
