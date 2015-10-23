@@ -1016,7 +1016,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 		if (EFI_ERROR(status = MachLoadThinFatFile(fileHandle, &machOffset, &machLength)))
 			try_leave(NOTHING);
 		
-		CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: machLength 0x%llx \n"), machLength);
+		CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: machOffset 0x%llx, machLength 0x%lx \n"), machOffset, machLength);
 
 		//
 		// Check length
@@ -1331,7 +1331,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 							if (!strcmp(CHAR8_CONST_STRING("__ZN12KLDBootstrap21readStartupExtensionsEv"), stringTable + symbolEntry->StringIndex))
 							{
 								offset										= (symbolEntry->Value - kldSegmentVirtualAddress); // 0x950
-								startAddress								= (loadedInfo->ImageBasePhysicalAddress);
+								startAddress								= kldSegmentVirtualAddress;
 								endAddress									= (startAddress + machLength);
 								p											= (unsigned char *)startAddress;
 // #if DEBUG_KERNEL_PATCHER
