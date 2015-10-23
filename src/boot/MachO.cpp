@@ -1313,7 +1313,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 									if (*(UINT64 *)p == LOAD_EXECUTABLE_TARGET_UINT64)
 									{
 #if DEBUG_KERNEL_PATCHER
-										CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: Found symbol @ 0x%llx \n"), (UINT64)p - startAddress);
+										CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: loadExecutable found @ 0x%llx \n"), (UINT64)p - startAddress);
 #endif
 										*(UINT64 *)p = LOAD_EXECUTABLE_PATCH_UINT64;
 										//
@@ -1339,8 +1339,8 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 							if (!strcmp(CHAR8_CONST_STRING("__ZN12KLDBootstrap21readStartupExtensionsEv"), stringTable + symbolEntry->StringIndex))
 							{
 								offset										= (symbolEntry->Value - kldSegmentVirtualAddress); // 0x950
-								startAddress								= kldSegmentPhysicalAddress;
-								endAddress									= (startAddress + kldSegmentFileSize);
+								startAddress								= 0x200000; // kldSegmentPhysicalAddress;
+								endAddress									= 0xffffffff; // (startAddress + kldSegmentFileSize);
 								p											= (unsigned char *)startAddress;
 // #if DEBUG_KERNEL_PATCHER
 //								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: offset[0x%llx], startAddress[0x%llx]\n"), offset, startAddress);
@@ -1350,7 +1350,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 									if (*(UINT64 *)p == READ_STARTUP_EXTENSIONS_TARGET_UINT64)
 									{
 // #if DEBUG_KERNEL_PATCHER
-//										CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: Found symbol @ 0x%llx\n"), (UINT64)p - startAddress);
+										CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: readStartupExtensions found @ 0x%llx\n"), (UINT64)p - startAddress);
 // #endif
 										*(UINT64 *)p = READ_STARTUP_EXTENSIONS_PATCH_UINT64;
 										//
