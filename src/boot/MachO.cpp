@@ -842,8 +842,6 @@ EFI_STATUS MachLoadThinFatFile(IO_FILE_HANDLE* fileHandle, UINT64* offsetInFile,
 		if(EFI_ERROR(status = IoReadFile(fileHandle, &fatHeader, sizeof(fatHeader), &readLength, FALSE)))
 			try_leave(NOTHING);
 
-		CsPrintf(CHAR8_CONST_STRING("PIKE: MachLoadThinFatFile readLength-1 [0x%llx]!\n"), readLength);
-
 		//
 		// check read length
 		//
@@ -872,8 +870,6 @@ EFI_STATUS MachLoadThinFatFile(IO_FILE_HANDLE* fileHandle, UINT64* offsetInFile,
 			fatHeader.ArchHeadersCount										= SWAP32(fatHeader.ArchHeadersCount);
 		else
 			try_leave(status = MachpLoadMachOThinFatFile(fileHandle, offsetInFile, dataSize));
-
-		CsPrintf(CHAR8_CONST_STRING("PIKE: MachLoadThinFatFile dataSize [0x%llx]!\n"), dataSize);
 
 		//
 		// read arch headers
@@ -915,8 +911,6 @@ EFI_STATUS MachLoadThinFatFile(IO_FILE_HANDLE* fileHandle, UINT64* offsetInFile,
 			}
 		}
 
-		CsPrintf(CHAR8_CONST_STRING("PIKE: MachLoadThinFatFile readLength-2 [0x%llx]!\n"), readLength);
-
 		//
 		// not found
 		//
@@ -940,9 +934,6 @@ EFI_STATUS MachLoadThinFatFile(IO_FILE_HANDLE* fileHandle, UINT64* offsetInFile,
 	__finally
 	{
 	}
-
-	CsPrintf(CHAR8_CONST_STRING("PIKE: MachLoadThinFatFile size-1 [0x%llx]!\n"), x64ArchHeader.Size);
-	CsPrintf(CHAR8_CONST_STRING("PIKE: MachLoadThinFatFile size-2 [0x%llx]!\n"), SWAP32(x64ArchHeader.Size));
 
 	return status;
 }
@@ -1025,8 +1016,6 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 		if (EFI_ERROR(status = MachLoadThinFatFile(fileHandle, &machOffset, &machLength)))
 			try_leave(NOTHING);
 		
-		CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: machOffset 0x%llx, machLength 0x%lx \n"), machOffset, machLength);
-
 		//
 		// Check length
 		//
@@ -1101,6 +1090,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 		UINT64 linkEditSegmentOffset										= 0;
 		UINT64 kldSegmentVirtualAddress										= 0;
 		UINT64 kldSegmentOffset												= 0;
+		UINT64 kldSegmentFileSize											= 0;
 		LOAD_COMMAND_HEADER* theCommand										= static_cast<LOAD_COMMAND_HEADER*>(commandsBuffer);
 
 		CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: ASLRDisplacement 0x%llx \n"), LdrGetASLRDisplacement());
@@ -1210,9 +1200,11 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 					{
 						kldSegmentVirtualAddress							= segmentVirtualAddress;
 						kldSegmentOffset									= segmentFileOffset;
+						kldSegmentFileSize									= segmentFileSize;
 						
 						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: kldSegmentVirtualAddress: 0x%llx \n"), kldSegmentVirtualAddress);
 						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: kldSegmentOffset........: 0x%llx \n"), kldSegmentOffset);
+						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: kldSegmentFileSize......: 0x%llx \n"), kldSegmentFileSize);
 					}
 
 					//
@@ -1340,8 +1332,8 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 							if (!strcmp(CHAR8_CONST_STRING("__ZN12KLDBootstrap21readStartupExtensionsEv"), stringTable + symbolEntry->StringIndex))
 							{
 								offset										= (symbolEntry->Value - kldSegmentVirtualAddress); // 0x950
-								startAddress								= LoadedInfo->ImageBasePhysicalAddress;
-								endAddress									= 0xffffff80ffffffff;
+								startAddress								= kldSegmentVirtualAddress;
+								endAddress									= (kldSegmentVirtualAddress + kldSegmentFileSize);
 								p											= (unsigned char *)startAddress;
 // #if DEBUG_KERNEL_PATCHER
 								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: offset[0x%llx], startAddress[0x%llx]\n"), offset, startAddress);
