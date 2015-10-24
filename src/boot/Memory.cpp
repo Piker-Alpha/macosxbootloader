@@ -49,13 +49,14 @@ STATIC UINT64 MmpKernelPhysicalEnd											= 0;
 //
 STATIC MEMORY_TAG* MmpGetMemoryTag()
 {
-	if(!MmpNextFreeMemoryTag)
+	if (!MmpNextFreeMemoryTag)
 	{
-		if(!EfiBootServices)
+		if (!EfiBootServices)
 			return nullptr;
 
 		VOID* memoryTagPool													= nullptr;
-		if(EFI_ERROR(EfiBootServices->AllocatePool(EfiBootServicesData, EFI_PAGE_SIZE, &memoryTagPool)))
+
+		if (EFI_ERROR(EfiBootServices->AllocatePool(EfiBootServicesData, EFI_PAGE_SIZE, &memoryTagPool)))
 			return nullptr;
 
 		MEMORY_TAG* allocatedMemoryTagPool									= static_cast<MEMORY_TAG*>(memoryTagPool);
@@ -65,7 +66,8 @@ STATIC MEMORY_TAG* MmpGetMemoryTag()
 		MmpAllocatedMemoryTagPoolHead										= allocatedMemoryTagPool;
 
 		allocatedMemoryTagPool												+= 1;
-		for(UINTN i = 1; i < EFI_PAGE_SIZE / sizeof(MEMORY_TAG); i ++, allocatedMemoryTagPool ++)
+
+		for (UINTN i = 1; i < EFI_PAGE_SIZE / sizeof(MEMORY_TAG); i ++, allocatedMemoryTagPool ++)
 		{
 			allocatedMemoryTagPool->Next									= MmpNextFreeMemoryTag;
 			MmpNextFreeMemoryTag											= allocatedMemoryTagPool;
@@ -75,6 +77,7 @@ STATIC MEMORY_TAG* MmpGetMemoryTag()
 	MEMORY_TAG* theTag														= MmpNextFreeMemoryTag;
 	MmpNextFreeMemoryTag													= theTag->Next;
 	memset(theTag, 0, sizeof(MEMORY_TAG));
+
 	return theTag;
 }
 
@@ -92,15 +95,15 @@ STATIC VOID MmpFreeMemoryTag(MEMORY_TAG* theTag)
 //
 STATIC MEMORY_TAG* MmpFindMemoryTag(VOID* virtualAddress, UINT64 physicalAddress, MEMORY_TAG** prevTag)
 {
-	if(prevTag)
+	if (prevTag)
 		*prevTag															= nullptr;
 
-	for(MEMORY_TAG* theTag = MmpAllocatedMemoryTagHead; theTag; theTag = theTag->Next)
+	for (MEMORY_TAG* theTag = MmpAllocatedMemoryTagHead; theTag; theTag = theTag->Next)
 	{
-		if(theTag->VirtualAddress == virtualAddress && theTag->PhysicalAddress == physicalAddress)
+		if (theTag->VirtualAddress == virtualAddress && theTag->PhysicalAddress == physicalAddress)
 			return theTag;
 
-		if(prevTag)
+		if (prevTag)
 			*prevTag														= theTag;
 	}
 
@@ -113,7 +116,8 @@ STATIC MEMORY_TAG* MmpFindMemoryTag(VOID* virtualAddress, UINT64 physicalAddress
 STATIC VOID MmpInsertMemoryTag(VOID* virtualAddress, UINT64 bufferLength, UINT64 physicalAddress)
 {
 	MEMORY_TAG* theTag														= MmpGetMemoryTag();
-	if(!theTag)
+
+	if (!theTag)
 		return;
 
 	theTag->BufferLength													= bufferLength;
@@ -130,10 +134,11 @@ STATIC VOID MmpRemoveMemoryTag(VOID* virtualAddress, UINT64 physicalAddress)
 {
 	MEMORY_TAG* prevTag														= nullptr;
 	MEMORY_TAG* theTag														= MmpFindMemoryTag(virtualAddress, physicalAddress, &prevTag);
-	if(!theTag)
+
+	if (!theTag)
 		return;
 
-	if(prevTag)
+	if (prevTag)
 		prevTag->Next														= theTag->Next;
 	else
 		MmpAllocatedMemoryTagHead											= theTag->Next;
@@ -146,11 +151,12 @@ STATIC VOID MmpRemoveMemoryTag(VOID* virtualAddress, UINT64 physicalAddress)
 //
 VOID* MmAllocatePool(UINTN bufferLength)
 {
-	if(!EfiBootServices)
+	if (!EfiBootServices)
 		return nullptr;
 
 	VOID* allocatedBuffer													= nullptr;
-	if(EFI_ERROR(EfiBootServices->AllocatePool(EfiBootServicesData, bufferLength, &allocatedBuffer)))
+
+	if (EFI_ERROR(EfiBootServices->AllocatePool(EfiBootServicesData, bufferLength, &allocatedBuffer)))
 		return nullptr;
 
 	MmpInsertMemoryTag(allocatedBuffer, bufferLength, 0);
@@ -163,10 +169,10 @@ VOID* MmAllocatePool(UINTN bufferLength)
 //
 VOID MmFreePool(VOID* freeBuffer)
 {
-	if(!freeBuffer)
+	if (!freeBuffer)
 		return;
 
-	if(EfiBootServices)
+	if (EfiBootServices)
 		EfiBootServices->FreePool(freeBuffer);
 
 	MmpRemoveMemoryTag(freeBuffer, 0);
@@ -177,13 +183,14 @@ VOID MmFreePool(VOID* freeBuffer)
 //
 VOID* MmAllocatePages(EFI_ALLOCATE_TYPE allocateType, EFI_MEMORY_TYPE memoryType, UINTN pagesCount, UINT64* physicalAddress)
 {
-	if(!EfiBootServices)
+	if (!EfiBootServices)
 		return nullptr;
 
-	if(EFI_ERROR(EfiBootServices->AllocatePages(allocateType, memoryType, pagesCount, physicalAddress)))
+	if (EFI_ERROR(EfiBootServices->AllocatePages(allocateType, memoryType, pagesCount, physicalAddress)))
 		return nullptr;
 
 	MmpInsertMemoryTag(nullptr, EFI_PAGES_TO_SIZE(static_cast<UINT64>(pagesCount)), *physicalAddress);
+
 	return ArchConvertAddressToPointer(*physicalAddress, VOID*);
 }
 
@@ -193,10 +200,10 @@ VOID* MmAllocatePages(EFI_ALLOCATE_TYPE allocateType, EFI_MEMORY_TYPE memoryType
 VOID MmFreePages(UINT64 phyAddress)
 {
 	MEMORY_TAG* memoryTag													= MmpFindMemoryTag(nullptr, phyAddress, nullptr);
-	if(!memoryTag)
+	if (!memoryTag)
 		return;
 
-	if(EfiBootServices)
+	if (EfiBootServices)
 		EfiBootServices->FreePages(phyAddress, static_cast<UINTN>(EFI_SIZE_TO_PAGES(memoryTag->BufferLength)));
 
 	MmpRemoveMemoryTag(nullptr, phyAddress);
@@ -215,17 +222,17 @@ EFI_STATUS MmInitialize()
 //
 VOID MmFinalize()
 {
-	if(EfiBootServices)
+	if (EfiBootServices)
 	{
-		for(MEMORY_TAG* allocatedMemoryTag = MmpAllocatedMemoryTagHead; allocatedMemoryTag; allocatedMemoryTag = allocatedMemoryTag->Next)
+		for (MEMORY_TAG* allocatedMemoryTag = MmpAllocatedMemoryTagHead; allocatedMemoryTag; allocatedMemoryTag = allocatedMemoryTag->Next)
 		{
-			if(allocatedMemoryTag->PhysicalAddress)
+			if (allocatedMemoryTag->PhysicalAddress)
 				EfiBootServices->FreePages(allocatedMemoryTag->PhysicalAddress, static_cast<UINTN>(EFI_SIZE_TO_PAGES(allocatedMemoryTag->BufferLength)));
-			else if(allocatedMemoryTag->VirtualAddress)
+			else if (allocatedMemoryTag->VirtualAddress)
 				EfiBootServices->FreePool(allocatedMemoryTag->VirtualAddress);
 		}
 
-		for(MEMORY_TAG* allocatedMemoryTagPool = MmpAllocatedMemoryTagPoolHead; allocatedMemoryTagPool; allocatedMemoryTagPool = allocatedMemoryTagPool->Next)
+		for (MEMORY_TAG* allocatedMemoryTagPool = MmpAllocatedMemoryTagPoolHead; allocatedMemoryTagPool; allocatedMemoryTagPool = allocatedMemoryTagPool->Next)
 			EfiBootServices->FreePool(allocatedMemoryTagPool->VirtualAddress);
 	}
 
@@ -239,14 +246,15 @@ VOID MmFinalize()
 //
 UINT64 MmAllocateKernelMemory(UINTN* bufferLength, UINT64* virtualAddress)
 {
-	if(!bufferLength || !EfiBootServices)
+	if (!bufferLength || !EfiBootServices)
 		return 0;
 
 	UINTN pagesCount														= EFI_SIZE_TO_PAGES(*bufferLength);
 	UINT64 kernelVirtualAddress												= 0;
-	if(!virtualAddress || *virtualAddress == 0)
+
+	if (!virtualAddress || *virtualAddress == 0)
 	{
-		if(MmpKernelVirtualBegin == -1)
+		if (MmpKernelVirtualBegin == -1)
 			return 0;
 
 		kernelVirtualAddress												= MmpKernelVirtualEnd;
@@ -257,24 +265,25 @@ UINT64 MmAllocateKernelMemory(UINTN* bufferLength, UINT64* virtualAddress)
 	}
 
 	UINT64 physicalAddress													= LdrStaticVirtualToPhysical(kernelVirtualAddress);
-	if(!MmAllocatePages(AllocateAddress, EfiLoaderData, pagesCount, &physicalAddress))
+
+	if (!MmAllocatePages(AllocateAddress, EfiLoaderData, pagesCount, &physicalAddress))
 		return 0;
 
 	*bufferLength															= pagesCount << EFI_PAGE_SHIFT;
 
-	if(kernelVirtualAddress < MmpKernelVirtualBegin)
+	if (kernelVirtualAddress < MmpKernelVirtualBegin)
 		MmpKernelVirtualBegin												= kernelVirtualAddress;
 
-	if(kernelVirtualAddress + *bufferLength > MmpKernelVirtualEnd)
+	if (kernelVirtualAddress + *bufferLength > MmpKernelVirtualEnd)
 		MmpKernelVirtualEnd													= kernelVirtualAddress + *bufferLength;
 
-	if(physicalAddress < MmpKernelPhysicalBegin)
+	if (physicalAddress < MmpKernelPhysicalBegin)
 		MmpKernelPhysicalBegin												= physicalAddress;
 
-	if(physicalAddress + *bufferLength > MmpKernelPhysicalEnd)
+	if (physicalAddress + *bufferLength > MmpKernelPhysicalEnd)
 		MmpKernelPhysicalEnd												= physicalAddress + *bufferLength;
 
-	if(virtualAddress)
+	if (virtualAddress)
 		*virtualAddress														= kernelVirtualAddress;
 
 	return physicalAddress;
@@ -286,10 +295,11 @@ UINT64 MmAllocateKernelMemory(UINTN* bufferLength, UINT64* virtualAddress)
 VOID MmFreeKernelMemory(UINT64 virtualAddress, UINT64 physicalAddress)
 {
 	MEMORY_TAG* theTag														= MmpFindMemoryTag(nullptr, physicalAddress, nullptr);
-	if(!theTag)
+
+	if (!theTag)
 		return;
 
-	if(virtualAddress + theTag->BufferLength != MmpKernelVirtualEnd && physicalAddress + theTag->BufferLength != MmpKernelPhysicalEnd)
+	if (virtualAddress + theTag->BufferLength != MmpKernelVirtualEnd && physicalAddress + theTag->BufferLength != MmpKernelPhysicalEnd)
 		return;
 
 	MmpKernelPhysicalEnd													-= theTag->BufferLength;
@@ -305,10 +315,12 @@ UINT64 MmAllocateLoaderData(UINTN* bufferLength, UINT64* virtualAddress)
 {
 	UINT64 physicalAddress													= LdrStaticVirtualToPhysical(*virtualAddress);
 	UINTN pagesCount														= EFI_SIZE_TO_PAGES(*bufferLength);
-	if(!MmAllocatePages(AllocateAddress, EfiLoaderData, pagesCount, &physicalAddress))
+
+	if (!MmAllocatePages(AllocateAddress, EfiLoaderData, pagesCount, &physicalAddress))
 		return 0;
 
 	*bufferLength															= pagesCount << EFI_PAGE_SHIFT;
+
 	return physicalAddress;
 }
 
