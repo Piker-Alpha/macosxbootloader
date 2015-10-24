@@ -1145,7 +1145,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 					if (fileLength && EFI_ERROR(status = IoReadFile(fileHandle, ArchConvertAddressToPointer(physicalAddress, VOID*), fileLength, &readLength, FALSE)))
 						try_leave(NOTHING);
 					
-					CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: physicalAddress[%d]: 0x%llx \n"), i, physicalAddress);
+					CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: %s @ 0x%llx \n"), segmentCommand64->Name, physicalAddress);
 
 					//
 					// Zero out
@@ -1311,15 +1311,15 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 								endAddress									= (startAddress + loadedInfo->TextSegmentFileSize);
 								p											= (unsigned char *)startAddress;
 
-								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: loadExecutable offset[0x%llx], startAddress[0x%llx]\n"), offset, startAddress);
+								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: loadExecutable offset[0x%llx], start[0x%llx], end[0x%llx]\n"), offset, startAddress, endAddress);
 
 								for (; p <= (unsigned char *)endAddress; p++)
 								{
 									if (*(UINT64 *)p == LOAD_EXECUTABLE_TARGET_UINT64)
 									{
-#if DEBUG_KERNEL_PATCHER
+// #if DEBUG_KERNEL_PATCHER
 										CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: loadExecutable found @ 0x%llx \n"), (UINT64)p - startAddress);
-#endif
+// #endif
 										*(UINT64 *)p = LOAD_EXECUTABLE_PATCH_UINT64;
 										//
 										// Done.
@@ -1348,7 +1348,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 								endAddress									= (startAddress + kldSegmentFileSize);
 								p											= (unsigned char *)startAddress;
 // #if DEBUG_KERNEL_PATCHER
-//								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: readStartupExtensions offset[0x%llx], startAddress[0x%llx]\n"), offset, startAddress);
+//								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: readStartupExtensions offset[0x%llx], start[0x%llx], end[0x%llx]\n"), offset, startAddress, endAddress);
 // #endif
 								for (; p <= (unsigned char *)endAddress; p++)
 								{
