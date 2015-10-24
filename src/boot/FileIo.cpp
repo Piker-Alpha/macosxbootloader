@@ -52,34 +52,39 @@ STATIC EFI_STATUS IopFindBootDevice(EFI_HANDLE* bootDeviceHandle, EFI_DEVICE_PAT
 		//
 		UINTN handleCount													= 0;
 		EfiBootServices->LocateHandleBuffer(ByProtocol, &EfiSimpleFileSystemProtocolGuid, nullptr, &handleCount, &handleArray);
-		for(UINTN i = 0; i < handleCount; i ++)
+
+		for (UINTN i = 0; i < handleCount; i ++)
 		{
 			EFI_HANDLE theHandle											= handleArray[i];
-			if(!theHandle)
+
+			if (!theHandle)
 				continue;
 
 			//
 			// get file system protocol
 			//
 			EFI_SIMPLE_FILE_SYSTEM_PROTOCOL* fileSystemProtocol				= nullptr;
-			if(EFI_ERROR(EfiBootServices->HandleProtocol(theHandle, &EfiSimpleFileSystemProtocolGuid, reinterpret_cast<VOID**>(&fileSystemProtocol))))
+
+			if (EFI_ERROR(EfiBootServices->HandleProtocol(theHandle, &EfiSimpleFileSystemProtocolGuid, reinterpret_cast<VOID**>(&fileSystemProtocol))))
 				continue;
 
 			//
 			// open root directory
 			//
 			EFI_FILE_HANDLE rootFile										= nullptr;
-			if(EFI_ERROR(fileSystemProtocol->OpenVolume(fileSystemProtocol, &rootFile)))
+
+			if (EFI_ERROR(fileSystemProtocol->OpenVolume(fileSystemProtocol, &rootFile)))
 				continue;
 
 			//
 			// check file exist
 			//
-			for(UINTN j = 0; j < ARRAYSIZE(checkFileName); j ++)
+			for (UINTN j = 0; j < ARRAYSIZE(checkFileName); j ++)
 			{
 				EFI_FILE_HANDLE checkFile									= nullptr;
 				BOOLEAN fileExist											= !EFI_ERROR(rootFile->Open(rootFile, &checkFile, checkFileName[j], EFI_FILE_MODE_READ, 0));
-				if(!fileExist)
+
+				if (!fileExist)
 					continue;
 
 				foundHandle[j]												= theHandle;
@@ -90,12 +95,12 @@ STATIC EFI_STATUS IopFindBootDevice(EFI_HANDLE* bootDeviceHandle, EFI_DEVICE_PAT
 	}
 	__finally
 	{
-		if(handleArray)
+		if (handleArray)
 			MmFreePool(handleArray);
 
-		for(UINTN i = 0; i < ARRAYSIZE(foundHandle); i ++)
+		for (UINTN i = 0; i < ARRAYSIZE(foundHandle); i ++)
 		{
-			if(!foundHandle[i])
+			if (!foundHandle[i])
 				continue;
 
 			FILEPATH_DEVICE_PATH* filePath									= reinterpret_cast<FILEPATH_DEVICE_PATH*>(bootFilePathBuffer);
@@ -133,28 +138,28 @@ STATIC EFI_STATUS IopCheckRPS(EFI_FILE_HANDLE rootFile, EFI_FILE_HANDLE* realRoo
 	EFI_FILE_HANDLE fileS													= nullptr;
 	EFI_STATUS startS														= rootFile->Open(rootFile, &fileS, CHAR16_STRING(L"com.apple.boot.S"), EFI_FILE_MODE_READ, 0);
 
-	if(!EFI_ERROR(startR) && !EFI_ERROR(startP) && !EFI_ERROR(startS))
+	if (!EFI_ERROR(startR) && !EFI_ERROR(startP) && !EFI_ERROR(startS))
 		*realRootFile														= fileR;
-	else if(!EFI_ERROR(startR) && !EFI_ERROR(startP))
+	else if (!EFI_ERROR(startR) && !EFI_ERROR(startP))
 		*realRootFile														= fileP;
-	else if(!EFI_ERROR(startR) && !EFI_ERROR(startS))
+	else if (!EFI_ERROR(startR) && !EFI_ERROR(startS))
 		*realRootFile														= fileR;
-	else if(!EFI_ERROR(startS) && !EFI_ERROR(startP))
+	else if (!EFI_ERROR(startS) && !EFI_ERROR(startP))
 		*realRootFile														= fileS;
-	else if(!EFI_ERROR(startR))
+	else if (!EFI_ERROR(startR))
 		*realRootFile														= fileR;
-	else if(!EFI_ERROR(startP))
+	else if (!EFI_ERROR(startP))
 		*realRootFile														= fileP;
-	else if(!EFI_ERROR(startS))
+	else if (!EFI_ERROR(startS))
 		*realRootFile														= fileS;
 	else
 		retValue															= EFI_NOT_FOUND;
 
-	if(!EFI_ERROR(startR) && *realRootFile != fileR)
+	if (!EFI_ERROR(startR) && *realRootFile != fileR)
 		fileR->Close(fileR);
-	if(!EFI_ERROR(startP) && *realRootFile != fileP)
+	if (!EFI_ERROR(startP) && *realRootFile != fileP)
 		fileP->Close(fileP);
-	if(!EFI_ERROR(startS) && *realRootFile != fileS)
+	if (!EFI_ERROR(startS) && *realRootFile != fileS)
 		fileS->Close(fileS);
 
 	return retValue;
@@ -179,31 +184,32 @@ STATIC EFI_STATUS IopDetectRoot(EFI_HANDLE deviceHandle, EFI_DEVICE_PATH_PROTOCO
 		// check simple file system protocol or load file protocol
 		//
 		EFI_SIMPLE_FILE_SYSTEM_PROTOCOL* fileSystemProtocol					= nullptr;
-		if(EFI_ERROR(status = EfiBootServices->HandleProtocol(deviceHandle, &EfiSimpleFileSystemProtocolGuid, reinterpret_cast<VOID**>(&fileSystemProtocol))))
+
+		if (EFI_ERROR(status = EfiBootServices->HandleProtocol(deviceHandle, &EfiSimpleFileSystemProtocolGuid, reinterpret_cast<VOID**>(&fileSystemProtocol))))
 			try_leave(status = EfiBootServices->HandleProtocol(deviceHandle, &EfiLoadFileProtocolGuid, reinterpret_cast<VOID**>(&IopLoadFileProtocol)));
 
 		//
 		// open root directory
 		//
-		if(EFI_ERROR(status = fileSystemProtocol->OpenVolume(fileSystemProtocol, &IopRootFile)))
+		if (EFI_ERROR(status = fileSystemProtocol->OpenVolume(fileSystemProtocol, &IopRootFile)))
 			try_leave(NOTHING);
 
 		//
 		// check kernel in Kernels directory
 		//
-		if(!EFI_ERROR(status = IopRootFile->Open(IopRootFile, &kernelFile, CHAR16_STRING(L"System\\Library\\Kernels\\kernel"), EFI_FILE_MODE_READ, 0)))
+		if (!EFI_ERROR(status = IopRootFile->Open(IopRootFile, &kernelFile, CHAR16_STRING(L"System\\Library\\Kernels\\kernel"), EFI_FILE_MODE_READ, 0)))
 			try_leave(NOTHING);
 
 		//
 		// detect RPS
 		//
-		if(!EFI_ERROR(status = IopCheckRPS(IopRootFile, &realRootFile)))
+		if (!EFI_ERROR(status = IopCheckRPS(IopRootFile, &realRootFile)))
 			try_leave(BlSetBootMode(BOOT_MODE_BOOT_IS_NOT_ROOT, 0));
 
 		//
 		// check boot directory
 		//
-		if(!allowBootDirectory)
+		if (!allowBootDirectory)
 			try_leave(status = EFI_NOT_FOUND);
 
 		//
@@ -211,19 +217,22 @@ STATIC EFI_STATUS IopDetectRoot(EFI_HANDLE deviceHandle, EFI_DEVICE_PATH_PROTOCO
 		//
 		status																= EFI_SUCCESS;
 		bootFullPath														= DevPathExtractFilePathName(bootFilePath, TRUE);
-		if(!bootFullPath || (bootFullPath[0] != '/' && bootFullPath[0] != '\\') || strlen(bootFullPath) == 1)
+
+		if (!bootFullPath || (bootFullPath[0] != '/' && bootFullPath[0] != '\\') || strlen(bootFullPath) == 1)
 			try_leave(NOTHING);
 
 		//
 		// get current directory
 		//
 		CHAR8* lastComponent												= nullptr;
-		for(UINTN i = 1; bootFullPath[i]; i ++)
+
+		for (UINTN i = 1; bootFullPath[i]; i ++)
 		{
-			if(bootFullPath[i] == '\\' || bootFullPath[i] == '/')
+			if (bootFullPath[i] == '\\' || bootFullPath[i] == '/')
 				lastComponent												= bootFullPath + i;
 		}
-		if(lastComponent)
+
+		if (lastComponent)
 			*lastComponent													= 0;
 		else
 			try_leave(NOTHING);
@@ -232,34 +241,36 @@ STATIC EFI_STATUS IopDetectRoot(EFI_HANDLE deviceHandle, EFI_DEVICE_PATH_PROTOCO
 		// open it
 		//
 		bootFullPath16														= BlAllocateUnicodeFromUtf8(bootFullPath, lastComponent - bootFullPath);
-		if(!bootFullPath16)
+
+		if (!bootFullPath16)
 			try_leave(status = EFI_OUT_OF_RESOURCES);
-		if(EFI_ERROR(status = IopRootFile->Open(IopRootFile, &realRootFile, bootFullPath16, EFI_FILE_MODE_READ, 0)))
+
+		if (EFI_ERROR(status = IopRootFile->Open(IopRootFile, &realRootFile, bootFullPath16, EFI_FILE_MODE_READ, 0)))
 			try_leave(realRootFile = nullptr);
 
 		//
 		// check EncryptedRoot.plist.wipekey
 		//
-		if(!EFI_ERROR(realRootFile->Open(realRootFile, &kernelFile, CHAR16_STRING(L"EncryptedRoot.plist.wipekey"), EFI_FILE_MODE_READ, 0)))
+		if (!EFI_ERROR(realRootFile->Open(realRootFile, &kernelFile, CHAR16_STRING(L"EncryptedRoot.plist.wipekey"), EFI_FILE_MODE_READ, 0)))
 			BlSetBootMode(BOOT_MODE_BOOT_IS_NOT_ROOT, 0);
 		else
 			realRootFile->Close(realRootFile), realRootFile = nullptr;
 	}
 	__finally
 	{
-		if(bootFullPath)
+		if (bootFullPath)
 			MmFreePool(bootFullPath);
 
-		if(bootFullPath16)
+		if (bootFullPath16)
 			MmFreePool(bootFullPath16);
 
-		if(kernelFile)
+		if (kernelFile)
 			kernelFile->Close(kernelFile);
 
-		if(realRootFile && realRootFile != IopRootFile)
+		if (realRootFile && realRootFile != IopRootFile)
 			IopRootFile->Close(IopRootFile), IopRootFile = realRootFile;
 
-		if(IopRootFile && EFI_ERROR(status))
+		if (IopRootFile && EFI_ERROR(status))
 			IopRootFile->Close(IopRootFile), IopRootFile = nullptr;
 	}
 
@@ -286,58 +297,62 @@ STATIC EFI_STATUS IopLoadBooterWithRootUUID(EFI_DEVICE_PATH_PROTOCOL* bootFilePa
 		// get device path
 		//
 		EFI_DEVICE_PATH_PROTOCOL* devicePath								= DevPathGetDevicePathProtocol(theHandle);
-		if(!devicePath)
+
+		if (!devicePath)
 			try_leave(status = EFI_NOT_FOUND);
 
 		//
 		// build recovery file path
 		//
 		recoveryFilePath													= DevPathAppendFilePath(devicePath, CHAR16_CONST_STRING(L"\\com.apple.recovery.boot\\boot.efi"));
-		if(!recoveryFilePath)
+
+		if (!recoveryFilePath)
 			try_leave(status = EFI_NOT_FOUND);
 
 		//
 		// check file exist
 		//
-		if(EFI_ERROR(status = EfiBootServices->LoadImage(FALSE, EfiImageHandle, recoveryFilePath, nullptr, 0, imageHandle)))
+		if (EFI_ERROR(status = EfiBootServices->LoadImage(FALSE, EfiImageHandle, recoveryFilePath, nullptr, 0, imageHandle)))
 			try_leave(NOTHING);
 
 		//
 		// get file system protocol
 		//
 		EFI_SIMPLE_FILE_SYSTEM_PROTOCOL* fileSystemProtocol					= nullptr;
-		if(EFI_ERROR(status = EfiBootServices->HandleProtocol(theHandle, &EfiSimpleFileSystemProtocolGuid, reinterpret_cast<VOID**>(&fileSystemProtocol))))
+
+		if (EFI_ERROR(status = EfiBootServices->HandleProtocol(theHandle, &EfiSimpleFileSystemProtocolGuid, reinterpret_cast<VOID**>(&fileSystemProtocol))))
 			try_leave(NOTHING);
 
 		//
 		// open root directory
 		//
-		if(EFI_ERROR(status = fileSystemProtocol->OpenVolume(fileSystemProtocol, &rootFile)))
+		if (EFI_ERROR(status = fileSystemProtocol->OpenVolume(fileSystemProtocol, &rootFile)))
 			try_leave(NOTHING);
 
 		//
 		// detect real root
 		//
-		if(EFI_ERROR(status = IopCheckRPS(rootFile, &IopRootFile)))
+		if (EFI_ERROR(status = IopCheckRPS(rootFile, &IopRootFile)))
 			try_leave(NOTHING);
 
 		//
 		// load boot file
 		//
-		if(EFI_ERROR(status = IoReadWholeFile(bootFilePath, CHAR8_CONST_STRING("Library\\Preferences\\SystemConfiguration\\com.apple.Boot.plist"), &fileBuffer, nullptr, TRUE)))
+		if (EFI_ERROR(status = IoReadWholeFile(bootFilePath, CHAR8_CONST_STRING("Library\\Preferences\\SystemConfiguration\\com.apple.Boot.plist"), &fileBuffer, nullptr, TRUE)))
 			try_leave(NOTHING);
 
 		//
 		// parse it
 		//
-		if(EFI_ERROR(status = CmParseXmlFile(fileBuffer, &rootTag)))
+		if (EFI_ERROR(status = CmParseXmlFile(fileBuffer, &rootTag)))
 			try_leave(NOTHING);
 
 		//
 		// read root UUID
 		//
 		CHAR8 CONST* theRootUUID											= CmGetStringValueForKey(rootTag, CHAR8_CONST_STRING("Root UUID"), nullptr);
-		if(!theRootUUID)
+
+		if (!theRootUUID)
 			try_leave(status = EFI_NOT_FOUND);
 
 		//
@@ -347,20 +362,20 @@ STATIC EFI_STATUS IopLoadBooterWithRootUUID(EFI_DEVICE_PATH_PROTOCOL* bootFilePa
 	}
 	__finally
 	{
-		if(recoveryFilePath)
+		if (recoveryFilePath)
 			MmFreePool(recoveryFilePath);
-		if(fileBuffer)
+		if (fileBuffer)
 			MmFreePool(fileBuffer);
-		if(rootTag)
+		if (rootTag)
 			CmFreeTag(rootTag);
 
-		if(EFI_ERROR(status) && *imageHandle)
+		if (EFI_ERROR(status) && *imageHandle)
 			EfiBootServices->UnloadImage(*imageHandle);
 
-		if(IopRootFile != rootFile)
+		if (IopRootFile != rootFile)
 			IopRootFile->Close(IopRootFile);
 
-		if(rootFile)
+		if (rootFile)
 			rootFile->Close(rootFile);
 
 		IopRootFile															= savedRootFile;
@@ -374,7 +389,7 @@ STATIC EFI_STATUS IopLoadBooterWithRootUUID(EFI_DEVICE_PATH_PROTOCOL* bootFilePa
 //
 EFI_STATUS IoDetectRoot(EFI_HANDLE* deviceHandle, EFI_DEVICE_PATH_PROTOCOL** bootFilePath, BOOLEAN detectBoot)
 {
-	if(detectBoot && (!EFI_ERROR(IopDetectRoot(*deviceHandle, *bootFilePath, FALSE)) || !EFI_ERROR(IopFindBootDevice(deviceHandle, bootFilePath))))
+	if (detectBoot && (!EFI_ERROR(IopDetectRoot(*deviceHandle, *bootFilePath, FALSE)) || !EFI_ERROR(IopFindBootDevice(deviceHandle, bootFilePath))))
 		return EFI_SUCCESS;
 
 	return IopDetectRoot(*deviceHandle, *bootFilePath, TRUE);
@@ -396,20 +411,22 @@ EFI_STATUS IoLoadBooterWithRootUUID(EFI_DEVICE_PATH_PROTOCOL* bootFilePath, CHAR
 		CsConnectDevice(TRUE, FALSE);
 		UINTN handleCount													= 0;
 		EfiBootServices->LocateHandleBuffer(ByProtocol, &EfiBlockIoProtocolGuid, nullptr, &handleCount, &handleArray);
-		for(UINTN i = 0; i < handleCount; i ++)
+
+		for (UINTN i = 0; i < handleCount; i ++)
 		{
 			EFI_HANDLE theHandle											= handleArray[i];
-			if(!theHandle)
+
+			if (!theHandle)
 				continue;
 
-			if(!EFI_ERROR(status = IopLoadBooterWithRootUUID(bootFilePath, theHandle, rootUUID, imageHandle)))
+			if (!EFI_ERROR(status = IopLoadBooterWithRootUUID(bootFilePath, theHandle, rootUUID, imageHandle)))
 				try_leave(NOTHING);
 		}
 		status																= EFI_NOT_FOUND;
 	}
 	__finally
 	{
-		if(handleArray)
+		if (handleArray)
 			MmFreePool(handleArray);
 	}
 
@@ -434,27 +451,28 @@ EFI_STATUS IoOpenFile(CHAR8 CONST* filePathName, EFI_DEVICE_PATH_PROTOCOL* fileP
 	__try
 	{
 		memset(fileHandle, 0, sizeof(IO_FILE_HANDLE));
-		if(IopLoadFileProtocol)
+
+		if (IopLoadFileProtocol)
 		{
-			if(filePath)
+			if (filePath)
 			{
 				fileHandle->EfiLoadFileProtocol								= IopLoadFileProtocol;
 				fileHandle->EfiFilePath										= DevPathDuplicate(filePath);
 				try_leave(status = fileHandle->EfiFilePath ? EFI_SUCCESS : EFI_OUT_OF_RESOURCES);
 			}
 
-			if(!filePathName || !filePathName[0])
+			if (!filePathName || !filePathName[0])
 				try_leave(status = EFI_NOT_FOUND);
 
-			if(openMode == IO_OPEN_MODE_RAMDISK)
+			if (openMode == IO_OPEN_MODE_RAMDISK)
 				try_leave(status = EFI_UNSUPPORTED);
 		}
-		else if(filePath)
+		else if (filePath)
 		{
-			if(openMode == IO_OPEN_MODE_KERNEL)
+			if (openMode == IO_OPEN_MODE_KERNEL)
 				try_leave(status = EFI_UNSUPPORTED);
 		}
-		else if((!filePathName || !filePathName[0] || !IopRootFile))
+		else if ((!filePathName || !filePathName[0] || !IopRootFile))
 		{
 			try_leave(status = EFI_NOT_FOUND);
 		}
@@ -463,11 +481,11 @@ EFI_STATUS IoOpenFile(CHAR8 CONST* filePathName, EFI_DEVICE_PATH_PROTOCOL* fileP
 		UINTN nameLength													= filePathName ? strlen(filePathName) : 0;
 		BlUtf8ToUnicode(filePathName, nameLength, unicodeFilePathName, ARRAYSIZE(unicodeFilePathName) - 1);
 
-		if(IopLoadFileProtocol)
+		if (IopLoadFileProtocol)
 		{
 			UINTN filePathNodeSize											= (nameLength + 1) * sizeof(CHAR16) + SIZE_OF_FILEPATH_DEVICE_PATH;
 			FILEPATH_DEVICE_PATH* fileDevicePath							= static_cast<FILEPATH_DEVICE_PATH*>(MmAllocatePool(filePathNodeSize + END_DEVICE_PATH_LENGTH));
-			if(!fileDevicePath)
+			if (!fileDevicePath)
 				try_leave(status = EFI_OUT_OF_RESOURCES);
 
 			fileDevicePath->Header.Type										= MEDIA_DEVICE_PATH;
@@ -498,10 +516,11 @@ EFI_STATUS IoOpenFile(CHAR8 CONST* filePathName, EFI_DEVICE_PATH_PROTOCOL* fileP
 //
 EFI_STATUS IoSetFilePosition(IO_FILE_HANDLE* fileHandle, UINT64 filePosition)
 {
-	if(fileHandle->EfiFileHandle)
+	if (fileHandle->EfiFileHandle)
 		return fileHandle->EfiFileHandle->SetPosition(fileHandle->EfiFileHandle, filePosition);
 
 	fileHandle->FileOffset													= static_cast<UINTN>(filePosition);
+
 	return EFI_SUCCESS;
 }
 
@@ -512,34 +531,39 @@ EFI_STATUS IoGetFileSize(IO_FILE_HANDLE* fileHandle, UINT64* fileSize)
 {
 	*fileSize																= 0;
 
-	if(fileHandle->EfiLoadFileProtocol)
+	if (fileHandle->EfiLoadFileProtocol)
 	{
-		if(!fileHandle->FileSize)
+		if (!fileHandle->FileSize)
 		{
 			EFI_STATUS status												= fileHandle->EfiLoadFileProtocol->LoadFile(fileHandle->EfiLoadFileProtocol, fileHandle->EfiFilePath, FALSE, &fileHandle->FileSize, nullptr);
-			if(status != EFI_BUFFER_TOO_SMALL)
+
+			if (status != EFI_BUFFER_TOO_SMALL)
 				return status;
 		}
 
 		*fileSize															= fileHandle->FileSize;
+
 		return EFI_SUCCESS;
 	}
 
-	if(fileHandle->FileBuffer)
+	if (fileHandle->FileBuffer)
 	{
 		*fileSize															= fileHandle->FileSize;
+
 		return EFI_SUCCESS;
 	}
 
-	if(fileHandle->EfiFileHandle)
+	if (fileHandle->EfiFileHandle)
 	{
 		EFI_FILE_INFO* fileInfo												= nullptr;
 		EFI_STATUS status													= IoGetFileInfo(fileHandle, &fileInfo);
-		if(EFI_ERROR(status) || !fileInfo)
+
+		if (EFI_ERROR(status) || !fileInfo)
 			return status;
 
 		*fileSize															= fileInfo->FileSize;
 		MmFreePool(fileInfo);
+
 		return EFI_SUCCESS;
 	}
 
@@ -552,23 +576,26 @@ EFI_STATUS IoGetFileSize(IO_FILE_HANDLE* fileHandle, UINT64* fileSize)
 EFI_STATUS IoGetFileInfo(IO_FILE_HANDLE* fileHandle, EFI_FILE_INFO** fileInfo)
 {
 	*fileInfo																= nullptr;
-	if(!fileHandle->EfiFileHandle)
+
+	if (!fileHandle->EfiFileHandle)
 		return EFI_INVALID_PARAMETER;
 
 	UINTN infoSize															= SIZE_OF_EFI_FILE_INFO + sizeof(CHAR16) * 64;
 	EFI_FILE_INFO* infoBuffer												= static_cast<EFI_FILE_INFO*>(MmAllocatePool(infoSize));
-	if(!infoBuffer)
+
+	if (!infoBuffer)
 		return EFI_OUT_OF_RESOURCES;
 
 	EFI_STATUS status														= fileHandle->EfiFileHandle->GetInfo(fileHandle->EfiFileHandle, &EfiFileInfoGuid, &infoSize, infoBuffer);
-	if(status == EFI_BUFFER_TOO_SMALL)
+
+	if (status == EFI_BUFFER_TOO_SMALL)
 	{
 		MmFreePool(infoBuffer);
 		infoBuffer															= static_cast<EFI_FILE_INFO*>(MmAllocatePool(infoSize));
 		status																= fileHandle->EfiFileHandle->GetInfo(fileHandle->EfiFileHandle, &EfiFileInfoGuid, &infoSize, infoBuffer);
 	}
 
-	if(EFI_ERROR(status))
+	if (EFI_ERROR(status))
 		MmFreePool(infoBuffer);
 	else
 		*fileInfo															= infoBuffer;
@@ -587,40 +614,44 @@ EFI_STATUS IoReadFile(IO_FILE_HANDLE* fileHandle, VOID* readBuffer, UINTN buffer
 	{
 		*readLength															= 0;
 
-		if(fileHandle->EfiLoadFileProtocol)
+		if (fileHandle->EfiLoadFileProtocol)
 		{
 			UINT64 fileSize													= 0;
-			if(EFI_ERROR(status = IoGetFileSize(fileHandle, &fileSize)))
+
+			if (EFI_ERROR(status = IoGetFileSize(fileHandle, &fileSize)))
 				try_leave(NOTHING);
 
-			if(!fileHandle->FileBuffer && !fileHandle->FileOffset && bufferSize == fileSize)
+			if (!fileHandle->FileBuffer && !fileHandle->FileOffset && bufferSize == fileSize)
 				try_leave(*readLength = bufferSize; status = fileHandle->EfiLoadFileProtocol->LoadFile(fileHandle->EfiLoadFileProtocol, fileHandle->EfiFilePath, FALSE, readLength, readBuffer));
 
-			if(fileSize <= fileHandle->FileOffset)
+			if (fileSize <= fileHandle->FileOffset)
 				try_leave(NOTHING);
 
 			fileHandle->FileSize											= static_cast<UINTN>(fileSize);
 
-			if(!fileHandle->FileBuffer)
+			if (!fileHandle->FileBuffer)
 			{
 				fileHandle->FileBuffer										= static_cast<UINT8*>(MmAllocatePool(static_cast<UINTN>(fileSize)));
-				if(!fileHandle->FileBuffer)
+
+				if (!fileHandle->FileBuffer)
 					try_leave(status = EFI_OUT_OF_RESOURCES);
 
 				UINTN read_length											= static_cast<UINTN>(fileSize);
 				status														= fileHandle->EfiLoadFileProtocol->LoadFile(fileHandle->EfiLoadFileProtocol, fileHandle->EfiFilePath, FALSE, &read_length, fileHandle->FileBuffer);
-				if(EFI_ERROR(status))
+
+				if (EFI_ERROR(status))
 					try_leave(NOTHING);
 
-				if(read_length != fileHandle->FileSize)
+				if (read_length != fileHandle->FileSize)
 					try_leave(MmFreePool(fileHandle->FileBuffer); fileHandle->FileBuffer = nullptr; status = EFI_DEVICE_ERROR);
 			}
 		}
 
-		if(fileHandle->FileBuffer)
+		if (fileHandle->FileBuffer)
 		{
 			UINTN copyLength												= fileHandle->FileOffset >= fileHandle->FileSize ? 0 : fileHandle->FileSize - fileHandle->FileOffset;
-			if(copyLength > bufferSize)
+
+			if (copyLength > bufferSize)
 				copyLength													= bufferSize;
 
 			memcpy(readBuffer, fileHandle->FileBuffer + fileHandle->FileOffset, copyLength);
@@ -629,21 +660,22 @@ EFI_STATUS IoReadFile(IO_FILE_HANDLE* fileHandle, VOID* readBuffer, UINTN buffer
 			try_leave(NOTHING);
 		}
 
-		if(!fileHandle->EfiFileHandle)
+		if (!fileHandle->EfiFileHandle)
 			try_leave(status = EFI_INVALID_PARAMETER);
 
 		UINT8* curBuffer													= static_cast<UINT8*>(readBuffer);
 		while(bufferSize)
 		{
 			UINTN lengthThisRun												= bufferSize > 1024 * 1024 ? 1024 * 1024 : bufferSize;
-			if(EFI_ERROR(status = fileHandle->EfiFileHandle->Read(fileHandle->EfiFileHandle, &lengthThisRun, curBuffer)) || !lengthThisRun)
+
+			if (EFI_ERROR(status = fileHandle->EfiFileHandle->Read(fileHandle->EfiFileHandle, &lengthThisRun, curBuffer)) || !lengthThisRun)
 				try_leave(NOTHING);
 
 			bufferSize														-= lengthThisRun;
 			curBuffer														+= lengthThisRun;
 			*readLength														+= lengthThisRun;
 
-			if(directoryFile)
+			if (directoryFile)
 				break;
 		}
 	}
@@ -659,13 +691,13 @@ EFI_STATUS IoReadFile(IO_FILE_HANDLE* fileHandle, VOID* readBuffer, UINTN buffer
 //
 VOID IoCloseFile(IO_FILE_HANDLE* fileHandle)
 {
-	if(fileHandle->FileBuffer)
+	if (fileHandle->FileBuffer)
 		MmFreePool(fileHandle->FileBuffer);
 
-	if(fileHandle->EfiFilePath)
+	if (fileHandle->EfiFilePath)
 		MmFreePool(fileHandle->EfiFilePath);
 
-	if(fileHandle->EfiFileHandle)
+	if (fileHandle->EfiFileHandle)
 		fileHandle->EfiFileHandle->Close(fileHandle->EfiFileHandle);
 
 	memset(fileHandle, 0, sizeof(IO_FILE_HANDLE));
@@ -686,20 +718,20 @@ EFI_STATUS IoReadWholeFile(EFI_DEVICE_PATH_PROTOCOL* bootFilePath, CHAR8 CONST* 
 		//
 		// build file path
 		//
-		if(IoBootingFromNet() && bootFilePath)
+		if (IoBootingFromNet() && bootFilePath)
 			filePath														= DevPathAppendLastComponent(bootFilePath, fileName, TRUE);
 
 		//
 		// open file
 		//
-		if(EFI_ERROR(status = IoOpenFile(fileName, filePath, &fileHandle, IO_OPEN_MODE_NORMAL)))
+		if (EFI_ERROR(status = IoOpenFile(fileName, filePath, &fileHandle, IO_OPEN_MODE_NORMAL)))
 			try_leave(NOTHING);
 
 		//
 		// get file size
 		//
 		UINT64 localFileSize												= 0;
-		if(EFI_ERROR(status = IoGetFileSize(&fileHandle, &localFileSize)))
+		if (EFI_ERROR(status = IoGetFileSize(&fileHandle, &localFileSize)))
 			try_leave(NOTHING);
 
 		//
@@ -707,39 +739,42 @@ EFI_STATUS IoReadWholeFile(EFI_DEVICE_PATH_PROTOCOL* bootFilePath, CHAR8 CONST* 
 		//
 		UINTN totalSize														= static_cast<UINTN>(localFileSize) + (asTextFile ? sizeof(CHAR8) : 0);
 		*fileBuffer															= static_cast<CHAR8*>(MmAllocatePool(totalSize));
-		if(!*fileBuffer)
+
+		if (!*fileBuffer)
 			try_leave(status = EFI_OUT_OF_RESOURCES);
 
 		//
 		// read file
 		//
 		UINTN readLength													= 0;
-		if(EFI_ERROR(status = IoReadFile(&fileHandle, *fileBuffer, static_cast<UINTN>(localFileSize), &readLength, FALSE)))
+
+		if (EFI_ERROR(status = IoReadFile(&fileHandle, *fileBuffer, static_cast<UINTN>(localFileSize), &readLength, FALSE)))
 			try_leave(NOTHING);
 
 		//
 		// append NULL
 		//
-		if(asTextFile)
+		if (asTextFile)
 			(*fileBuffer)[readLength / sizeof(CHAR8)]						= 0;
 
-		if(fileSize)
+		if (fileSize)
 			*fileSize														= static_cast<UINTN>(localFileSize);
 	}
 	__finally
 	{
 		IoCloseFile(&fileHandle);
 
-		if(filePath)
+		if (filePath)
 			MmFreePool(filePath);
 
-		if(EFI_ERROR(status))
+		if (EFI_ERROR(status))
 		{
-			if(*fileBuffer)
+			if (*fileBuffer)
 				MmFreePool(*fileBuffer);
 
 			*fileBuffer														= nullptr;
-			if(fileSize)
+
+			if (fileSize)
 				*fileSize													= 0;
 		}
 	}
