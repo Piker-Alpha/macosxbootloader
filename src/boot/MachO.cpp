@@ -1095,7 +1095,9 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 		UINT64 kldSegmentFileSize											= 0;
 		LOAD_COMMAND_HEADER* theCommand										= static_cast<LOAD_COMMAND_HEADER*>(commandsBuffer);
 
+#if DEBUG_KERNEL_PATCHER
 		CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: ASLRDisplacement 0x%llx \n"), LdrGetASLRDisplacement());
+#endif
 
 		for (UINT32 i = 0; i < machHeader.CommandsCount; i ++, theCommand = Add2Ptr(theCommand, theCommand->CommandLength, LOAD_COMMAND_HEADER*))
 		{
@@ -1144,9 +1146,10 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 
 					if (fileLength && EFI_ERROR(status = IoReadFile(fileHandle, ArchConvertAddressToPointer(physicalAddress, VOID*), fileLength, &readLength, FALSE)))
 						try_leave(NOTHING);
-					
-					CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: %s @ 0x%llx \n"), segmentCommand64->Name, physicalAddress);
 
+#if DEBUG_KERNEL_PATCHER
+					CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: %s @ 0x%llx \n"), segmentCommand64->Name, physicalAddress);
+#endif
 					//
 					// Zero out
 					//
@@ -1165,10 +1168,11 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 						loadedInfo->ImageBaseVirtualAddress					= virtualAddress;
 						loadedInfo->TextSegmentFileSize						= segmentFileSize;
 
-						// CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: physicalAddress: 0x%llx \n"), loadedInfo->ImageBasePhysicalAddress);
-						// CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: virtualAddress.: 0x%llx \n"), loadedInfo->ImageBaseVirtualAddress);
+#if DEBUG_KERNEL_PATCHER
+						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: physicalAddress: 0x%llx \n"), loadedInfo->ImageBasePhysicalAddress);
+						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: virtualAddress.: 0x%llx \n"), loadedInfo->ImageBaseVirtualAddress);
 						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: loadedInfo->TextSegmentFileSize[0x%llx]\n"), loadedInfo->TextSegmentFileSize);
-
+#endif
 						//
 						// Relocation for ASLR
 						//
@@ -1209,10 +1213,12 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 						kldSegmentOffset									= segmentFileOffset;
 						kldSegmentFileSize									= segmentFileSize;
 
-						/* CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: kldSegmentPhysicalAddress: 0x%llx \n"), kldSegmentPhysicalAddress);
+#if DEBUG_KERNEL_PATCHER
+						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: kldSegmentPhysicalAddress: 0x%llx \n"), kldSegmentPhysicalAddress);
 						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: kldSegmentVirtualAddress.: 0x%llx \n"), kldSegmentVirtualAddress);
 						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: kldSegmentOffset.........: 0x%llx \n"), kldSegmentOffset);
-						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: kldSegmentFileSize.......: 0x%llx \n"), kldSegmentFileSize); */
+						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: kldSegmentFileSize.......: 0x%llx \n"), kldSegmentFileSize);
+#endif
 					}
 
 					//
@@ -1277,17 +1283,23 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 
 				case MACH_O_COMMAND_SYMTAB:
 				{
+#if (PATCH_LOAD_EXECUTABLE && (TARGET_OS == EL_CAPITAN))
 					BOOLEAN loadExecutablePatched							= FALSE;
-					BOOLEAN readStartExtensionsPatched						= FALSE;
+#endif
 
+#if (PATCH_READ_STARTUP_EXTENSIONS && (TARGET_OS == EL_CAPITAN))
+					BOOLEAN readStartExtensionsPatched						= FALSE;
+#endif
 					UINT64 index											= 0;
 					UINT64 asld												= LdrGetASLRDisplacement();
+
+#if ((PATCH_LOAD_EXECUTABLE || PATCH_READ_STARTUP_EXTENSIONS) && (TARGET_OS == EL_CAPITAN))
 					UINT64 offset											= 0;
 					UINT64 startAddress										= 0;
 					UINT64 endAddress										= 0;
 
 					unsigned char * p										= nullptr;
-
+#endif
 					SYMTAB_COMMAND* symbolTableCommand						= _CR(theCommand, SYMTAB_COMMAND, Header);
 
 					CHAR8 CONST* stringTable								= Add2Ptr(linkEditSegment, symbolTableCommand->StringTableOffset - linkEditSegmentOffset, CHAR8 CONST*);
@@ -1301,7 +1313,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 							symbolEntry->Value								+= LdrGetASLRDisplacement();
 						}
 
-#if (TARGET_OS >= YOSEMITE)
+#if (PATCH_LOAD_EXECUTABLE && (TARGET_OS == EL_CAPITAN))
 						if ((loadExecutablePatched == FALSE) && (symbolEntry->SectionIndex == 1)) // __TEXT,__text
 						{
 							if (!strcmp(CHAR8_CONST_STRING("__ZN6OSKext14loadExecutableEv"), stringTable + symbolEntry->StringIndex))
@@ -1310,16 +1322,16 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 								startAddress								= (loadedInfo->ImageBasePhysicalAddress + offset);
 								endAddress									= (startAddress + loadedInfo->TextSegmentFileSize);
 								p											= (unsigned char *)startAddress;
-
+#if DEBUG_KERNEL_PATCHER
 								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: loadExecutable offset[0x%llx], start[0x%llx], end[0x%llx]\n"), offset, startAddress, endAddress);
-
+#endif
 								for (; p <= (unsigned char *)endAddress; p++)
 								{
 									if (*(UINT64 *)p == LOAD_EXECUTABLE_TARGET_UINT64)
 									{
-// #if DEBUG_KERNEL_PATCHER
+#if DEBUG_KERNEL_PATCHER
 										CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: loadExecutable found @ 0x%llx \n"), (UINT64)p - startAddress);
-// #endif
+#endif
 										*(UINT64 *)p = LOAD_EXECUTABLE_PATCH_UINT64;
 										//
 										// Done.
@@ -1328,35 +1340,41 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 										break;
 									}
 								}
-								
+#if DEBUG_KERNEL_PATCHER
 								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: loadExecutable done @ [0x%llx]\n"), (UINT64)p);
+#endif
 							}
 						}
-						else if (symbolEntry->SectionIndex == 15) // __DATA,__common
+						else
+#endif // #if (PATCH_LOAD_EXECUTABLE &&(TARGET_OS >= YOSEMITE))
+
+						if (symbolEntry->SectionIndex == 15) // __DATA,__common
 						{
 							if (!strcmp(CHAR8_CONST_STRING("_IdlePML4"), stringTable + symbolEntry->StringIndex))
 							{
 								loadedInfo->IdlePML4VirtualAddress			= symbolEntry->Value;
 							}
 						}
+
+#if (PATCH_READ_STARTUP_EXTENSIONS && (TARGET_OS == EL_CAPITAN))
 						else if ((readStartExtensionsPatched == FALSE) && (symbolEntry->SectionIndex == 25)) // __KLD,__text
 						{
 							if (!strcmp(CHAR8_CONST_STRING("__ZN12KLDBootstrap21readStartupExtensionsEv"), stringTable + symbolEntry->StringIndex))
 							{
 								offset										= (symbolEntry->Value - kldSegmentVirtualAddress); // 0x950
-								startAddress								= kldSegmentPhysicalAddress;
+								startAddress								= kldSegmentPhysicalAddress + offset;
 								endAddress									= (startAddress + kldSegmentFileSize);
 								p											= (unsigned char *)startAddress;
-// #if DEBUG_KERNEL_PATCHER
+#if DEBUG_KERNEL_PATCHER
 								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: readStartupExtensions offset[0x%llx], start[0x%llx], end[0x%llx]\n"), offset, startAddress, endAddress);
-// #endif
+#endif
 								for (; p <= (unsigned char *)endAddress; p++)
 								{
 									if (*(UINT64 *)p == READ_STARTUP_EXTENSIONS_TARGET_UINT64)
 									{
-// #if DEBUG_KERNEL_PATCHER
+#if DEBUG_KERNEL_PATCHER
 										CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: readStartupExtensions found @ 0x%llx\n"), (UINT64)p - startAddress);
-// #endif
+#endif
 										*(UINT64 *)p = READ_STARTUP_EXTENSIONS_PATCH_UINT64;
 										//
 										// Done.
@@ -1365,11 +1383,12 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 										break;
 									}
 								}
-
+#if DEBUG_KERNEL_PATCHER
 								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: readStartupExtensions done @ [0x%llx]\n"), (UINT64)p);
+#endif
 							}
 						}
-#endif
+#endif // #if (PATCH_READ_STARTUP_EXTENSIONS && (TARGET_OS == EL_CAPITAN))
 					}
 				}
 				break;

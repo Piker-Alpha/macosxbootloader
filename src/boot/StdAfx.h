@@ -23,12 +23,14 @@
 	#define LEGACY_GREY_SUPPORT												0
 #endif
 
+#define PATCH_LOAD_EXECUTABLE												1
 //
 // grep '\x48\x89\xc3\x48\x85\xdb\x74\x70' /S*/L*/Kernels/kernel
 //
 #define LOAD_EXECUTABLE_TARGET_UINT64										0x487074db8548c389ULL
 #define LOAD_EXECUTABLE_PATCH_UINT64										0x4812ebdb8548c389ULL
 
+#define PATCH_READ_STARTUP_EXTENSIONS										0
 //
 // grep '\xe8\x25\x00\x00\x00\xeb\x05\xe8' /S*/L*/Kernels/kernel
 //
