@@ -839,6 +839,7 @@ EFI_STATUS MachLoadThinFatFile(IO_FILE_HANDLE* fileHandle, UINT64* offsetInFile,
 		//
 		FAT_HEADER fatHeader												= {0};
 		UINTN readLength													= 0;
+
 		if (EFI_ERROR(status = IoReadFile(fileHandle, &fatHeader, sizeof(fatHeader), &readLength, FALSE)))
 			try_leave(NOTHING);
 
@@ -1101,7 +1102,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 			//
 			// Process it
 			//
-			switch(theCommand->CommandType)
+			switch (theCommand->CommandType)
 			{
 				case MACH_O_COMMAND_SEGMENT64:
 				{
@@ -1174,12 +1175,12 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 
 							SEGMENT_COMMAND64* theSegment64					= MachpGetFirstSegment64(Add2Ptr(physicalAddress, 0, MACH_HEADER64*));
 
-							while(theSegment64)
+							while (theSegment64)
 							{
 								theSegment64->VirtualAddress				+= LdrGetASLRDisplacement();
 								SECTION64* theSection64						= MachpGetFirstSection64(theSegment64);
 
-								while(theSection64)
+								while (theSection64)
 								{
 									theSection64->Address					+= LdrGetASLRDisplacement();
 									theSection64							= MachpGetNextSection64(theSegment64, theSection64);
@@ -1275,7 +1276,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 				case MACH_O_COMMAND_SYMTAB:
 				{
 					BOOLEAN loadExecutablePatched							= FALSE;
-					BOOLEAN readStartExtensionsPatched						= FALSE;
+					// BOOLEAN readStartExtensionsPatched						= FALSE;
 
 					UINT64 index											= 0;
 					UINT64 asld												= LdrGetASLRDisplacement();
