@@ -1143,6 +1143,8 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 
 					if (fileLength && EFI_ERROR(status = IoReadFile(fileHandle, ArchConvertAddressToPointer(physicalAddress, VOID*), fileLength, &readLength, FALSE)))
 						try_leave(NOTHING);
+					
+					CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: physicalAddress[%d]: 0x%llx \n"), i, physicalAddress);
 
 					//
 					// Zero out
@@ -1161,8 +1163,8 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 						loadedInfo->ImageBasePhysicalAddress				= physicalAddress;
 						loadedInfo->ImageBaseVirtualAddress					= virtualAddress;
 
-						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: physicalAddress: 0x%llx \n"), physicalAddress);
-						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: virtualAddress.: 0x%llx \n"), virtualAddress);
+						// CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: physicalAddress: 0x%llx \n"), physicalAddress);
+						// CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: virtualAddress.: 0x%llx \n"), virtualAddress);
 
 						//
 						// Relocation for ASLR
@@ -1334,7 +1336,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 								loadedInfo->IdlePML4VirtualAddress			= symbolEntry->Value;
 							}
 						}
-						else if ((readStartExtensionsPatched == FALSE) && (symbolEntry->SectionIndex == 25)) // __KLD,__text
+						/* else if ((readStartExtensionsPatched == FALSE) && (symbolEntry->SectionIndex == 25)) // __KLD,__text
 						{
 							if (!strcmp(CHAR8_CONST_STRING("__ZN12KLDBootstrap21readStartupExtensionsEv"), stringTable + symbolEntry->StringIndex))
 							{
@@ -1363,7 +1365,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 
 //								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: Done @ [0x%llx]\n"), (UINT64)p);
 							}
-						}
+						} */
 #endif
 					}
 				}
