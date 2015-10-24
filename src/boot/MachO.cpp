@@ -1165,8 +1165,9 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 						loadedInfo->ImageBaseVirtualAddress					= virtualAddress;
 						loadedInfo->TextSegmentFileSize						= segmentFileSize;
 
-						// CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: physicalAddress: 0x%llx \n"), physicalAddress);
-						// CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: virtualAddress.: 0x%llx \n"), virtualAddress);
+						// CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: physicalAddress: 0x%llx \n"), loadedInfo->ImageBasePhysicalAddress);
+						// CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: virtualAddress.: 0x%llx \n"), loadedInfo->ImageBaseVirtualAddress);
+						CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: loadedInfo->TextSegmentFileSize[0x%llx]\n"), loadedInfo->TextSegmentFileSize);
 
 						//
 						// Relocation for ASLR
@@ -1306,7 +1307,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 							if (!strcmp(CHAR8_CONST_STRING("__ZN6OSKext14loadExecutableEv"), stringTable + symbolEntry->StringIndex))
 							{
 								offset										= (symbolEntry->Value - loadedInfo->ImageBaseVirtualAddress);
-								startAddress								= (loadedInfo->ImageBasePhysicalAddress + offset);
+								startAddress								= loadedInfo->ImageBasePhysicalAddress;
 								endAddress									= (startAddress + loadedInfo->TextSegmentFileSize);
 								p											= (unsigned char *)startAddress;
 
@@ -1328,7 +1329,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 									}
 								}
 								
-								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: Done @ [0x%llx]\n"), (UINT64)p);
+								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: loadExecutable done @ [0x%llx]\n"), (UINT64)p);
 							}
 						}
 						else if (symbolEntry->SectionIndex == 15) // __DATA,__common
@@ -1365,7 +1366,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 									}
 								}
 
-//								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: Done @ [0x%llx]\n"), (UINT64)p);
+//								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: readStartupExtensions done @ [0x%llx]\n"), (UINT64)p);
 							}
 						} */
 #endif
