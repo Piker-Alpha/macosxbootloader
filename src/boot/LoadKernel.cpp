@@ -655,7 +655,7 @@ EFI_STATUS LdrLoadKernelCache(MACH_O_LOADED_INFO* loadedInfo, EFI_DEVICE_PATH_PR
 		//
 		// load mach-o
 		//
-		if (EFI_ERROR(status = MachLoadMachO(&fileHandle, TRUE, loadedInfo)))
+		if (EFI_ERROR(status = MachLoadMachO(&fileHandle, loadedInfo)))
 			try_leave(NOTHING);
 
 		DEVICE_TREE_NODE* chosenNode										= DevTreeFindNode(CHAR8_CONST_STRING("/chosen"), TRUE);
@@ -690,7 +690,7 @@ EFI_STATUS LdrLoadKernel(MACH_O_LOADED_INFO* loadedInfo)
 	if (EFI_ERROR(status = IoOpenFile(LdrpKernelPathName, LdrpKernelFilePath, &fileHandle, IO_OPEN_MODE_KERNEL)))
 		return status;
 
-	status																	= MachLoadMachO(&fileHandle, TRUE, loadedInfo);
+	status																	= MachLoadMachO(&fileHandle, loadedInfo);
 	IoCloseFile(&fileHandle);
 
 	return status;
