@@ -13,47 +13,52 @@
 typedef struct _MACH_O_LOADED_INFO
 {
 	//
-	// image base physical address
+	// Image base physical address.
 	//
 	UINT64																	ImageBasePhysicalAddress;
 
 	//
-	// image base virtual address
+	// __TEXT segment size.
 	//
-	UINT64																	ImageBaseVirtualAddress;
+	UINT64																	TextSegmentFileSize;
 
 	//
-	// min physical address
+	// Image base virtual address.
+	//
+	UINT64																	ImageBaseVirtualAddress;
+	
+	//
+	// Miniman physical address.
 	//
 	UINT64																	MinPhysicalAddress;
 
 	//
-	// max physical address
+	// Maximum physical address.
 	//
 	UINT64																	MaxPhysicalAddress;
 
 	//
-	// entry point physical address
+	// Entry point physical address.
 	//
 	UINT64																	EntryPointPhysicalAddress;
 
 	//
-	// min virtual address
+	// Minimum virtual address.
 	//
 	UINT64																	MinVirtualAddress;
 
 	//
-	// max virtual address
+	// Max virtual address.
 	//
 	UINT64																	MaxVirtualAddress;
 
 	//
-	// entry point virtual address
+	// Entry point virtual address.
 	//
 	UINT64																	EntryPointVirtualAddress;
 
 	//
-	// arch type
+	// Arch type.
 	//
 	UINT32																	ArchType;
 	

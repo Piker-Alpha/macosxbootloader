@@ -1159,10 +1159,11 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 					if (!strcmp(segmentCommand64->Name, CHAR8_CONST_STRING("__TEXT")))
 					{
 						//
-						// Save mach header
+						// Save __TEXT segment data.
 						//
 						loadedInfo->ImageBasePhysicalAddress				= physicalAddress;
 						loadedInfo->ImageBaseVirtualAddress					= virtualAddress;
+						loadedInfo->TextSegmentFileSize						= segmentFileSize;
 
 						// CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: physicalAddress: 0x%llx \n"), physicalAddress);
 						// CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: virtualAddress.: 0x%llx \n"), virtualAddress);
@@ -1306,10 +1307,10 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 							{
 								offset										= (symbolEntry->Value - loadedInfo->ImageBaseVirtualAddress);
 								startAddress								= (loadedInfo->ImageBasePhysicalAddress + offset);
-								endAddress									= (startAddress + 0x200);
+								endAddress									= (startAddress + loadedInfo->TextSegmentFileSize);
 								p											= (unsigned char *)startAddress;
 
-								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: offset[0x%llx], startAddress[0x%llx]\n"), offset, startAddress);
+								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: loadExecutable offset[0x%llx], startAddress[0x%llx]\n"), offset, startAddress);
 
 								for (; p <= (unsigned char *)endAddress; p++)
 								{
@@ -1342,11 +1343,11 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 							if (!strcmp(CHAR8_CONST_STRING("__ZN12KLDBootstrap21readStartupExtensionsEv"), stringTable + symbolEntry->StringIndex))
 							{
 								offset										= (symbolEntry->Value - kldSegmentVirtualAddress); // 0x950
-								startAddress								= 0x200000; // kldSegmentPhysicalAddress;
-								endAddress									= 0xffffffff; // (startAddress + kldSegmentFileSize);
+								startAddress								= kldSegmentPhysicalAddress;
+								endAddress									= (startAddress + kldSegmentFileSize);
 								p											= (unsigned char *)startAddress;
 // #if DEBUG_KERNEL_PATCHER
-//								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: offset[0x%llx], startAddress[0x%llx]\n"), offset, startAddress);
+//								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: readStartupExtensions offset[0x%llx], startAddress[0x%llx]\n"), offset, startAddress);
 // #endif
 								for (; p <= (unsigned char *)endAddress; p++)
 								{
