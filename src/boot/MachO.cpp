@@ -765,7 +765,7 @@ EFI_STATUS MachpLoadMachOThinFatFile(IO_FILE_HANDLE* fileHandle, UINT64* offsetI
 		//
 		// seek file
 		//
-		if(EFI_ERROR(status = IoSetFilePosition(fileHandle, 0)))
+		if (EFI_ERROR(status = IoSetFilePosition(fileHandle, 0)))
 			try_leave(NOTHING);
 
 		//
@@ -774,19 +774,19 @@ EFI_STATUS MachpLoadMachOThinFatFile(IO_FILE_HANDLE* fileHandle, UINT64* offsetI
 		MACH_HEADER machHeader												= {0};
 		UINTN readLength													= 0;
 
-		if(EFI_ERROR(status = IoReadFile(fileHandle, &machHeader, sizeof(machHeader), &readLength, FALSE)))
+		if (EFI_ERROR(status = IoReadFile(fileHandle, &machHeader, sizeof(machHeader), &readLength, FALSE)))
 			try_leave(NOTHING);
 
 		//
 		// check length
 		//
-		if(readLength < sizeof(machHeader))
+		if (readLength < sizeof(machHeader))
 			try_leave(status = EFI_DEVICE_ERROR);
 
 		//
 		// seek back
 		//
-		if(EFI_ERROR(status = IoSetFilePosition(fileHandle, 0)))
+		if (EFI_ERROR(status = IoSetFilePosition(fileHandle, 0)))
 			try_leave(NOTHING);
 
 		//
@@ -794,28 +794,28 @@ EFI_STATUS MachpLoadMachOThinFatFile(IO_FILE_HANDLE* fileHandle, UINT64* offsetI
 		//
 		UINT64 fileSize														= 0;
 
-		if(EFI_ERROR(status = IoGetFileSize(fileHandle, &fileSize)))
+		if (EFI_ERROR(status = IoGetFileSize(fileHandle, &fileSize)))
 			try_leave(NOTHING);
 
 		//
 		// check magic
 		//
-		if(machHeader.Magic != MH_MAGIC_64)
+		if (machHeader.Magic != MH_MAGIC_64)
 			try_leave(status = EFI_NOT_FOUND);
 
 		//
 		// check CPU arch type
 		//
-		if(machHeader.CpuType != 0x1000007)
+		if (machHeader.CpuType != 0x1000007)
 			try_leave(status = EFI_NOT_FOUND);
 
 		//
 		// the whole file
 		//
-		if(offsetInFile)
+		if (offsetInFile)
 			*offsetInFile													= 0;
 
-		if(dataSize)
+		if (dataSize)
 			*dataSize														= static_cast<UINT32>(fileSize);
 	}
 	__finally
@@ -839,19 +839,19 @@ EFI_STATUS MachLoadThinFatFile(IO_FILE_HANDLE* fileHandle, UINT64* offsetInFile,
 		//
 		FAT_HEADER fatHeader												= {0};
 		UINTN readLength													= 0;
-		if(EFI_ERROR(status = IoReadFile(fileHandle, &fatHeader, sizeof(fatHeader), &readLength, FALSE)))
+		if (EFI_ERROR(status = IoReadFile(fileHandle, &fatHeader, sizeof(fatHeader), &readLength, FALSE)))
 			try_leave(NOTHING);
 
 		//
 		// check read length
 		//
-		if(readLength < sizeof(fatHeader))
+		if (readLength < sizeof(fatHeader))
 			try_leave(status = EFI_DEVICE_ERROR);
 
 		//
 		// check for kernelcache magic (comp)
 		//
-		if(fatHeader.Magic == SWAP_BE32_TO_HOST(KERNEL_CACHE_MAGIC))
+		if (fatHeader.Magic == SWAP_BE32_TO_HOST(KERNEL_CACHE_MAGIC))
 		{
 #if DEBUG_LDRP_CALL_CSPRINTF
 			CsPrintf(CHAR8_CONST_STRING("PIKE: SWAP_BE32_TO_HOST(KERNEL_CACHE_MAGIC) found!\n"));
@@ -864,9 +864,9 @@ EFI_STATUS MachLoadThinFatFile(IO_FILE_HANDLE* fileHandle, UINT64* offsetInFile,
 		//
 		BOOLEAN needSwap													= TRUE;
 
-		if(fatHeader.Magic == FAT_MAGIC)
+		if (fatHeader.Magic == FAT_MAGIC)
 			needSwap														= FALSE;
-		else if(fatHeader.Magic == FAT_CIGAM)
+		else if (fatHeader.Magic == FAT_CIGAM)
 			fatHeader.ArchHeadersCount										= SWAP32(fatHeader.ArchHeadersCount);
 		else
 			try_leave(status = MachpLoadMachOThinFatFile(fileHandle, offsetInFile, dataSize));
@@ -877,24 +877,24 @@ EFI_STATUS MachLoadThinFatFile(IO_FILE_HANDLE* fileHandle, UINT64* offsetInFile,
 		FAT_ARCH_HEADER x64ArchHeader										= {0};
 		FAT_ARCH_HEADER curArchHeader										= {0};
 
-		for(UINT32 i = 0; i < fatHeader.ArchHeadersCount; i ++)
+		for (UINT32 i = 0; i < fatHeader.ArchHeadersCount; i ++)
 		{
 			//
 			// read it
 			//
-			if(EFI_ERROR(status = IoReadFile(fileHandle, &curArchHeader, sizeof(curArchHeader), &readLength, FALSE)))
+			if (EFI_ERROR(status = IoReadFile(fileHandle, &curArchHeader, sizeof(curArchHeader), &readLength, FALSE)))
 				try_leave(NOTHING);
 
 			//
 			// check length
 			//
-			if(readLength < sizeof(curArchHeader))
+			if (readLength < sizeof(curArchHeader))
 				try_leave(status = EFI_DEVICE_ERROR);
 
 			//
 			// swap
 			//
-			if(needSwap)
+			if (needSwap)
 			{
 				curArchHeader.CpuType										= SWAP32(curArchHeader.CpuType);
 				curArchHeader.OffsetInFile									= SWAP32(curArchHeader.OffsetInFile);
@@ -904,7 +904,7 @@ EFI_STATUS MachLoadThinFatFile(IO_FILE_HANDLE* fileHandle, UINT64* offsetInFile,
 			//
 			// check arch
 			//
-			if(curArchHeader.CpuType == 0x1000007)
+			if (curArchHeader.CpuType == 0x1000007)
 			{
 				x64ArchHeader												= curArchHeader;
 				break;
@@ -914,21 +914,21 @@ EFI_STATUS MachLoadThinFatFile(IO_FILE_HANDLE* fileHandle, UINT64* offsetInFile,
 		//
 		// not found
 		//
-		if(!x64ArchHeader.Size)
+		if (!x64ArchHeader.Size)
 			try_leave(status = EFI_NOT_FOUND);
 
 		//
 		// seek file
 		//
-		if(x64ArchHeader.OffsetInFile)
+		if (x64ArchHeader.OffsetInFile)
 			IoSetFilePosition(fileHandle, x64ArchHeader.OffsetInFile);
 
 		//
 		// output
 		//
-		if(offsetInFile)
+		if (offsetInFile)
 			*offsetInFile													= x64ArchHeader.OffsetInFile;
-		if(dataSize)
+		if (dataSize)
 			*dataSize														= x64ArchHeader.Size;
 	}
 	__finally
@@ -945,9 +945,9 @@ SEGMENT_COMMAND64* MachpGetFirstSegment64(MACH_HEADER64* machHeader)
 {
 	SEGMENT_COMMAND64* segment64											= Add2Ptr(machHeader, sizeof(MACH_HEADER64), SEGMENT_COMMAND64*);
 
-	for(UINT32 i = 0; i < machHeader->CommandsCount; i ++, segment64 = Add2Ptr(segment64, segment64->Header.CommandLength, SEGMENT_COMMAND64*))
+	for (UINT32 i = 0; i < machHeader->CommandsCount; i ++, segment64 = Add2Ptr(segment64, segment64->Header.CommandLength, SEGMENT_COMMAND64*))
 	{
-		if(segment64->Header.CommandType == MACH_O_COMMAND_SEGMENT64)
+		if (segment64->Header.CommandType == MACH_O_COMMAND_SEGMENT64)
 			return segment64;
 	}
 
@@ -962,12 +962,12 @@ SEGMENT_COMMAND64* MachpGetNextSegment64(MACH_HEADER64* machHeader, SEGMENT_COMM
 	UINT32 i																= 0;
 	LOAD_COMMAND_HEADER* loadCommand										= Add2Ptr(machHeader, sizeof(MACH_HEADER64), LOAD_COMMAND_HEADER*);
 
-	for(; i < machHeader->CommandsCount && static_cast<VOID*>(loadCommand) != static_cast<VOID*>(segment64); i ++)
+	for (; i < machHeader->CommandsCount && static_cast<VOID*>(loadCommand) != static_cast<VOID*>(segment64); i ++)
 		loadCommand															= Add2Ptr(loadCommand, loadCommand->CommandLength, LOAD_COMMAND_HEADER*);
 
-	for(i += 1, loadCommand = Add2Ptr(loadCommand, loadCommand->CommandLength, LOAD_COMMAND_HEADER*); i < machHeader->CommandsCount; i ++)
+	for (i += 1, loadCommand = Add2Ptr(loadCommand, loadCommand->CommandLength, LOAD_COMMAND_HEADER*); i < machHeader->CommandsCount; i ++)
 	{
-		if(loadCommand->CommandType == MACH_O_COMMAND_SEGMENT64)
+		if (loadCommand->CommandType == MACH_O_COMMAND_SEGMENT64)
 			return _CR(loadCommand, SEGMENT_COMMAND64, Header);
 
 		loadCommand															= Add2Ptr(loadCommand, loadCommand->CommandLength, LOAD_COMMAND_HEADER*);
@@ -989,7 +989,7 @@ SECTION64* MachpGetFirstSection64(SEGMENT_COMMAND64* segment64)
 //
 SECTION64* MachpGetNextSection64(SEGMENT_COMMAND64* segment64, SECTION64* section64)
 {
-	if(!segment64 || !segment64->SectionCount)
+	if (!segment64 || !segment64->SectionCount)
 		return nullptr;
 
 	UINTN index																= (static_cast<UINT8*>(static_cast<VOID*>(section64)) - static_cast<UINT8*>(static_cast<VOID*>(segment64 + 1))) / sizeof(SECTION64);
@@ -1000,7 +1000,7 @@ SECTION64* MachpGetNextSection64(SEGMENT_COMMAND64* segment64, SECTION64* sectio
 //
 // Load kernel, prelinkedkernel or kernelcache
 //
-EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MACH_O_LOADED_INFO* loadedInfo)
+EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedInfo)
 {
 	EFI_STATUS status														= EFI_SUCCESS;
 	VOID* commandsBuffer													= 0;
@@ -1096,7 +1096,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 
 		CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: ASLRDisplacement 0x%llx \n"), LdrGetASLRDisplacement());
 
-		for(UINT32 i = 0; i < machHeader.CommandsCount; i ++, theCommand = Add2Ptr(theCommand, theCommand->CommandLength, LOAD_COMMAND_HEADER*))
+		for (UINT32 i = 0; i < machHeader.CommandsCount; i ++, theCommand = Add2Ptr(theCommand, theCommand->CommandLength, LOAD_COMMAND_HEADER*))
 		{
 			//
 			// Process it
@@ -1117,13 +1117,13 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 					//
 					// Empty segment
 					//
-					if(!segmentVirtualSize)
+					if (!segmentVirtualSize)
 						break;
 
 					//
 					// Seek file
 					//
-					if(EFI_ERROR(status = IoSetFilePosition(fileHandle, machOffset + segmentFileOffset)))
+					if (EFI_ERROR(status = IoSetFilePosition(fileHandle, machOffset + segmentFileOffset)))
 						try_leave(NOTHING);
 
 					//
@@ -1131,7 +1131,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 					//
 					UINTN allocatedLength									= static_cast<UINTN>(segmentVirtualSize);
 					UINT64 virtualAddress									= segmentVirtualAddress;
-					UINT64 physicalAddress									= useKernelMemory ? MmAllocateKernelMemory(&allocatedLength, &virtualAddress) : MmAllocateLoaderData(&allocatedLength, &virtualAddress);
+					UINT64 physicalAddress									= MmAllocateKernelMemory(&allocatedLength, &virtualAddress);
 
 					if (!physicalAddress)
 						try_leave(status = EFI_OUT_OF_RESOURCES);
@@ -1249,7 +1249,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 						
 						RELOCATION_INFO* relocationInfo						= Add2Ptr(linkEditSegment, dynamicSymbolTableCommand->LocalRelocationOffset - linkEditSegmentOffset, RELOCATION_INFO*);
 
-						for(ix = 0; ix < dynamicSymbolTableCommand->LocalRelocationCount; ix++, relocationInfo++)
+						for (ix = 0; ix < dynamicSymbolTableCommand->LocalRelocationCount; ix++, relocationInfo++)
 						{
 							//
 							// In final linked images, there are only two valid relocation kinds:
@@ -1301,7 +1301,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, BOOLEAN useKernelMemory, MA
 #if (TARGET_OS >= YOSEMITE)
 						if ((loadExecutablePatched == FALSE) && (symbolEntry->SectionIndex == 1)) // __TEXT,__text
 						{
-							if(!strcmp(CHAR8_CONST_STRING("__ZN6OSKext14loadExecutableEv"), stringTable + symbolEntry->StringIndex))
+							if (!strcmp(CHAR8_CONST_STRING("__ZN6OSKext14loadExecutableEv"), stringTable + symbolEntry->StringIndex))
 							{
 								offset										= (symbolEntry->Value - loadedInfo->ImageBaseVirtualAddress);
 								startAddress								= (loadedInfo->ImageBasePhysicalAddress + offset);
@@ -1416,34 +1416,34 @@ UINT64 MachFindSymbolVirtualAddressByName(MACH_O_LOADED_INFO* loadedInfo, CHAR8 
 	UINT64 linkEditSegmentOffset											= 0;
 	SYMTAB_COMMAND* symbolTableCommand										= nullptr;
 
-	for(UINT32 i = 0; i < machHeader->CommandsCount; i ++, commandHeader = Add2Ptr(commandHeader, commandHeader->CommandLength, LOAD_COMMAND_HEADER*))
+	for (UINT32 i = 0; i < machHeader->CommandsCount; i ++, commandHeader = Add2Ptr(commandHeader, commandHeader->CommandLength, LOAD_COMMAND_HEADER*))
 	{
-		if(commandHeader->CommandType == MACH_O_COMMAND_SEGMENT32 || commandHeader->CommandType == MACH_O_COMMAND_SEGMENT64)
+		if (commandHeader->CommandType == MACH_O_COMMAND_SEGMENT32 || commandHeader->CommandType == MACH_O_COMMAND_SEGMENT64)
 		{
 			SEGMENT_COMMAND64* segmentCommand64									= _CR(commandHeader, SEGMENT_COMMAND64, Header);
 			SEGMENT_COMMAND* segmentCommand										= _CR(commandHeader, SEGMENT_COMMAND, Header);
 
-			if(is64Bits ? strcmp(segmentCommand64->Name, CHAR8_CONST_STRING("__LINKEDIT")) : strcmp(segmentCommand->Name, CHAR8_CONST_STRING("__LINKEDIT")))
+			if (is64Bits ? strcmp(segmentCommand64->Name, CHAR8_CONST_STRING("__LINKEDIT")) : strcmp(segmentCommand->Name, CHAR8_CONST_STRING("__LINKEDIT")))
 				continue;
 
 			linkEditSegment													= ArchConvertAddressToPointer(LdrStaticVirtualToPhysical(is64Bits ? segmentCommand64->VirtualAddress : segmentCommand->VirtualAddress), VOID*);
 			linkEditSegmentOffset											= is64Bits ? segmentCommand64->FileOffset : segmentCommand->FileOffset;
 		}
-		else if(commandHeader->CommandType == MACH_O_COMMAND_SYMTAB)
+		else if (commandHeader->CommandType == MACH_O_COMMAND_SYMTAB)
 		{
 			symbolTableCommand												= _CR(commandHeader, SYMTAB_COMMAND, Header);
 		}
 	}
 
-	if(!linkEditSegment || !linkEditSegmentOffset || !symbolTableCommand)
+	if (!linkEditSegment || !linkEditSegmentOffset || !symbolTableCommand)
 		return 0;
 
 	CHAR8 CONST* stringTable												= Add2Ptr(linkEditSegment, symbolTableCommand->StringTableOffset - linkEditSegmentOffset, CHAR8 CONST*);
 	SYMTAB_ENTRY64* symbolEntry												= Add2Ptr(linkEditSegment, symbolTableCommand->SymbolTableOffset - linkEditSegmentOffset, SYMTAB_ENTRY64*);
 
-	for(UINT32 i = 0; i < symbolTableCommand->SymbolCount; i ++, symbolEntry ++)
+	for (UINT32 i = 0; i < symbolTableCommand->SymbolCount; i ++, symbolEntry ++)
 	{
-		if(!strcmp(symbolName, stringTable + symbolEntry->StringIndex))
+		if (!strcmp(symbolName, stringTable + symbolEntry->StringIndex))
 			return symbolEntry->Value;
 	}
 
