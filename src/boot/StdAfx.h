@@ -23,11 +23,17 @@
 	#define LEGACY_GREY_SUPPORT												0
 #endif
 
+//
+// grep '\x48\x89\xc3\x48\x85\xdb\x74\x70' /S*/L*/Kenels/kernel
+//
 #define LOAD_EXECUTABLE_TARGET_UINT64										0x487074db8548c389ULL
 #define LOAD_EXECUTABLE_PATCH_UINT64										0x4812ebdb8548c389ULL
 
-#define READ_STARTUP_EXTENSIONS_TARGET_UINT64								0xe805eb00000025ebULL
-#define READ_STARTUP_EXTENSIONS_PATCH_UINT64								0xe8909000000025ebULL
+//
+// grep '\xe8\x25\x00\x00\x00\xeb\x05\xe8' /S*/L*/Kenels/kernel
+//
+#define READ_STARTUP_EXTENSIONS_TARGET_UINT64								0xe805eb00000025e8ULL
+#define READ_STARTUP_EXTENSIONS_PATCH_UINT64								0xe8909000000025e8ULL
 
 #define DO_REPLACE_BOARD_ID													1
 
