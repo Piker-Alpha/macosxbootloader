@@ -1278,7 +1278,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 				case MACH_O_COMMAND_SYMTAB:
 				{
 					BOOLEAN loadExecutablePatched							= FALSE;
-					// BOOLEAN readStartExtensionsPatched						= FALSE;
+					BOOLEAN readStartExtensionsPatched						= FALSE;
 
 					UINT64 index											= 0;
 					UINT64 asld												= LdrGetASLRDisplacement();
