@@ -1307,7 +1307,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 							if (!strcmp(CHAR8_CONST_STRING("__ZN6OSKext14loadExecutableEv"), stringTable + symbolEntry->StringIndex))
 							{
 								offset										= (symbolEntry->Value - loadedInfo->ImageBaseVirtualAddress);
-								startAddress								= loadedInfo->ImageBasePhysicalAddress;
+								startAddress								= (loadedInfo->ImageBasePhysicalAddress + offset);
 								endAddress									= (startAddress + loadedInfo->TextSegmentFileSize);
 								p											= (unsigned char *)startAddress;
 
@@ -1339,7 +1339,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 								loadedInfo->IdlePML4VirtualAddress			= symbolEntry->Value;
 							}
 						}
-						/* else if ((readStartExtensionsPatched == FALSE) && (symbolEntry->SectionIndex == 25)) // __KLD,__text
+						else if ((readStartExtensionsPatched == FALSE) && (symbolEntry->SectionIndex == 25)) // __KLD,__text
 						{
 							if (!strcmp(CHAR8_CONST_STRING("__ZN12KLDBootstrap21readStartupExtensionsEv"), stringTable + symbolEntry->StringIndex))
 							{
@@ -1348,7 +1348,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 								endAddress									= (startAddress + kldSegmentFileSize);
 								p											= (unsigned char *)startAddress;
 // #if DEBUG_KERNEL_PATCHER
-//								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: readStartupExtensions offset[0x%llx], start[0x%llx], end[0x%llx]\n"), offset, startAddress, endAddress);
+								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: readStartupExtensions offset[0x%llx], start[0x%llx], end[0x%llx]\n"), offset, startAddress, endAddress);
 // #endif
 								for (; p <= (unsigned char *)endAddress; p++)
 								{
@@ -1366,9 +1366,9 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 									}
 								}
 
-//								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: readStartupExtensions done @ [0x%llx]\n"), (UINT64)p);
+								CsPrintf(CHAR8_CONST_STRING("Kernelpatcher: readStartupExtensions done @ [0x%llx]\n"), (UINT64)p);
 							}
-						} */
+						}
 #endif
 					}
 				}
