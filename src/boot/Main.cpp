@@ -569,9 +569,9 @@ EFI_STATUS EFIAPI EfiMain(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable)
 					MmFreePool(installationFolderInfo);
 				}
 			}
-		}
 
-		IoCloseFile(&installationFolder);
+			IoCloseFile(&installationFolder);
+		}
 
 		//
 		// show panic dialog
