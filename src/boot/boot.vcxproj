@@ -9,6 +9,22 @@
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release (Black)|Win32">
+      <Configuration>Release (Black)</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release (Black)|x64">
+      <Configuration>Release (Black)</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release (Grey)|Win32">
+      <Configuration>Release (Grey)</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release (Grey)|x64">
+      <Configuration>Release (Grey)</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
@@ -36,7 +52,23 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release (Black)|Win32'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|Win32'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release (Black)|x64'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|x64'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
@@ -58,7 +90,27 @@
     <Import Project="..\common.props" />
     <Import Project="..\release.props" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release (Black)|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\common.props" />
+    <Import Project="..\release.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\common.props" />
+    <Import Project="..\release.props" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\common.props" />
+    <Import Project="..\release.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release (Black)|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\common.props" />
+    <Import Project="..\release.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\common.props" />
     <Import Project="..\release.props" />
@@ -73,9 +125,41 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetExt>.efi</TargetExt>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release (Black)|Win32'">
+    <TargetExt>.efi</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|Win32'">
+    <TargetExt>.efi</TargetExt>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetExt>.efi</TargetExt>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release (Black)|x64'">
+    <TargetExt>.efi</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|x64'">
+    <TargetExt>.efi</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release (Black)|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>LEGACY_GREY_SUPPORT=0;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>LEGACY_GREY_SUPPORT=1;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release (Black)|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>LEGACY_GREY_SUPPORT=0;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>LEGACY_GREY_SUPPORT=1;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AcpiUtils.h" />
     <ClInclude Include="Base64.h" />
@@ -135,10 +219,14 @@
     <ClCompile Include="x64\ArchUtilsX64.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release (Black)|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="x64\DebuggerUtilsX64.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release (Black)|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="BootDebugger.cpp" />
     <ClCompile Include="Crc32.cpp" />
@@ -156,38 +244,60 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release (Black)|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release (Black)|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="x86\ArchUtilsX86.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release (Black)|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="x86\CompilerX86.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release (Black)|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="x86\DebuggerUtilsX86.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release (Black)|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="x86\Thunk64.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release (Black)|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|x64'">true</ExcludedFromBuild>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="x64\CompilerX64.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release (Black)|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|Win32'">true</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">cd "%(RootDir)%(Directory)" &amp; nasm -o "$(IntDir)%(Filename).obj" -f win64 -X vc "%(FullPath)"</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">cd "%(RootDir)%(Directory)" &amp; nasm -o "$(IntDir)%(Filename).obj" -f win64 -X vc "%(FullPath)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release (Black)|x64'">cd "%(RootDir)%(Directory)" &amp; nasm -o "$(IntDir)%(Filename).obj" -f win64 -X vc "%(FullPath)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|x64'">cd "%(RootDir)%(Directory)" &amp; nasm -o "$(IntDir)%(Filename).obj" -f win64 -X vc "%(FullPath)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RootDir)%(Directory)/Common.inc;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release (Black)|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RootDir)%(Directory)/Common.inc;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release (Black)|x64'">%(RootDir)%(Directory)/Common.inc;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|x64'">%(RootDir)%(Directory)/Common.inc;%(AdditionalInputs)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Identity)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Identity)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release (Black)|x64'">%(Identity)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|x64'">%(Identity)</Message>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -197,10 +307,18 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RootDir)%(Directory)/Common.inc;%(AdditionalInputs)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RootDir)%(Directory)/Common.inc;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release (Black)|x64'">%(RootDir)%(Directory)/Common.inc;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|x64'">%(RootDir)%(Directory)/Common.inc;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release (Black)|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">cd "%(RootDir)%(Directory)" &amp; nasm -o "$(IntDir)%(Filename).obj" -f win64 -X vc "%(FullPath)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release (Black)|x64'">cd "%(RootDir)%(Directory)" &amp; nasm -o "$(IntDir)%(Filename).obj" -f win64 -X vc "%(FullPath)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|x64'">cd "%(RootDir)%(Directory)" &amp; nasm -o "$(IntDir)%(Filename).obj" -f win64 -X vc "%(FullPath)"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Identity)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Identity)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release (Black)|x64'">%(Identity)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|x64'">%(Identity)</Message>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -208,12 +326,20 @@
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">cd "%(RootDir)%(Directory)" &amp; nasm -o "$(IntDir)%(Filename).obj" -f win64 -X vc "%(FullPath)"</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">cd "%(RootDir)%(Directory)" &amp; nasm -o "$(IntDir)%(Filename).obj" -f win64 -X vc "%(FullPath)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release (Black)|x64'">cd "%(RootDir)%(Directory)" &amp; nasm -o "$(IntDir)%(Filename).obj" -f win64 -X vc "%(FullPath)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|x64'">cd "%(RootDir)%(Directory)" &amp; nasm -o "$(IntDir)%(Filename).obj" -f win64 -X vc "%(FullPath)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release (Black)|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RootDir)%(Directory)/Common.inc;%(AdditionalInputs)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RootDir)%(Directory)/Common.inc;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release (Black)|x64'">%(RootDir)%(Directory)/Common.inc;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|x64'">%(RootDir)%(Directory)/Common.inc;%(AdditionalInputs)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Identity)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Identity)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release (Black)|x64'">%(Identity)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|x64'">%(Identity)</Message>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -221,12 +347,20 @@
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">cd "%(RootDir)%(Directory)" &amp; nasm -o "$(IntDir)%(Filename).obj" -f win64 -X vc "%(FullPath)"</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">cd "%(RootDir)%(Directory)" &amp; nasm -o "$(IntDir)%(Filename).obj" -f win64 -X vc "%(FullPath)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release (Black)|x64'">cd "%(RootDir)%(Directory)" &amp; nasm -o "$(IntDir)%(Filename).obj" -f win64 -X vc "%(FullPath)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|x64'">cd "%(RootDir)%(Directory)" &amp; nasm -o "$(IntDir)%(Filename).obj" -f win64 -X vc "%(FullPath)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release (Black)|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RootDir)%(Directory)/Common.inc;%(AdditionalInputs)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RootDir)%(Directory)/Common.inc;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release (Black)|x64'">%(RootDir)%(Directory)/Common.inc;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|x64'">%(RootDir)%(Directory)/Common.inc;%(AdditionalInputs)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Identity)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Identity)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release (Black)|x64'">%(Identity)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|x64'">%(Identity)</Message>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -234,21 +368,35 @@
       <FileType>Document</FileType>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)ThunkCode64.dat;%(AdditionalInputs)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)ThunkCode64.dat;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release (Black)|Win32'">$(IntDir)ThunkCode64.dat;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|Win32'">$(IntDir)ThunkCode64.dat;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release (Black)|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd "$(IntDir)" &amp; nasm -o "$(IntDir)%(Filename).obj" -fwin32 -X vc "%(FullPath)"</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd "$(IntDir)" &amp; nasm -o "$(IntDir)%(Filename).obj" -fwin32 -X vc "%(FullPath)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release (Black)|Win32'">cd "$(IntDir)" &amp; nasm -o "$(IntDir)%(Filename).obj" -fwin32 -X vc "%(FullPath)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|Win32'">cd "$(IntDir)" &amp; nasm -o "$(IntDir)%(Filename).obj" -fwin32 -X vc "%(FullPath)"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Identity)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Identity)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release (Black)|Win32'">%(Identity)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|Win32'">%(Identity)</Message>
     </CustomBuild>
     <CustomBuild Include="x86\ThunkCode64.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd "%(RootDir)%(Directory)" &amp; nasm -o "$(IntDir)%(Filename).dat"  -X vc "%(FullPath)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).dat;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd "%(RootDir)%(Directory)" &amp; nasm -o "$(IntDir)%(Filename).dat"  -X vc "%(FullPath)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release (Black)|Win32'">cd "%(RootDir)%(Directory)" &amp; nasm -o "$(IntDir)%(Filename).dat"  -X vc "%(FullPath)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|Win32'">cd "%(RootDir)%(Directory)" &amp; nasm -o "$(IntDir)%(Filename).dat"  -X vc "%(FullPath)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).dat;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release (Black)|Win32'">$(IntDir)%(Filename).dat;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|Win32'">$(IntDir)%(Filename).dat;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Identity)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Identity)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release (Black)|Win32'">%(Identity)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release (Grey)|Win32'">%(Identity)</Message>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
