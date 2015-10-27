@@ -11,7 +11,7 @@
   </head>
   <body>
     <section class="page-header">
-      <h1 class="project-name">Macosxbootloader</h1>
+      <h1 class="project-name">Macosxbootloader v3.1</h1>
       <h2 class="project-tagline">For OS X 10.11 El Capitan</h2>
       <a href="https://github.com/Piker-Alpha/macosxbootloader" class="btn">View on GitHub</a>
       <a href="https://raw.githubusercontent.com/Piker-Alpha/macosxbootloader/El-Capitan/Prebuilt/boot.efi" class="btn">Download boot.efi</a>
@@ -25,16 +25,9 @@
 <p>This project is a new and updated branch of the <a href="https://github.com/Piker-Alpha/macosxbootloader/tree/master">Yosemite tree</a> and is now targetted at OS X 10.11 El Capitan.</p>
 
 <h2>
-<a id="goals" class="anchor" href="#goals" aria-hidden="true"><span class="octicon octicon-link"></span></a>Goals</h2>
+<a id="donations" class="anchor" href="#donations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Donations</h2>
 
-<p>This project aims to add support for El Capitan (OS X 10.11) for unsupported Mac hardware with a 32-bit only EFI implementation. Like for example the first and second generation Mac Pro models. Though it should work well with any other model with a 32-bit EFI implementation.</p>
-
-<h2>
-<a id="current-state" class="anchor" href="#current-state" aria-hidden="true"><span class="octicon octicon-link"></span></a>Current State</h2>
-
-<p>The current state of this project is: Phase 1, 2 and 3 completed (OS X 10.11 El Capitan is now fully supported).</p>
-
-<p>Note: For more information about the development phases, please visit the <a href="https://github.com/Piker-Alpha/macosxbootloader/blob/El-Capitan/TODO.md">TODO list</a>.</p>
+<p>If you like to support my (ongoing) work, the over 200 hours that I have put into this project, then you may want to consider to <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=JXFBXK7J97RAE">make a donation</a>.</p>
 
 <h2>
 <a id="download" class="anchor" href="#download" aria-hidden="true"><span class="octicon octicon-link"></span></a>Download</h2>
@@ -43,14 +36,14 @@
 
 <p>Download your copy of the prebuild (32-bit) version of boot.efi for El Capitan (compiled on Microsoft Windows 10 with Microsoft Visual Studio 2015) with a <a href="https://raw.githubusercontent.com/Piker-Alpha/macosxbootloader/El-Capitan/Prebuilt/boot.efi">black background and white Apple logo</a> now, and verify the download by entering (either one) in a terminal window:</p>
 
-<pre><code>openssl md5  boot.efi = b57d13b87226d72a31bf0aa527bc5f1f
-openssl sha1 boot.efi = e8b2f26fa5b11fb0552ce4cf7c2740dbd5e4c9e6
+<pre><code>openssl md5  boot.efi = 036476dc081da904f50736eb56acbcfa
+openssl sha1 boot.efi = 0b1864bdec2ae28a1b7538724e1732b31ab466e5
 </code></pre>
 
 <p>Or download the one for legacy hardware, with a <a href="https://raw.githubusercontent.com/Piker-Alpha/macosxbootloader/El-Capitan/Prebuilt/boot_grey.efi">grey background and logo</a> for your Mac Pro and verify the download by entering (either one) in a terminal window:</p>
 
-<pre><code>openssl md5  boot.efi = 94d217c24ce967446cbbc177fcae5c3f
-openssl sha1 boot.efi = 7de31ecfcb52ddcde764ee523fe68d5c5b052056
+<pre><code>openssl md5  boot.efi = 23348e2baff575405f527cf0a26e2838
+openssl sha1 boot.efi = 41ec2b9ac115cb6def687b1bfdef891df6556b74
 </code></pre>
 
 <p>Note: If the output is different, then your copy of boot.efi should not be used!</p>
@@ -65,26 +58,22 @@ openssl sha1 boot.efi = 7de31ecfcb52ddcde764ee523fe68d5c5b052056
 <h2>
 <a id="thanks-to" class="anchor" href="#thanks-to" aria-hidden="true"><span class="octicon octicon-link"></span></a>Thanks To</h2>
 
-<p>This project would not have been possible without the help of Peter Holbrook and Mike Boss. Peter did all compiling and Mike ran dozens of test builds that Peter pushed out over at forums.macrumors.com Awesome work guys. Job well done!</p>
-
-<h2>
-<a id="donations" class="anchor" href="#donations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Donations</h2>
-
-<p>If you like to support my work then you may want to consider to <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=JXFBXK7J97RAE">make a donation</a></p>
+<p>This project would not have been possible without the help of Peter Holbrook, Mike Boss and a number of other people. Peter did all compiling and Mike ran dozens of test builds that Peter pushed out over at forums.macrumors.com Awesome work guys. Job well done! </p>
+<p>I'd also like to thank everyone else whoh helped with testing our nightly builds. Thank you so much!</p>
 
 <h2>
 <a id="help" class="anchor" href="#help" aria-hidden="true"><span class="octicon octicon-link"></span></a>Help</h2>
 
-<p>If you need help with the setup then please visit <a href="http://forums.macrumors.com/threads/2006-2007-mac-pro-1-1-2-1-and-os-x-el-capitan.1890435/">this macrumor thread</a></p>
+<p>If you need help with the setup then please visit <a href="http://forums.macrumors.com/threads/2006-2007-mac-pro-1-1-2-1-and-os-x-el-capitan.1890435/">this macrumor thread</a>. Developers, or people who need help with compiling boot.efi themself, can visit <a href="http://forums.macrumors.com/threads/boot-efi-developers-thread.1924434/">this macrumors developer thread.</a></p>
 
-<p>Note: Sorry. I can't help you. I don't have unsupported hardware with 32-bit EFI.</p>
+<p>Note: I myself don't own any unsupported Apple hardware with a 32-bit EFI implementation, so I can probably do not much for you, but there may be others to help you.</p>
 
 <h2>
 <a id="bugs" class="anchor" href="#bugs" aria-hidden="true"><span class="octicon octicon-link"></span></a>Bugs</h2>
 
 <p>Bugs can be reported <a href="https://github.com/Piker-Alpha/macosxbootloader/issues">here</a></p>
 
-<p>Note: Please provide a clear step by step way to reproduce the bug.</p>
+<p>Note: Please provide a clear step by step procedure to reproduce the bug. Thanks.</p>
 
 <h2>
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
