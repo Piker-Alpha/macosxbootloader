@@ -1,0 +1,35 @@
+version: 3.2_testing_{build}
+branches:
+  only:
+  - El-Capitan
+os: Visual Studio 2015
+configuration:
+- Release (Grey)
+- Release (Black)
+environment:
+  PATH: '%PATH%;C:\Program Files (x86)\nasm'
+install:
+- cmd: >-
+    curl -L -o nasminst.exe http://www.nasm.us/pub/nasm/releasebuilds/2.11.08/win32/nasm-2.11.08-installer.exe
+
+    start /wait nasminst.exe /S
+before_build:
+- cmd: if not %APPVEYOR_REPO_NAME%==Piker-Alpha/macosxbootloader ( cd /d C:\projects\macosxbootloader && git remote add upstream https://github.com/Piker-Alpha/macosxbootloader.git &&  git fetch upstream )
+build:
+  project: src\boot.sln
+  verbosity: normal
+after_build:
+- cmd: >-
+    cd "%APPVEYOR_BUILD_FOLDER%\bin\x86"
+
+    CertUtil -hashfile "%CONFIGURATION%\boot.efi" MD5 > "%CONFIGURATION%\md5.txt"
+
+    if "%CONFIGURATION%"=="Release (Grey)" (set CONFIG=grey)
+
+    if "%CONFIGURATION%"=="Release (Black)" (set CONFIG=black)
+
+    7z a "%APPVEYOR_PROJECT_NAME%_%CONFIG%_%APPVEYOR_BUILD_ID%.zip" "%CONFIGURATION%\boot.efi"
+
+    7z a "%APPVEYOR_PROJECT_NAME%_%CONFIG%_%APPVEYOR_BUILD_ID%.zip" "%CONFIGURATION%\md5.txt"
+
+    appveyor PushArtifact "macosxbootloader_%CONFIG%_%APPVEYOR_BUILD_ID%.zip"

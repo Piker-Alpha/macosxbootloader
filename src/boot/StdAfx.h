@@ -18,9 +18,13 @@
 #define TARGET_OS															EL_CAPITAN
 
 #if (TARGET_OS >= YOSEMITE)
+#ifndef LEGACY_GREY_SUPPORT
 	#define LEGACY_GREY_SUPPORT												1
+#endif
 #else
+#ifndef LEGACY_GREY_SUPPORT
 	#define LEGACY_GREY_SUPPORT												0
+#endif
 #endif
 
 #define PATCH_LOAD_EXECUTABLE												1
