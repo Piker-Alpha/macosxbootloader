@@ -851,6 +851,7 @@ STATIC VOID BdpGetBusData(DBGKD_MANIPULATE_STATE64* manipulateState, STRING* add
 	{
 		manipulateState->ReturnStatus										= STATUS_UNSUCCESSFUL;
 		BdSendPacket(PACKET_TYPE_KD_STATE_MANIPULATE, &messageHeader, additionalData);
+
 		return;
 	}
 
@@ -978,6 +979,7 @@ STATIC UINT32 BdpSendWaitContinue(UINT32 packetType, STRING* outputHead, STRING*
 		if (sendOutputPacket)
 		{
 			BdSendPacket(packetType, outputHead, outputData);
+
 			if (BdDebuggerNotPresent)
 				return KD_CONTINUE_SUCCESS;
 		}
@@ -1612,6 +1614,7 @@ EFI_STATUS BdFinalize()
 	// Free ldr.
 	//
 	BdpFreeDataTableEntry(&BdModuleDataTableEntry);
+
 	return EFI_SUCCESS;
 }
 
