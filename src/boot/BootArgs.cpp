@@ -819,7 +819,7 @@ EFI_STATUS BlInitCSRState(BOOT_ARGS* bootArgs)
 	}
 	else
 	{
-		bootArgs->Flags														|= kBootArgsFlagCSRActiveConfig;
+		bootArgs->Flags														|= (kBootArgsFlagCSRActiveConfig + kBootArgsFlagCSRBoot);
 	}
 
 	//
