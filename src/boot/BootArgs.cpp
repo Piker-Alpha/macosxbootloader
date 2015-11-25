@@ -296,6 +296,7 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 		//
 		UINTN bufferLength													= sizeof(BOOT_ARGS);
 		physicalAddress														= MmAllocateKernelMemory(&bufferLength, &virtualAddress);
+
 		if(!physicalAddress)
 			try_leave(status = EFI_OUT_OF_RESOURCES);
 
@@ -314,6 +315,12 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 		bootArgs->Flags														= 65;	// kBootArgsFlagRebootOnPanic + kBootArgsFlagBlackTheme
 #endif
 		bootArgs->PhysicalMemorySize										= BlGetMemorySize();
+
+		for (UINT8 m = 0; m < 5; m++)
+		{
+			CsPrintf(CHAR8_CONST_STRING("PIKE: bootArgs->PhysicalMemorySize= 0x%llx\n"), bootArgs->PhysicalMemorySize);
+		}
+
 		bootArgs->ASLRDisplacement											= static_cast<UINT32>(LdrGetASLRDisplacement());
 
 		//
