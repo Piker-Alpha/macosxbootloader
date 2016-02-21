@@ -14,12 +14,12 @@ EFI_FORWARD_DECLARATION(APPLE_FIRMWARE_PASSWORD_PROTOCOL);
 
 typedef EFI_STATUS (EFIAPI* CHECK)(IN APPLE_FIRMWARE_PASSWORD_PROTOCOL* This, OUT UINTN* CheckValue);
 
-typedef struct _APPLE_FIRMWARE_PASSWORD_PROTOCOL
+struct _APPLE_FIRMWARE_PASSWORD_PROTOCOL
 {
 	UINT64																	Signature;
 	UINTN																	Unknown[3];
 	CHECK																	Check;
-}APPLE_FIRMWARE_PASSWORD_PROTOCOL;
+};
 
 extern EFI_GUID gAppleFirmwarePasswordProtocolGuid;
 

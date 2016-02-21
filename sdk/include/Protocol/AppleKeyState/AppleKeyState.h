@@ -120,11 +120,11 @@ EFI_FORWARD_DECLARATION (APPLE_KEY_STATE_PROTOCOL);
 
 typedef EFI_STATUS (EFIAPI *READ_KEY_STATE)(IN APPLE_KEY_STATE_PROTOCOL *This, OUT UINT16 *ModifyFlags, OUT UINTN *PressedKeyStatesCount, OUT CHAR16 *PressedKeyStates);
 
-typedef struct _APPLE_KEY_STATE_PROTOCOL
+struct _APPLE_KEY_STATE_PROTOCOL
 {
 	UINT64																	Signature;
 	READ_KEY_STATE															ReadKeyState;
-}APPLE_KEY_STATE_PROTOCOL;
+};
 
 extern EFI_GUID gAppleKeyStateProtocolGuid;
 
