@@ -14,12 +14,11 @@ EFI_FORWARD_DECLARATION(APPLE_DEVICE_PROPERTY_PROTOCOL);
 
 typedef EFI_STATUS (EFIAPI* GET_DEVICE_PROPERTY)(IN APPLE_DEVICE_PROPERTY_PROTOCOL* This, OUT VOID* PropertiesBuffer, IN OUT UINTN *BufferSize);
 
-typedef struct _APPLE_DEVICE_PROPERTY_PROTOCOL
-{
+struct _APPLE_DEVICE_PROPERTY_PROTOCOL {
 	UINT64																	Signature;
 	UINTN																	Unknown[3];
 	GET_DEVICE_PROPERTY														GetDeviceProperty;
-}APPLE_DEVICE_PROPERTY_PROTOCOL;
+};
 
 extern EFI_GUID gAppleDevicePropertyProtocolGuid;
 

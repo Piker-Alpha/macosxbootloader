@@ -14,10 +14,10 @@ EFI_FORWARD_DECLARATION(APPLE_GRAPH_INFO_PROTOCOL);
 
 typedef EFI_STATUS (EFIAPI* GET_INFO)(APPLE_GRAPH_INFO_PROTOCOL* This, UINT64* BaseAddress, UINT64* FrameBufferSize, UINT32* ByterPerRow, UINT32* Width, UINT32* Height, UINT32* ColorDepth);
 
-typedef struct _APPLE_GRAPH_INFO_PROTOCOL
+struct _APPLE_GRAPH_INFO_PROTOCOL
 {
 	GET_INFO																GetInfo;
-}APPLE_GRAPH_INFO_PROTOCOL;
+};
 
 extern EFI_GUID gAppleGraphInfoProtocolGuid;
 
