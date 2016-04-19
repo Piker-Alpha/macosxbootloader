@@ -19,7 +19,7 @@ EFI_GUID BlpSmbiosUuid														= {0};
 #define IS_LEAP_YEAR(y)														(((y) % 4 == 0 && (y) % 100 != 0) || (y) % 400 == 0)
 
 //
-// get memory capacity
+// Get memory capacity.
 //
 UINT64 BlGetMemoryCapacity()
 {
@@ -27,7 +27,7 @@ UINT64 BlGetMemoryCapacity()
 }
 
 //
-// get memory size
+// Get memory size.
 //
 UINT64 BlGetMemorySize()
 {
@@ -35,7 +35,7 @@ UINT64 BlGetMemorySize()
 }
 
 //
-// get board id
+// Get board-id.
 //
 CHAR8* BlGetBoardId()
 {
@@ -44,11 +44,12 @@ CHAR8* BlGetBoardId()
 	UINT32 ecxValue															= 0;
 	UINT32 edxValue															= 0;
 	ArchCpuId(1, &eaxValue, &ebxValue, &ecxValue, &edxValue);
+
 	return ecxValue & 0x80000000 ? CHAR8_STRING("VMM") : BlpBoardId;
 }
 
 //
-// Get systemId.
+// Get system-id.
 //
 EFI_GUID BlGetSmbiosUuid()
 {
@@ -56,7 +57,7 @@ EFI_GUID BlGetSmbiosUuid()
 }
 
 //
-// connect drivers
+// Connect drivers.
 //
 EFI_STATUS BlConnectAllController()
 {
@@ -66,16 +67,17 @@ EFI_STATUS BlConnectAllController()
 
 	__try
 	{
-		while(TRUE)
+		while (TRUE)
 		{
 			UINTN totalHandles												= 0;
-			if(EFI_ERROR(status = EfiBootServices->LocateHandleBuffer(AllHandles, nullptr, nullptr, &totalHandles, &handleArray)))
+
+			if (EFI_ERROR(status = EfiBootServices->LocateHandleBuffer(AllHandles, nullptr, nullptr, &totalHandles, &handleArray)))
 				try_leave(NOTHING);
 
-			if(lastHandles == totalHandles)
+			if (lastHandles == totalHandles)
 				try_leave(NOTHING);
 
-			for(UINTN i = 0; i < totalHandles; i ++)
+			for (UINTN i = 0; i < totalHandles; i ++)
 				EfiBootServices->ConnectController(handleArray[i], nullptr, nullptr, TRUE);
 
 			EfiBootServices->FreePool(handleArray);
@@ -85,7 +87,7 @@ EFI_STATUS BlConnectAllController()
 	}
 	__finally
 	{
-		if(handleArray)
+		if (handleArray)
 			EfiBootServices->FreePool(handleArray);
 	}
 
@@ -93,50 +95,55 @@ EFI_STATUS BlConnectAllController()
 }
 
 //
-// get base and size
+// Get base and size.
 //
 EFI_STATUS BlGetApplicationBaseAndSize(UINT64* imageBase, UINT64* imageSize)
 {
 	EFI_LOADED_IMAGE_PROTOCOL* loadeImageProtocol							= nullptr;
-	if(EfiBootServices->HandleProtocol(EfiImageHandle, &EfiLoadedImageProtocolGuid, reinterpret_cast<VOID**>(&loadeImageProtocol)) != EFI_SUCCESS)
+
+	if (EfiBootServices->HandleProtocol(EfiImageHandle, &EfiLoadedImageProtocolGuid, reinterpret_cast<VOID**>(&loadeImageProtocol)) != EFI_SUCCESS)
 		return EFI_UNSUPPORTED;
 
-	if(imageBase)
+	if (imageBase)
 		*imageBase															= ArchConvertPointerToAddress(loadeImageProtocol->ImageBase);
 
-	if(imageSize)
+	if (imageSize)
 		*imageSize															= loadeImageProtocol->ImageSize;
 
 	return EFI_SUCCESS;
 }
 
 //
-// parse device location
+// Parse device location.
 //
 VOID BlParseDeviceLocation(CHAR8 CONST* loaderOptions, UINTN* segment, UINTN* bus, UINTN* device, UINTN* func)
 {
-	if(loaderOptions && loaderOptions[0])
+	if (loaderOptions && loaderOptions[0])
 	{
 		CHAR8 CONST* temp													= strstr(loaderOptions, CHAR8_CONST_STRING("/seg="));
-		if(temp && segment)
+
+		if (temp && segment)
 			*segment														= static_cast<UINTN>(atoi(temp + 5));
 
 		temp																= strstr(loaderOptions, CHAR8_CONST_STRING("/bus="));
-		if(temp && bus)
+
+		if (temp && bus)
 			*bus															= static_cast<UINTN>(atoi(temp + 5));
 
 		temp																= strstr(loaderOptions, CHAR8_CONST_STRING("/dev="));
-		if(temp && device)
+
+		if (temp && device)
 			*device															= static_cast<UINTN>(atoi(temp + 5));
 
 		temp																= strstr(loaderOptions, CHAR8_CONST_STRING("/func="));
-		if(temp && func)
+
+		if (temp && func)
 			*func															= static_cast<UINTN>(atoi(temp + 6));
 	}
 }
 
 //
-// pci get bar attribute
+// PCI get bar attribute.
 //
 EFI_STATUS BlGetPciBarAttribute(EFI_PCI_IO_PROTOCOL* pciIoProtocol, UINT8 barIndex, UINT64* baseAddress, UINT64* barLength, BOOLEAN* isMemorySpace)
 {
@@ -144,45 +151,45 @@ EFI_STATUS BlGetPciBarAttribute(EFI_PCI_IO_PROTOCOL* pciIoProtocol, UINT8 barInd
 	EFI_STATUS Status														= pciIoProtocol->GetBarAttributes(pciIoProtocol, barIndex, nullptr, &pciResource);
 
 	//
-	// get information
+	// Get information.
 	//
-	if(!EFI_ERROR(Status) && pciResource)
+	if (!EFI_ERROR(Status) && pciResource)
 	{
 		//
-		// pci resource is an acpi descriptor
+		// PCI resource is an ACPI descriptor.
 		//
 		EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR* desc								= static_cast<EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR*>(pciResource);
 
 		//
-		// check it
+		// Check it.
 		//
-		if(desc->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR)
+		if (desc->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR)
 		{
 			//
-			// output
+			// Output.
 			//
-			if(baseAddress)
+			if (baseAddress)
 				*baseAddress												= desc->AddrRangeMin;
 
-			if(barLength)
+			if (barLength)
 				*barLength													= desc->AddrLen;
 
-			if(isMemorySpace)
+			if (isMemorySpace)
 				*isMemorySpace												= desc->ResType == ACPI_ADDRESS_SPACE_TYPE_MEM;
 		}
 	}
 
 	//
-	// free this pointer
+	// Free this pointer.
 	//
-	if(pciResource)
+	if (pciResource)
 		EfiBootServices->FreePool(pciResource);
 
 	return Status;
 }
 
 //
-// find pci device
+// Find PCI device.
 //
 EFI_STATUS BlFindPciDevice(UINTN segment, UINTN bus, UINTN device, UINTN func, UINT8 baseClass, UINT8 subClass, UINT8 progIf, EFI_PCI_IO_PROTOCOL** outPciIoProtocol, EFI_HANDLE* outHandle)
 {
@@ -193,140 +200,164 @@ EFI_STATUS BlFindPciDevice(UINTN segment, UINTN bus, UINTN device, UINTN func, U
 	__try
 	{
 		//
-		// locate pci io protocol handle
+		// Locate PCI io protocol handle.
 		//
-		if(EFI_ERROR(status = EfiBootServices->LocateHandleBuffer(ByProtocol, &EfiPciIoProtocolGuid, nullptr, &totalHandles, &handleArray)))
+		if (EFI_ERROR(status = EfiBootServices->LocateHandleBuffer(ByProtocol, &EfiPciIoProtocolGuid, nullptr, &totalHandles, &handleArray)))
 			try_leave(NOTHING);
 
 		//
-		// for each handle, check it
+		// For each handle, check it.
 		//
 		status																= EFI_NOT_FOUND;
-		for(UINTN i = 0; i < totalHandles; i ++)
+
+		for (UINTN i = 0; i < totalHandles; i ++)
 		{
 			//
-			// open pci io protocol
+			// Open PCI io protocol.
 			//
 			EFI_HANDLE theHandle											= handleArray[i];
 			EFI_PCI_IO_PROTOCOL* pciIoProtocol								= nullptr;
 
 			//
-			// if open failed, skip it
+			// If open failed, skip it.
 			//
-			if(EFI_ERROR(EfiBootServices->HandleProtocol(theHandle, &EfiPciIoProtocolGuid, reinterpret_cast<VOID**>(&pciIoProtocol))))
+			if (EFI_ERROR(EfiBootServices->HandleProtocol(theHandle, &EfiPciIoProtocolGuid, reinterpret_cast<VOID**>(&pciIoProtocol))))
 				continue;
 
 			//
-			// get location
+			// Get location.
 			//
 			UINTN curSeg													= static_cast<UINTN>(-1);
 			UINTN curBus													= static_cast<UINTN>(-1);
 			UINTN curDev													= static_cast<UINTN>(-1);
 			UINTN curFunc													= static_cast<UINTN>(-1);
-			if(EFI_ERROR(pciIoProtocol->GetLocation(pciIoProtocol, &curSeg, &curBus, &curDev, &curFunc)))
+
+			if (EFI_ERROR(pciIoProtocol->GetLocation(pciIoProtocol, &curSeg, &curBus, &curDev, &curFunc)))
 				continue;
 
 			//
-			// check location
+			// Check location.
 			//
-			if((segment != -1 && segment != curSeg) || (bus != -1 && bus != curBus) || (device != -1 && device != curDev) || (func != -1 && func != curFunc))
+			if ((segment != -1 && segment != curSeg) || (bus != -1 && bus != curBus) || (device != -1 && device != curDev) || (func != -1 && func != curFunc))
 				continue;
 
 			//
-			// read config space
+			// Read config space.
 			//
 			PCI_DEVICE_INDEPENDENT_REGION configHeader;
-			if(EFI_ERROR(pciIoProtocol->Pci.Read(pciIoProtocol, EfiPciIoWidthUint8, 0, sizeof(configHeader), &configHeader)))
+
+			if (EFI_ERROR(pciIoProtocol->Pci.Read(pciIoProtocol, EfiPciIoWidthUint8, 0, sizeof(configHeader), &configHeader)))
 				continue;
 
 			//
-			// check base/sub/progif
+			// Check base/sub/progif.
 			//
-			if(configHeader.ClassCode[2] == baseClass && configHeader.ClassCode[1] == subClass && configHeader.ClassCode[0] == progIf)
-				try_leave(if(outPciIoProtocol) *outPciIoProtocol = pciIoProtocol; if(outHandle) *outHandle = theHandle; status = EFI_SUCCESS);
+			if (configHeader.ClassCode[2] == baseClass && configHeader.ClassCode[1] == subClass && configHeader.ClassCode[0] == progIf)
+				try_leave(if (outPciIoProtocol) *outPciIoProtocol = pciIoProtocol; if (outHandle) *outHandle = theHandle; status = EFI_SUCCESS);
 		}
 	}
 	__finally
 	{
-		if(handleArray)
+		if (handleArray)
 			EfiBootServices->FreePool(handleArray);
 	}
 	return status;
 }
 
 //
-// start pci device
+// Start PCI device.
 //
 EFI_STATUS BlStartPciDevice(EFI_PCI_IO_PROTOCOL* pciIoProtocol, BOOLEAN decodeIo, BOOLEAN decodeMemory, BOOLEAN busMaster)
 {
 	UINT64 attribute														= decodeIo ? EFI_PCI_IO_ATTRIBUTE_IO : 0;
 	attribute																|= (decodeMemory ? EFI_PCI_IO_ATTRIBUTE_MEMORY : 0);
 	attribute																|= (busMaster ? EFI_PCI_IO_ATTRIBUTE_BUS_MASTER : 0);
+
 	return pciIoProtocol->Attributes(pciIoProtocol, EfiPciIoAttributeOperationEnable, attribute, nullptr);
 }
 
 //
-// get string from smbios table
+// Get string from SMBIOS table.
 //
 UINT8* BlpGetStringFromSMBIOSTable(UINT8* startOfStringTable, UINT8 index)
 {
-	for(UINT8 i = 1; i < index && *startOfStringTable; i ++)
+	for (UINT8 i = 1; i < index && *startOfStringTable; i ++)
 		startOfStringTable													+= strlen(reinterpret_cast<CHAR8*>(startOfStringTable)) + 1;
 
 	STATIC UINT8 BadIndex[]                                                 = "BadIndex";
+
 	return *startOfStringTable ? startOfStringTable : (UINT8 *)BadIndex;
 }
 
 //
-// detect memory size
+// Detect memory size.
 //
 EFI_STATUS BlDetectMemorySize()
 {
 	EFI_CONFIGURATION_TABLE* theTable										= EfiSystemTable->ConfigurationTable;
 
-	for(UINTN i = 0; i < EfiSystemTable->NumberOfTableEntries; i ++, theTable ++)
+	for (UINTN i = 0; i < EfiSystemTable->NumberOfTableEntries; i ++, theTable ++)
 	{
-		if(memcmp(&theTable->VendorGuid, &EfiSmbiosTableGuid, sizeof(EfiSmbiosTableGuid)))
+		if (memcmp(&theTable->VendorGuid, &EfiSmbiosTableGuid, sizeof(EfiSmbiosTableGuid)))
 			continue;
 
 		SMBIOS_ENTRY_POINT_STRUCTURE* tableStructure						= static_cast<SMBIOS_ENTRY_POINT_STRUCTURE*>(theTable->VendorTable);
-		if(memcmp(tableStructure->AnchorString, "_SM_", sizeof(tableStructure->AnchorString)))
+
+		if (memcmp(tableStructure->AnchorString, "_SM_", sizeof(tableStructure->AnchorString)))
 			break;
 
 		UINT8* startOfTable													= ArchConvertAddressToPointer(tableStructure->DMI.TableAddress, UINT8*);
 		UINT8* endOfTable													= startOfTable + tableStructure->DMI.TableLength;
 
-		while(startOfTable + sizeof(SMBIOS_TABLE_HEADER) <= endOfTable)
+		while (startOfTable + sizeof(SMBIOS_TABLE_HEADER) <= endOfTable)
 		{
 			SMBIOS_TABLE_HEADER* tableHeader								= reinterpret_cast<SMBIOS_TABLE_HEADER*>(startOfTable);
-			if(tableHeader->Type == 16)
+
+			if (tableHeader->Type == 16) // Physical Memory Array.
 			{
-				if(startOfTable + sizeof(SMBIOS_TABLE_TYPE16) > endOfTable)
+				if (startOfTable + sizeof(SMBIOS_TABLE_TYPE16) > endOfTable)
 					break;
 
 				SMBIOS_TABLE_TYPE16* table16								= reinterpret_cast<SMBIOS_TABLE_TYPE16*>(startOfTable);
-				if(table16->MaximumCapacity != 0x80000000)
+
+				// Capacity present?
+				if (table16->MaximumCapacity != 0x80000000)
 				{
+					// Maximum memory capacity in kilobytes.
 					BlpMemoryCapacity										+= (static_cast<UINT64>(table16->MaximumCapacity) << 10);
 					BlpMemoryDevices										+= table16->NumberOfMemoryDevices;
 				}
+				else
+				{
+					// Use Maximum memory capacity.
+				}
 			}
-			else if(tableHeader->Type == 17)
+			else if (tableHeader->Type == 17) // Memory Device.
 			{
-				if(startOfTable + sizeof(SMBIOS_TABLE_TYPE17) > endOfTable)
+				if (startOfTable + sizeof(SMBIOS_TABLE_TYPE17) > endOfTable)
 					break;
 
 				SMBIOS_TABLE_TYPE17* table17								= reinterpret_cast<SMBIOS_TABLE_TYPE17*>(startOfTable);
-				if(table17->Size != 0xffff)
+
+				if (table17->Size != 0xffff)
+				{
+					// The granularity depends on bit-15 (0x8000). If set the value is given in kilobyte units otherwise in megabytes units.
 					BlpMemorySize											+= (static_cast<UINT64>(table17->Size) << ((table17->Size & 0x8000) ? 10 : 20));
+				}
+				else if (table17->Size > 0)
+				{
+					// Use Extended Size field for 32/64/128 GB modules.
+					BlpMemorySize											+= (static_cast<UINT64>(table17->ExtendedSize) << 10);
+				}
 			}
-			else if(tableHeader->Type == 1)
+			else if (tableHeader->Type == 1) // System Information.
 			{
-				if(startOfTable + sizeof(SMBIOS_TABLE_TYPE1) > endOfTable)
+				if (startOfTable + sizeof(SMBIOS_TABLE_TYPE1) > endOfTable)
 					break;
 				
 				SMBIOS_TABLE_TYPE1* table1									= reinterpret_cast<SMBIOS_TABLE_TYPE1*>(startOfTable);
-				if(!isEfiNullGuid(&table1->Uuid))
+
+				if (!isEfiNullGuid(&table1->Uuid))
 				{
 					//
 					// Copy SMBIOS UUID into BlpSystemId.
@@ -334,23 +365,25 @@ EFI_STATUS BlDetectMemorySize()
 					memcpy((VOID*)&BlpSmbiosUuid, (VOID*)&table1->Uuid, 16);
 				}
 			}
-			else if(tableHeader->Type == 2)
+			else if (tableHeader->Type == 2) // Baseboard (or Module) Information.
 			{
-				if(startOfTable + sizeof(SMBIOS_TABLE_TYPE2) > endOfTable)
+				if (startOfTable + sizeof(SMBIOS_TABLE_TYPE2) > endOfTable)
 					break;
 				
 				SMBIOS_TABLE_TYPE2* table2									= reinterpret_cast<SMBIOS_TABLE_TYPE2*>(startOfTable);
-				if(table2->ProductName)
+
+				if (table2->ProductName)
 				{
 					UINT8* boardId											= BlpGetStringFromSMBIOSTable(startOfTable + table2->Hdr.Length, table2->ProductName);
 					strncpy(BlpBoardId, reinterpret_cast<CHAR8*>(boardId), ARRAYSIZE(BlpBoardId) - 1);
 				}
 			}
+
 			startOfTable													+= tableHeader->Length;
 
-			while(startOfTable < endOfTable)
+			while (startOfTable < endOfTable)
 			{
-				if(startOfTable[0] || startOfTable + 1 >= endOfTable || startOfTable[1])
+				if (startOfTable[0] || startOfTable + 1 >= endOfTable || startOfTable[1])
 				{
 					startOfTable											+= 1;
 				}
@@ -366,24 +399,24 @@ EFI_STATUS BlDetectMemorySize()
 	return EFI_SUCCESS;
 }
 
-#define READ_BUFFER(B, L, I, V, T)											do{if((I) >= (L)) return EFI_BAD_BUFFER_SIZE; (V) = static_cast<T>((B)[(I)]); (I) += 1;}while(0)
-#define WRITE_BUFFER(B, L, I, V, T)											do{if((I) >= (L) - 1) return EFI_BUFFER_TOO_SMALL; (B)[(I)] = static_cast<T>(V); (I) += 1;}while(0)
+#define READ_BUFFER(B, L, I, V, T)											do{if ((I) >= (L)) return EFI_BAD_BUFFER_SIZE; (V) = static_cast<T>((B)[(I)]); (I) += 1;}while (0)
+#define WRITE_BUFFER(B, L, I, V, T)											do{if ((I) >= (L) - 1) return EFI_BUFFER_TOO_SMALL; (B)[(I)] = static_cast<T>(V); (I) += 1;}while (0)
 
 //
-// unicode to utf8
+// Unicode to UTF8.
 //
 EFI_STATUS BlUnicodeToUtf8(CHAR16 CONST* unicodeBuffer, UINTN unicodeCharCount, CHAR8* utf8Buffer, UINTN utf8BufferLength)
 {
 	UINT32 j																= 0;
 	utf8Buffer[utf8BufferLength - 1]										= 0;
-	for(UINT32 i = 0; i < unicodeCharCount; i ++)
+	for (UINT32 i = 0; i < unicodeCharCount; i ++)
 	{
 		CHAR16 unicodeChar													= unicodeBuffer[i];
-		if(unicodeChar < 0x0080)
+		if (unicodeChar < 0x0080)
 		{
 			WRITE_BUFFER(utf8Buffer, utf8BufferLength, j, unicodeChar, UINT8);
 		}
-		else if(unicodeChar < 0x0800)
+		else if (unicodeChar < 0x0800)
 		{
 			WRITE_BUFFER(utf8Buffer, utf8BufferLength, j, ((unicodeChar >>  6) & 0x0f) | 0xc0, UINT8);
 			WRITE_BUFFER(utf8Buffer, utf8BufferLength, j, ((unicodeChar >>  0) & 0x3f) | 0x80, UINT8);
@@ -396,51 +429,51 @@ EFI_STATUS BlUnicodeToUtf8(CHAR16 CONST* unicodeBuffer, UINTN unicodeCharCount, 
 		}
 	}
 
-	if(j < utf8BufferLength - 1)
+	if (j < utf8BufferLength - 1)
 		WRITE_BUFFER(utf8Buffer, utf8BufferLength, j, 0, UINT8);
 
 	return EFI_SUCCESS;
 }
 
 //
-// unicode to ansi
+// unicode to ANSI.
 //
 EFI_STATUS BlUnicodeToAnsi(CHAR16 CONST* unicodeBuffer, UINTN unicodeCharCount, CHAR8* ansiBuffer, UINTN ansiBufferLength)
 {
 	UINTN j																	= 0;
 	ansiBuffer[ansiBufferLength - 1]										= 0;
-	for(UINTN i = 0; i < unicodeCharCount; i ++)
+	for (UINTN i = 0; i < unicodeCharCount; i ++)
 	{
 		CHAR16 unicodeChar													= unicodeBuffer[i];
 		WRITE_BUFFER(ansiBuffer, ansiBufferLength, j, unicodeChar & 0xff, CHAR8);
 	}
 
-	if(j < ansiBufferLength - 1)
+	if (j < ansiBufferLength - 1)
 		WRITE_BUFFER(ansiBuffer, ansiBufferLength, j, 0, CHAR8);
 
 	return EFI_SUCCESS;
 }
 
 //
-// utf8 to unicode
+// UTF8 to unicode.
 //
 EFI_STATUS BlUtf8ToUnicode(CHAR8 CONST* utf8Buffer, UINTN bytesCount, CHAR16* unicodeBuffer, UINTN unicodeBufferLengthInChar)
 {
 	UINTN i																	= 0;
 	UINTN j																	= 0;
 	unicodeBuffer[unicodeBufferLengthInChar - 1]							= 0;
-	while(i < bytesCount)
+	while (i < bytesCount)
 	{
 		UINT8 utf8Char1;
 		UINT8 utf8Char2;
 		UINT8 utf8Char3;
 		READ_BUFFER(utf8Buffer, bytesCount, i, utf8Char1, UINT8);
 
-		if(utf8Char1 < 0x80)
+		if (utf8Char1 < 0x80)
 		{
 			WRITE_BUFFER(unicodeBuffer, unicodeBufferLengthInChar, j, utf8Char1, CHAR16);
 		}
-		else if(utf8Char1 < 0xe0)
+		else if (utf8Char1 < 0xe0)
 		{
 			READ_BUFFER(utf8Buffer, bytesCount, i, utf8Char2, UINT8);
 
@@ -457,7 +490,7 @@ EFI_STATUS BlUtf8ToUnicode(CHAR8 CONST* utf8Buffer, UINTN bytesCount, CHAR16* un
 		}
 	}
 
-	if(j < unicodeBufferLengthInChar - 1)
+	if (j < unicodeBufferLengthInChar - 1)
 		WRITE_BUFFER(unicodeBuffer, unicodeBufferLengthInChar, j, 0, CHAR16);
 
 	return EFI_SUCCESS;
@@ -467,74 +500,80 @@ EFI_STATUS BlUtf8ToUnicode(CHAR8 CONST* utf8Buffer, UINTN bytesCount, CHAR16* un
 #undef WRITE_BUFFER
 
 //
-// build utf8 string from unicode
+// Build UTF8 string from unicode.
 //
 CHAR8* BlAllocateUtf8FromUnicode(CHAR16 CONST* unicodeString, UINTN unicodeCharCount)
 {
 	UINTN length															= unicodeCharCount == -1 ? wcslen(unicodeString) : unicodeCharCount;
 	UINTN utf8BufferLength													= (length * 3 + 1) * sizeof(CHAR8);
 	UINT8* utf8NameBuffer													= static_cast<UINT8*>(MmAllocatePool(utf8BufferLength));
-	if(!utf8NameBuffer)
+
+	if (!utf8NameBuffer)
 		return nullptr;
 
-	if(!EFI_ERROR(BlUnicodeToUtf8(unicodeString, length, utf8NameBuffer, utf8BufferLength / sizeof(CHAR8))))
+	if (!EFI_ERROR(BlUnicodeToUtf8(unicodeString, length, utf8NameBuffer, utf8BufferLength / sizeof(CHAR8))))
 		return utf8NameBuffer;
 
 	MmFreePool(utf8NameBuffer);
+
 	return nullptr;
 }
 
 //
-// build unicode string from utf8
+// Build unicode string from UTF8.
 //
 CHAR16* BlAllocateUnicodeFromUtf8(CHAR8 CONST* utf8String, UINTN utf8Length)
 {
 	UINTN length															= (utf8Length == -1 ? strlen(utf8String) : utf8Length) + 1;
 	CHAR16* unicodeBuffer													= static_cast<CHAR16*>(MmAllocatePool(length * sizeof(CHAR16)));
-	if(!unicodeBuffer)
+
+	if (!unicodeBuffer)
 		return nullptr;
 
-	if(!EFI_ERROR(BlUtf8ToUnicode(utf8String, utf8Length, unicodeBuffer, length)))
+	if (!EFI_ERROR(BlUtf8ToUnicode(utf8String, utf8Length, unicodeBuffer, length)))
 		return unicodeBuffer;
 
 	MmFreePool(unicodeBuffer);
+
 	return nullptr;
 }
 
 //
-// allocate string
+// Allocate string.
 //
 CHAR8* BlAllocateString(CHAR8 CONST* inputString)
 {
 	CHAR8* retValue															= static_cast<UINT8*>(MmAllocatePool(strlen(inputString) + 1));
-	if(retValue)
+
+	if (retValue)
 		strcpy(retValue, inputString);
 
 	return retValue;
 }
 
 //
-// convert path sep
+// Convert path separator.
 //
 VOID BlConvertPathSeparator(CHAR8* pathName, CHAR8 fromChar, CHAR8 toChar)
 {
 	UINTN pathLength														= strlen(pathName);
-	for(UINTN i = 0; i < pathLength; i ++)
+
+	for (UINTN i = 0; i < pathLength; i ++)
 	{
-		if(pathName[i] == fromChar)
+		if (pathName[i] == fromChar)
 			pathName[i]														= toChar;
 	}
 }
 
 //
-// uuid to buffer
+// UUID to buffer.
 //
 BOOLEAN BlUUIDStringToBuffer(CHAR8 CONST* uuidString, UINT8* uuidBuffer)
 {
 	//
 	// 00112233-4455-6677-8899-aabbccddeeff
 	//
-	if(strlen(uuidString) != 36 || uuidString[8] != '-' || uuidString[13] != '-' || uuidString[18] != '-' || uuidString[23] != '-')
+	if (strlen(uuidString) != 36 || uuidString[8] != '-' || uuidString[13] != '-' || uuidString[18] != '-' || uuidString[23] != '-')
 		return FALSE;
 
 #define CHAR_TO_NIBBLE(c)													((c) >= '0' && (c) <= '9' ? (c) - '0' : ((c) >= 'a' && (c) <= 'f' ? (c) - 'a' + 10 : ((c) >= 'A' && (c) <= 'F' ? (c) - 'A' + 10 : 0)))
@@ -560,77 +599,82 @@ BOOLEAN BlUUIDStringToBuffer(CHAR8 CONST* uuidString, UINT8* uuidBuffer)
 }
 
 //
-// compare time
+// Compare time.
 //
 INTN BlCompareTime(EFI_TIME* time1, EFI_TIME* time2)
 {
-	if(time1->Year < time2->Year)
+	if (time1->Year < time2->Year)
 		return -1;
 
-	if(time1->Year > time2->Year)
+	if (time1->Year > time2->Year)
 		return 1;
 
-	if(time1->Month < time2->Month)
+	if (time1->Month < time2->Month)
 		return -1;
 
-	if(time1->Month > time2->Month)
+	if (time1->Month > time2->Month)
 		return 1;
 
-	if(time1->Day < time2->Day)
+	if (time1->Day < time2->Day)
 		return -1;
 
-	if(time1->Day > time2->Day)
+	if (time1->Day > time2->Day)
 		return 1;
 
-	if(time1->Hour < time2->Hour)
+	if (time1->Hour < time2->Hour)
 		return -1;
 
-	if(time1->Hour > time2->Hour)
+	if (time1->Hour > time2->Hour)
 		return 1;
 
-	if(time1->Minute < time2->Minute)
+	if (time1->Minute < time2->Minute)
 		return -1;
 
-	if(time1->Minute > time2->Minute)
+	if (time1->Minute > time2->Minute)
 		return 1;
 
-	if(time1->Second < time2->Second)
+	if (time1->Second < time2->Second)
 		return -1;
 
-	if(time1->Second > time2->Second)
+	if (time1->Second > time2->Second)
 		return 1;
 
 	return 0;
 }
 
 //
-// add one second
+// Add one second.
 //
 VOID BlAddOneSecond(EFI_TIME* theTime)
 {
 	theTime->Second															+= 1;
-	if(theTime->Second > 59)
+
+	if (theTime->Second > 59)
 	{
 		theTime->Second														= 0;
 		theTime->Minute														+= 1;
-		if(theTime->Minute > 59)
+
+		if (theTime->Minute > 59)
 		{
 			theTime->Minute													= 0;
 			theTime->Hour													+= 1;
-			if(theTime->Hour > 23)
+
+			if (theTime->Hour > 23)
 			{
 				theTime->Hour												= 0;
 				theTime->Day												+= 1;
 
 				UINT32 daysOfMonth											= ((1 << theTime->Month) & 0x15aa) ? 31 : 30;
-				if(theTime->Month == 2)
+
+				if (theTime->Month == 2)
 					daysOfMonth												= IS_LEAP_YEAR(theTime->Year) ? 29 : 28;
 
-				if(theTime->Day > daysOfMonth)
+				if (theTime->Day > daysOfMonth)
 				{
 					theTime->Day											= 1;
 					theTime->Month											+= 1;
-					if(theTime->Month > 12)
+
+					if (theTime->Month > 12)
 					{
 						theTime->Month										= 1;
 						theTime->Year										+= 1;
@@ -642,7 +686,7 @@ VOID BlAddOneSecond(EFI_TIME* theTime)
 }
 
 //
-// efi time to unix time
+// EFI time to UNIX time.
 //
 UINT32 BlEfiTimeToUnixTime(EFI_TIME CONST* efiTime)
 {
@@ -682,26 +726,27 @@ UINT32 BlEfiTimeToUnixTime(EFI_TIME CONST* efiTime)
 	};
 
 	//
-	// check range
+	// Check range.
 	//
-	if(efiTime->Year < 1998 || efiTime->Year > 2099 || !efiTime->Month || efiTime->Month > 12 || !efiTime->Day || efiTime->Day > 31 || efiTime->Hour > 23 || efiTime->Minute > 59 || efiTime->Second > 59)
+	if (efiTime->Year < 1998 || efiTime->Year > 2099 || !efiTime->Month || efiTime->Month > 12 || !efiTime->Day || efiTime->Day > 31 || efiTime->Hour > 23 || efiTime->Minute > 59 || efiTime->Second > 59)
 		return 0;
 
 	//
-	// check timezone
+	// Check timezone.
 	//
-	if(efiTime->TimeZone < -1440 || (efiTime->TimeZone > 1440 && efiTime->TimeZone != EFI_UNSPECIFIED_TIMEZONE))
+	if (efiTime->TimeZone < -1440 || (efiTime->TimeZone > 1440 && efiTime->TimeZone != EFI_UNSPECIFIED_TIMEZONE))
 		return 0;
 
 	//
-	// count year
+	// Count year.
 	//
 	UINT32 retValue															= 0;
-	for(UINT16 year = 1970; year < efiTime->Year; year ++)
+
+	for (UINT16 year = 1970; year < efiTime->Year; year ++)
 		retValue															+= cumulativeDays[IS_LEAP_YEAR(year)][13] * 60 * 60 * 24;
 
 	//
-	// count month, day, hour, minute, second
+	// Count month, day, hour, minute, second.
 	//
 	retValue																+= cumulativeDays[IS_LEAP_YEAR(efiTime->Year)][efiTime->Month] * 60 * 60 * 24;
 	retValue																+= efiTime->Day > 0 ? (efiTime->Day - 1) * 60 * 60 * 24 : 0;
@@ -710,29 +755,30 @@ UINT32 BlEfiTimeToUnixTime(EFI_TIME CONST* efiTime)
 	retValue																+= efiTime->Second;
 
 	//
-	// efi time is reported in local time, adjust time zone (time zone is kept in minutes)
+	// EFI time is reported in local time, adjust time zone (time zone is kept in minutes).
 	//
-	if(efiTime->TimeZone != EFI_UNSPECIFIED_TIMEZONE)
+	if (efiTime->TimeZone != EFI_UNSPECIFIED_TIMEZONE)
 		retValue															+= efiTime->TimeZone * 60;
 
 	return retValue;
 }
 
 //
-// get current unix time
+// Get current UNIX time.
 //
 UINT32 BlGetCurrentUnixTime()
 {
 	EFI_TIME efiTime;
 	EFI_TIME_CAPABILITIES timeCapabilities;
-	if(EFI_ERROR(EfiRuntimeServices->GetTime(&efiTime, &timeCapabilities)))
+
+	if (EFI_ERROR(EfiRuntimeServices->GetTime(&efiTime, &timeCapabilities)))
 		return 0;
 
 	return BlEfiTimeToUnixTime(&efiTime);
 }
 
 //
-// adler32
+// Returns adler32.
 //
 UINT32 BlAdler32(VOID CONST* inputBuffer, UINTN bufferLength)
 {
@@ -740,9 +786,9 @@ UINT32 BlAdler32(VOID CONST* inputBuffer, UINTN bufferLength)
 	UINT32 highHalf															= 0;
 	UINT8 CONST* theBuffer													= static_cast<UINT8 CONST*>(inputBuffer);
 
-	for(UINT32 i = 0; i < bufferLength; i ++)
+	for (UINT32 i = 0; i < bufferLength; i ++)
 	{
-		if((i % 5000) == 0)
+		if ((i % 5000) == 0)
 		{
 			lowHalf															%= 65521;
 			highHalf														%= 65521;
@@ -754,11 +800,12 @@ UINT32 BlAdler32(VOID CONST* inputBuffer, UINTN bufferLength)
 
 	lowHalf																	%= 65521;
 	highHalf																%= 65521;
+
 	return (highHalf << 16) | lowHalf;
 }
 
 //
-// uncompress LZSS
+// Uncompress LZSS.
 //
 EFI_STATUS BlDecompressLZSS(VOID CONST* compressedBuffer, UINTN compressedSize, VOID* uncompressedBuffer, UINTN uncompressedBufferSize, UINTN* uncompressedSize)
 {
@@ -778,14 +825,14 @@ EFI_STATUS BlDecompressLZSS(VOID CONST* compressedBuffer, UINTN compressedSize, 
 	INT32 r																	= N - F;
 	UINT32 flags															= 0;
 
-	for(i = 0; i < N - F; i ++)
+	for (i = 0; i < N - F; i ++)
 		textBuffer[i]														= ' ';
 
-	while(TRUE)
+	while (TRUE)
 	{
-		if(((flags >>= 1) & 0x100) == 0)
+		if (((flags >>= 1) & 0x100) == 0)
 		{
-			if(srcBuffer < srcend)
+			if (srcBuffer < srcend)
 				c															= *srcBuffer ++;
 			else
 				break;
@@ -793,9 +840,9 @@ EFI_STATUS BlDecompressLZSS(VOID CONST* compressedBuffer, UINTN compressedSize, 
 			flags															= c | 0xFF00;
 		}
 
-		if(flags & 1)
+		if (flags & 1)
 		{
-			if(srcBuffer < srcend)
+			if (srcBuffer < srcend)
 				c															= *srcBuffer ++;
 			else
 				break;
@@ -806,19 +853,19 @@ EFI_STATUS BlDecompressLZSS(VOID CONST* compressedBuffer, UINTN compressedSize, 
 		}
 		else
 		{
-			if(srcBuffer < srcend)
+			if (srcBuffer < srcend)
 				i															= *srcBuffer ++;
 			else
 				break;
 
-			if(srcBuffer < srcend)
+			if (srcBuffer < srcend)
 				j															= *srcBuffer ++;
 			else
 				break;
 			i																|= ((j & 0xf0) << 4);
 			j																=  (j & 0x0f) + THRESHOLD;
 
-			for(INT32 k = 0; k <= j; k ++)
+			for (INT32 k = 0; k <= j; k ++)
 			{
 				c															= textBuffer[(i + k) & (N - 1)];
 				*dstBuffer ++												= c;
@@ -835,7 +882,7 @@ EFI_STATUS BlDecompressLZSS(VOID CONST* compressedBuffer, UINTN compressedSize, 
 
 #if (TARGET_OS >= YOSEMITE)
 //
-// uncompress LZVN
+// Uncompress LZVN.
 //
 EFI_STATUS BlDecompressLZVN(VOID CONST* compressedBuffer, UINTN aCompressedSize, VOID* uncompressedBuffer, UINTN uncompressedBufferSize, UINTN* uncompressedSize)
 {

@@ -44,17 +44,20 @@ STATIC EFI_STATUS CspConvertImage(EFI_UGA_PIXEL** imageBuffer, UINT8 CONST* imag
 	UINTN dataLength														= width * height * frameCount;
 	UINTN imageLength														= dataLength * sizeof(EFI_UGA_PIXEL);
 	EFI_UGA_PIXEL* theImage													= static_cast<EFI_UGA_PIXEL*>(MmAllocatePool(imageLength));
-	if(!theImage)
+
+	if (!theImage)
 		return EFI_OUT_OF_RESOURCES;
 
 	*imageBuffer															= theImage;
-	for(UINTN i = 0; i < dataLength; i ++, theImage ++, imageData ++)
+
+	for (UINTN i = 0; i < dataLength; i++, theImage++, imageData++)
 	{
 		UINTN index															= *imageData * 3;
 		theImage->Red														= lookupTable[index + 0];
 		theImage->Green														= lookupTable[index + 1];
 		theImage->Blue														= lookupTable[index + 2];
 	}
+
 	return EFI_SUCCESS;
 }
 
@@ -72,15 +75,21 @@ STATIC EFI_STATUS CspScaleImage(EFI_UGA_PIXEL* inputData, UINTN inputWidth, UINT
 		//
 		UINTN scaledWidth													= inputWidth * scaleRate / 1000;
 		UINTN scaledHeight													= inputHeight * scaleRate / 1000;
-		if(!scaledWidth || !scaledHeight || scaledWidth > CspHorzRes || scaledHeight > CspVertRes)
+
+		if (!scaledWidth || !scaledHeight || scaledWidth > CspHorzRes || scaledHeight > CspVertRes)
+		{
 			try_leave(status = EFI_INVALID_PARAMETER);
+		}
 
 		//
 		// allocate buffer
 		//
 		EFI_UGA_PIXEL* scaledData											= static_cast<EFI_UGA_PIXEL*>(MmAllocatePool(scaledWidth * scaledHeight * sizeof(EFI_UGA_PIXEL)));
-		if(!scaledData)
+
+		if (!scaledData)
+		{
 			try_leave(status = EFI_OUT_OF_RESOURCES);
+		}
 
 		//
 		// output
@@ -92,10 +101,12 @@ STATIC EFI_STATUS CspScaleImage(EFI_UGA_PIXEL* inputData, UINTN inputWidth, UINT
 		//
 		// scale it
 		//
-		for(UINTN y = 0; y < scaledHeight; y ++)
+		for (UINTN y = 0; y < scaledHeight; y++)
 		{
-			for(UINTN x = 0; x < scaledWidth; x ++, scaledData ++)
+			for (UINTN x = 0; x < scaledWidth; x++, scaledData++)
+			{
 				*scaledData													= *(inputData + x * inputWidth / scaledWidth + y * inputHeight / scaledHeight * inputWidth);
+			}
 		}
 	}
 	__finally
@@ -113,11 +124,15 @@ STATIC EFI_STATUS CspFillRect(UINTN x, UINTN y, UINTN width, UINTN height, EFI_U
 {
 	CspScreenNeedRedraw														= TRUE;
 
-	if(CspGraphicsOutputProtocol)
+	if (CspGraphicsOutputProtocol)
+	{
 		return CspGraphicsOutputProtocol->Blt(CspGraphicsOutputProtocol, &pixelColor, EfiBltVideoFill, 0, 0, x, y, width, height, 0);
+	}
 
-	if(CspUgaDrawProtocol)
+	if (CspUgaDrawProtocol)
+	{
 		return CspUgaDrawProtocol->Blt(CspUgaDrawProtocol, &pixelColor, EfiUgaVideoFill, 0, 0, x, y, width, height, 0);
+	}
 
 	return EFI_UNSUPPORTED;
 }
@@ -129,11 +144,15 @@ STATIC EFI_STATUS CspDrawRect(UINTN x, UINTN y, UINTN width, UINTN height, EFI_U
 {
 	CspScreenNeedRedraw														= TRUE;
 
-	if(CspGraphicsOutputProtocol)
+	if (CspGraphicsOutputProtocol)
+	{
 		return CspGraphicsOutputProtocol->Blt(CspGraphicsOutputProtocol, pixelBuffer, EfiBltBufferToVideo, 0, 0, x, y, width, height, 0);
+	}
 
-	if(CspUgaDrawProtocol)
+	if (CspUgaDrawProtocol)
+	{
 		return CspUgaDrawProtocol->Blt(CspUgaDrawProtocol, pixelBuffer, EfiUgaBltBufferToVideo, 0, 0, x, y, width, height, 0);
+	}
 
 	return EFI_UNSUPPORTED;
 }
@@ -153,87 +172,113 @@ EFI_STATUS CspLoadLogoFile(CHAR8 CONST* logoFileName, EFI_UGA_PIXEL** logoImage,
 		//
 		// read file
 		//
-		if(EFI_ERROR(status = IoReadWholeFile(nullptr, logoFileName, &fileBuffer, &fileSize, FALSE)))
+		if (EFI_ERROR(status = IoReadWholeFile(nullptr, logoFileName, &fileBuffer, &fileSize, FALSE)))
+		{
 			try_leave(NOTHING);
+		}
 
 		//
 		// get image decoders
 		//
 		UINTN totalHandles													= 0;
-		if(EFI_ERROR(status = EfiBootServices->LocateHandleBuffer(ByProtocol, &AppleImageCodecProtocolGuid, nullptr, &totalHandles, &handleArray)))
+
+		if (EFI_ERROR(status = EfiBootServices->LocateHandleBuffer(ByProtocol, &AppleImageCodecProtocolGuid, nullptr, &totalHandles, &handleArray)))
+		{
 			try_leave(NOTHING);
+		}
 
 		//
 		// search decoder
 		//
 		APPLE_IMAGE_CODEC_PROTOCOL* imageCodecProtocol						= nullptr;
 		status																= EFI_NOT_FOUND;
-		for(UINTN i = 0; i < totalHandles; i ++)
+
+		for (UINTN i = 0; i < totalHandles; i++)
 		{
 			//
 			// get codec protocol
 			//
 			EFI_HANDLE theHandle											= handleArray[i];
-			if(!theHandle)
-				continue;
 
-			if(EFI_ERROR(status = EfiBootServices->HandleProtocol(theHandle, &AppleImageCodecProtocolGuid, reinterpret_cast<VOID**>(&imageCodecProtocol))))
+			if (!theHandle)
+			{
+				continue;
+			}
+
+			if (EFI_ERROR(status = EfiBootServices->HandleProtocol(theHandle, &AppleImageCodecProtocolGuid, reinterpret_cast<VOID**>(&imageCodecProtocol))))
+			{
 				try_leave(NOTHING);
+			}
 
 			//
 			// can decode this file
 			//
-			if(!EFI_ERROR(status = imageCodecProtocol->RecognizeImageData(fileBuffer, fileSize)))
+			if (!EFI_ERROR(status = imageCodecProtocol->RecognizeImageData(fileBuffer, fileSize)))
+			{
 				break;
+			}
 		}
 
 		//
 		// decoder not found
 		//
-		if(EFI_ERROR(status))
+		if (EFI_ERROR(status))
+		{
 			try_leave(NOTHING);
+		}
 
 		//
 		// get image dims
 		//
-		if(EFI_ERROR(status = imageCodecProtocol->GetImageDims(fileBuffer, fileSize, imageWidth, imageHeight)))
+		if (EFI_ERROR(status = imageCodecProtocol->GetImageDims(fileBuffer, fileSize, imageWidth, imageHeight)))
+		{
 			try_leave(NOTHING);
+		}
 
 		//
 		// decode buffer
 		//
 		UINTN imageDataSize													= 0;
-		if(EFI_ERROR(status = imageCodecProtocol->DecodeImageData(fileBuffer, fileSize, logoImage, &imageDataSize)))
+
+		if (EFI_ERROR(status = imageCodecProtocol->DecodeImageData(fileBuffer, fileSize, logoImage, &imageDataSize)))
+		{
 			try_leave(NOTHING);
+		}
 
 		//
 		// alpha blend with background
 		//
 		UINTN pixelCount													= imageDataSize / sizeof(EFI_UGA_PIXEL);
 		EFI_UGA_PIXEL* imageData											= *logoImage;
-		for(UINTN i = 0; i < pixelCount; i ++, imageData ++)
+
+		for (UINTN i = 0; i < pixelCount; i++, imageData++)
 		{
 			UINT8 alpha														= 255 - imageData->Reserved;
-			if(alpha == 255)
-				continue;
 
-			UINT32 red														= (imageData->Red * alpha + imageData->Reserved * CspBackgroundClear.Red) / 255;
-			imageData->Red													= static_cast<UINT8>(red > 255 ? 255 : red);
+			if (alpha != 255)
+			{
+				UINT32 red													= (imageData->Red * alpha + imageData->Reserved * CspBackgroundClear.Red) / 255;
+				imageData->Red												= static_cast<UINT8>(red > 255 ? 255 : red);
 
-			UINT32 green													= (imageData->Green * alpha + imageData->Reserved * CspBackgroundClear.Green) / 255;
-			imageData->Green												= static_cast<UINT8>(green > 255 ? 255 : green);
+				UINT32 green												= (imageData->Green * alpha + imageData->Reserved * CspBackgroundClear.Green) / 255;
+				imageData->Green											= static_cast<UINT8>(green > 255 ? 255 : green);
 
-			UINT32 blue														= (imageData->Blue * alpha + imageData->Reserved * CspBackgroundClear.Blue) / 255;
-			imageData->Blue													= static_cast<UINT8>(blue > 255 ? 255 : blue);
+				UINT32 blue													= (imageData->Blue * alpha + imageData->Reserved * CspBackgroundClear.Blue) / 255;
+				imageData->Blue												= static_cast<UINT8>(blue > 255 ? 255 : blue);
+			}
 		}
 	}
 	__finally
 	{
-		if(fileBuffer)
+		if (fileBuffer)
+		{
 			MmFreePool(fileBuffer);
+		}
 
-		if(handleArray)
+		if (handleArray)
+		{
 			EfiBootServices->FreePool(handleArray);
+		}
 	}
 
 	return status;
@@ -261,12 +306,12 @@ STATIC EFI_STATUS CspConvertLogoImage(BOOLEAN normalLogo, EFI_UGA_PIXEL** logoIm
 		//
 		// using alt image
 		//
-		if(logoFileName)
+		if (logoFileName)
 		{
 			//
 			// load file
 			//
-			if(!EFI_ERROR(CspLoadLogoFile(logoFileName, &efiAllocatedData, imageWidth, imageHeight)))
+			if (!EFI_ERROR(CspLoadLogoFile(logoFileName, &efiAllocatedData, imageWidth, imageHeight)))
 			{
 				//
 				// get scale rate
@@ -277,18 +322,23 @@ STATIC EFI_STATUS CspConvertLogoImage(BOOLEAN normalLogo, EFI_UGA_PIXEL** logoIm
 				//
 				// no scale
 				//
-				if(scaleRate <= 0 || CspVertRes >= 1080)
+				if (scaleRate <= 0 || CspVertRes >= 1080)
 				{
 					UINTN imageSize											= *imageWidth * *imageHeight * sizeof(EFI_UGA_PIXEL);
 					*logoImage												= static_cast<EFI_UGA_PIXEL*>(MmAllocatePool(imageSize));
-					if(*logoImage)
+
+					if (*logoImage)
+					{
 						memcpy(*logoImage, efiAllocatedData, imageSize);
+					}
 
 					try_leave(status = *logoImage ? EFI_SUCCESS : EFI_OUT_OF_RESOURCES);
 				}
 
-				if(!EFI_ERROR(CspScaleImage(efiAllocatedData, *imageWidth, *imageHeight, logoImage, imageWidth, imageHeight, static_cast<INTN>(scaleRate))))
+				if (!EFI_ERROR(CspScaleImage(efiAllocatedData, *imageWidth, *imageHeight, logoImage, imageWidth, imageHeight, static_cast<INTN>(scaleRate))))
+				{
 					try_leave(NOTHING);
+				}
 
 				MmFreePool(*logoImage);
 			}
@@ -304,7 +354,7 @@ STATIC EFI_STATUS CspConvertLogoImage(BOOLEAN normalLogo, EFI_UGA_PIXEL** logoIm
 			UINTN															BufferSize;
 			VOID*															Buffer;
 			UINT8*															LookupTable;
-		}builtin_image_info;
+		} builtin_image_info;
 
 		//
 		// 4 images(normal, normal@2x, failed, failed@2x)
@@ -338,38 +388,51 @@ STATIC EFI_STATUS CspConvertLogoImage(BOOLEAN normalLogo, EFI_UGA_PIXEL** logoIm
 		*imageHeight														= imageInfo[index].Height;
 		UINTN imageSize														= *imageWidth * *imageHeight;
 		imageData															= static_cast<UINT8*>(MmAllocatePool(imageSize));
-		if(!imageData)
+
+		if (!imageData)
+		{
 			try_leave(status = EFI_OUT_OF_RESOURCES);
+		}
 
 #if (TARGET_OS >= YOSMITE)
 		if (index < 2)
 		{
-			if(EFI_ERROR(status = BlDecompressLZVN(imageInfo[index].Buffer, imageInfo[index].BufferSize, imageData, imageSize, &imageSize)))
+			if (EFI_ERROR(status = BlDecompressLZVN(imageInfo[index].Buffer, imageInfo[index].BufferSize, imageData, imageSize, &imageSize)))
+			{
 				try_leave(NOTHING);
+			}
 		}
 		else
 		{
 #endif // #if (TARGET_OS >= YOSMITE)
-			if(EFI_ERROR(status = BlDecompressLZSS(imageInfo[index].Buffer, imageInfo[index].BufferSize, imageData, imageSize, &imageSize)))
+			if (EFI_ERROR(status = BlDecompressLZSS(imageInfo[index].Buffer, imageInfo[index].BufferSize, imageData, imageSize, &imageSize)))
+			{
 				try_leave(NOTHING);
+			}
 #if (TARGET_OS >= YOSMITE)
 		}
 #endif // #if (TARGET_OS >= YOSMITE)
 		//
 		// convert it
 		//
-		if(EFI_ERROR(status = CspConvertImage(logoImage, imageData, *imageWidth, *imageHeight, 1, imageInfo[index].LookupTable)))
+		if (EFI_ERROR(status = CspConvertImage(logoImage, imageData, *imageWidth, *imageHeight, 1, imageInfo[index].LookupTable)))
+		{
 			try_leave(NOTHING);
+		}
 	}
 	__finally
 	{
-		if(imageData)
+		if (imageData)
+		{
 			MmFreePool(imageData);
+		}
 
-		if(efiAllocatedData)
+		if (efiAllocatedData)
+		{
 			EfiBootServices->FreePool(efiAllocatedData);
+		}
 
-		if(EFI_ERROR(status))
+		if (EFI_ERROR(status))
 		{
 			*imageWidth														= 0;
 			*imageHeight													= 0;
@@ -385,8 +448,10 @@ STATIC EFI_STATUS CspConvertLogoImage(BOOLEAN normalLogo, EFI_UGA_PIXEL** logoIm
 //
 STATIC EFI_STATUS CspRestoreGraphConfig(UINT32 count, VOID* p1, VOID* p2, VOID* p3)
 {
-	if(ArchConvertPointerToAddress(CspGraphConfigProtocol) >= 2)
+	if (ArchConvertPointerToAddress(CspGraphConfigProtocol) >= 2)
+	{
 		return CspGraphConfigProtocol->RestoreConfig(CspGraphConfigProtocol, 2, count, p1, p2, p3);
+	}
 
 	return EFI_SUCCESS;
 }
@@ -396,7 +461,7 @@ STATIC EFI_STATUS CspRestoreGraphConfig(UINT32 count, VOID* p1, VOID* p2, VOID* 
 //
 STATIC VOID EFIAPI CspIndicatorRefreshTimerEventNotifyRoutine(EFI_EVENT theEvent, VOID* theContext)
 {
-	if(!theContext)
+	if (!theContext)
 	{
 		EFI_UGA_PIXEL* curBuffer											= CspIndicatorImage + CspIndicatorHeight * CspIndicatorWidth * CspIndicatorCurrentFrame;
 		CspIndicatorCurrentFrame											= (CspIndicatorCurrentFrame + 1) % CspIndicatorFrameCount;
@@ -420,14 +485,18 @@ STATIC VOID CspDecodeAndDrawPreviewBufferColored(HIBERNATE_PREVIEW* previewBuffe
 		VOID* output														= ArchConvertAddressToPointer(frameBuffer, VOID*);
 		UINT8* dataBuffer													= reinterpret_cast<UINT8*>(previewBuffer + 1) + previewBuffer->ImageCount * vertRes;
 		row																	= static_cast<UINT32*>(MmAllocatePool(horzRes * sizeof(UINT32)));
-		if(!row)
-			try_leave(NOTHING);
 
-		if(config)
+		if (!row)
+		{
+			try_leave(NOTHING);
+		}
+
+		if (config)
 		{
 			INT32 delta														= 0;
 			UINT16* configBuffer											= static_cast<UINT16*>(config);
-			for(INT32 i = 0; i < 0x400; i ++, configBuffer ++)
+
+			for (INT32 i = 0; i < 0x400; i++, configBuffer++)
 			{
 				INT32 index													= (i - delta) / 4;
 				delta														= index / 85 + 1;
@@ -437,7 +506,7 @@ STATIC VOID CspDecodeAndDrawPreviewBufferColored(HIBERNATE_PREVIEW* previewBuffe
 			}
 		}
 
-		for(UINT32 j = 0; j < vertRes; j ++)
+		for (UINT32 j = 0; j < vertRes; j++)
 		{
 			UINT32* input													= reinterpret_cast<UINT32*>(previewBuffer + 1) + imageIndex * vertRes + j;
 			input															= Add2Ptr(previewBuffer, *input, UINT32*);
@@ -446,9 +515,10 @@ STATIC VOID CspDecodeAndDrawPreviewBufferColored(HIBERNATE_PREVIEW* previewBuffe
 			UINT32 repeat													= 0;
 			BOOLEAN fetch													= FALSE;
 			UINT32 data														= 0;
-			for(UINT32 i = 0; i < horzRes; i ++)
+
+			for (UINT32 i = 0; i < horzRes; i++)
 			{
-				if(!count)
+				if (!count)
 				{
 					count													= *input++;
 					repeat													= (count & 0xff000000);
@@ -462,11 +532,14 @@ STATIC VOID CspDecodeAndDrawPreviewBufferColored(HIBERNATE_PREVIEW* previewBuffe
 
 				count														-= 1;
 
-				if(fetch)
+				if (fetch)
 				{
 					data													= *input++;
-					if(dataBuffer)
+
+					if (dataBuffer)
+					{
 						data												= (dataBuffer[(data  >> 16) & 0xff] << 16) | (dataBuffer[0x100 | ((data >> 8) & 0xff)] << 8) | dataBuffer[0x200 | (data & 0xff)];
+					}
 				}
 
 				row[i]														= data;
@@ -478,8 +551,10 @@ STATIC VOID CspDecodeAndDrawPreviewBufferColored(HIBERNATE_PREVIEW* previewBuffe
 	}
 	__finally
 	{
-		if(row)
+		if (row)
+		{
 			MmFreePool(row);
+		}
 	}
 }
 
@@ -500,14 +575,18 @@ STATIC EFI_STATUS CspDecodeAndDrawPreviewBuffer(HIBERNATE_PREVIEW* previewBuffer
 		//
 		// check match
 		//
-		if(imageIndex >= previewBuffer->ImageCount || (colorDepth >> 3) != previewBuffer->Depth || horzRes != previewBuffer->Width || vertRes != previewBuffer->Height || colorDepth != 32)
+		if (imageIndex >= previewBuffer->ImageCount || (colorDepth >> 3) != previewBuffer->Depth || horzRes != previewBuffer->Width || vertRes != previewBuffer->Height || colorDepth != 32)
+		{
 			try_leave(status = EFI_INVALID_PARAMETER);
+		}
 
 		//
 		// color mode
 		//
-		if(colorMode)
+		if (colorMode)
+		{
 			try_leave(CspDecodeAndDrawPreviewBufferColored(previewBuffer, imageIndex, horzRes, vertRes, bytesPerRow / sizeof(UINT32), frameBuffer, config));
+		}
 
 		//
 		// get info
@@ -519,21 +598,29 @@ STATIC EFI_STATUS CspDecodeAndDrawPreviewBuffer(HIBERNATE_PREVIEW* previewBuffer
 		sc1																	= static_cast<UINT16*>(MmAllocatePool((horzRes + 2) * sizeof(UINT16)));
 		sc2																	= static_cast<UINT16*>(MmAllocatePool((horzRes + 2) * sizeof(UINT16)));
 		sc3																	= static_cast<UINT16*>(MmAllocatePool((horzRes + 2) * sizeof(UINT16)));
-		if(!sc0 || !sc1 || !sc2 || !sc3 || !row)
+
+		if (!sc0 || !sc1 || !sc2 || !sc3 || !row)
+		{
 			try_leave(status = EFI_OUT_OF_RESOURCES);
+		}
 
 		memset(sc0, 0, (horzRes + 2) * sizeof(UINT16));
 		memset(sc1, 0, (horzRes + 2) * sizeof(UINT16));
 		memset(sc2, 0, (horzRes + 2) * sizeof(UINT16));
 		memset(sc3, 0, (horzRes + 2) * sizeof(UINT16));
 
-		for(UINT32 j = 0; j < vertRes + 2; j ++)
+		for (UINT32 j = 0; j < vertRes + 2; j++)
 		{
 			UINT32* input													= reinterpret_cast<UINT32*>(previewBuffer + 1) + imageIndex * vertRes;
-			if(j < vertRes)
+
+			if (j < vertRes)
+			{
 				input														+= j;
+			}
 			else
+			{
 				input														+= vertRes - 1;
+			}
 
 			input															= Add2Ptr(previewBuffer, *input, UINT32*);
 
@@ -545,11 +632,12 @@ STATIC EFI_STATUS CspDecodeAndDrawPreviewBuffer(HIBERNATE_PREVIEW* previewBuffer
 			UINT32 sr3														= 0;
 			BOOLEAN fetch													= FALSE;
 			UINT32 data														= 0;
-			for(UINT32 i = 0; i < horzRes + 2; i ++)
+
+			for (UINT32 i = 0; i < horzRes + 2; i++)
 			{
-				if(i < horzRes)
+				if (i < horzRes)
 				{
-					if(!count)
+					if (!count)
 					{
 						count												= *input++;
 						repeat												= (count & 0xff000000);
@@ -563,7 +651,7 @@ STATIC EFI_STATUS CspDecodeAndDrawPreviewBuffer(HIBERNATE_PREVIEW* previewBuffer
 
 					count													-= 1;
 
-					if(fetch)
+					if (fetch)
 					{
 						data												= *input++;
 						data												= (((13933 * (0xff & (data >> 24)) + 46871 * (0xff & (data >> 16)) + 4732 * (0xff & data)) >> 16) * 19661 + (103 << 16)) >> 16;
@@ -588,11 +676,13 @@ STATIC EFI_STATUS CspDecodeAndDrawPreviewBuffer(HIBERNATE_PREVIEW* previewBuffer
 				UINT32 out													= ((128 + sc3[i] + tmp2) >> 8) & 0xff;
 				sc3[i]														= static_cast<UINT16>(tmp2);
 
-				if(i > 1 && j > 1)
+				if (i > 1 && j > 1)
+				{
 					row[i - 2]												= out | (out << 8) | (out << 16);
+				}
 			}
 
-			if(j > 1)
+			if (j > 1)
 			{
 				EfiBootServices->CopyMem(output, row, horzRes * sizeof(UINT32));
 				output														= Add2Ptr(output, pixelPerRow * sizeof(UINT32), VOID*);
@@ -601,20 +691,30 @@ STATIC EFI_STATUS CspDecodeAndDrawPreviewBuffer(HIBERNATE_PREVIEW* previewBuffer
 	}
 	__finally
 	{
-		if(sc0)
+		if (sc0)
+		{
 			MmFreePool(sc0);
+		}
 
-		if(sc1)
+		if (sc1)
+		{
 			MmFreePool(sc1);
+		}
 
-		if(sc2)
+		if (sc2)
+		{
 			MmFreePool(sc2);
+		}
 
-		if(sc3)
+		if (sc3)
+		{
 			MmFreePool(sc3);
+		}
 
-		if(row)
+		if (row)
+		{
 			MmFreePool(row);
+		}
 	}
 
 	return status;
@@ -629,30 +729,41 @@ EFI_STATUS CsInitialize()
 	// get background clear
 	//
 	UINTN dataSize															= sizeof(CspBackgroundClear);
-	if(!EFI_ERROR(EfiRuntimeServices->GetVariable(CHAR16_STRING(L"BackgroundClear"), &AppleFirmwareVariableGuid, nullptr, &dataSize, &CspBackgroundClear)))
+
+	if (!EFI_ERROR(EfiRuntimeServices->GetVariable(CHAR16_STRING(L"BackgroundClear"), &AppleFirmwareVariableGuid, nullptr, &dataSize, &CspBackgroundClear)))
+	{
 		CspScreenNeedRedraw													= FALSE;
+	}
 	else
+	{
 		CspScreenNeedRedraw													= TRUE;
+	}
 
 	//
 	// get console control protocol
 	//
 	EFI_STATUS status														= EFI_SUCCESS;
-	if(EFI_ERROR(status = EfiBootServices->LocateProtocol(&EfiConsoleControlProtocolGuid, nullptr, reinterpret_cast<VOID**>(&CspConsoleControlProtocol))))
+
+	if (EFI_ERROR(status = EfiBootServices->LocateProtocol(&EfiConsoleControlProtocolGuid, nullptr, reinterpret_cast<VOID**>(&CspConsoleControlProtocol))))
+	{
 		return status;
+	}
 
 	//
 	// get console mode
 	//
-	if(EFI_ERROR(status = CspConsoleControlProtocol->GetMode(CspConsoleControlProtocol, &CspConsoleMode, nullptr, nullptr)))
+	if (EFI_ERROR(status = CspConsoleControlProtocol->GetMode(CspConsoleControlProtocol, &CspConsoleMode, nullptr, nullptr)))
+	{
 		return status;
+	}
 
 	//
 	// read UIScale
 	//
 	UINT8 uiScale															= 0;
 	dataSize																= sizeof(uiScale);
-	if(!EFI_ERROR(EfiRuntimeServices->GetVariable(CHAR16_STRING(L"UIScale"), &AppleFirmwareVariableGuid, nullptr, &dataSize, &uiScale)))
+
+	if (!EFI_ERROR(EfiRuntimeServices->GetVariable(CHAR16_STRING(L"UIScale"), &AppleFirmwareVariableGuid, nullptr, &dataSize, &uiScale)))
 	{
 		UINT16 actualDensity												= 0;
 		dataSize															= sizeof(actualDensity);
@@ -669,6 +780,7 @@ EFI_STATUS CsInitialize()
 	// save old mode
 	//
 	CspRestoreMode															= CspConsoleMode;
+
 	return EFI_SUCCESS;
 }
 
@@ -678,15 +790,22 @@ EFI_STATUS CsInitialize()
 EFI_STATUS CsSetConsoleMode(BOOLEAN textMode, BOOLEAN force)
 {
 	EFI_CONSOLE_CONTROL_SCREEN_MODE screenMode								= textMode ? EfiConsoleControlScreenText : EfiConsoleControlScreenGraphics;
-	if(!force && screenMode == CspConsoleMode)
+
+	if (!force && screenMode == CspConsoleMode)
+	{
 		return EFI_SUCCESS;
+	}
 
 	EFI_STATUS status														= CspConsoleControlProtocol->SetMode(CspConsoleControlProtocol, screenMode);
-	if(EFI_ERROR(status))
+
+	if (EFI_ERROR(status))
+	{
 		return status;
+	}
 
 	CspConsoleMode															= screenMode;
 	CspScreenNeedRedraw														= TRUE;
+
 	return EFI_SUCCESS;
 }
 
@@ -696,13 +815,18 @@ EFI_STATUS CsSetConsoleMode(BOOLEAN textMode, BOOLEAN force)
 EFI_STATUS CsInitializeGraphMode()
 {
 	EFI_STATUS status;
-	if(EFI_ERROR(status = CsSetConsoleMode(FALSE, FALSE)))
-		return status;
 
-	if(EFI_ERROR(status = EfiBootServices->HandleProtocol(EfiSystemTable->ConsoleOutHandle, &EfiGraphicsOutputProtocolGuid, reinterpret_cast<VOID**>(&CspGraphicsOutputProtocol))))
+	if (EFI_ERROR(status = CsSetConsoleMode(FALSE, FALSE)))
 	{
-		if(EFI_ERROR(status = EfiBootServices->HandleProtocol(EfiSystemTable->ConsoleOutHandle, &EfiUgaDrawProtocolGuid, reinterpret_cast<VOID**>(&CspUgaDrawProtocol))))
+		return status;
+	}
+
+	if (EFI_ERROR(status = EfiBootServices->HandleProtocol(EfiSystemTable->ConsoleOutHandle, &EfiGraphicsOutputProtocolGuid, reinterpret_cast<VOID**>(&CspGraphicsOutputProtocol))))
+	{
+		if (EFI_ERROR(status = EfiBootServices->HandleProtocol(EfiSystemTable->ConsoleOutHandle, &EfiUgaDrawProtocolGuid, reinterpret_cast<VOID**>(&CspUgaDrawProtocol))))
+		{
 			return status;
+		}
 	}
 
 	BlSetBootMode(BOOT_MODE_GRAPH, 0);
@@ -718,8 +842,10 @@ EFI_STATUS CsInitializeGraphMode()
 	clearPixel.Green														= static_cast<UINT8>((clearColor >>  8) & 0xff);
 	clearPixel.Blue															= static_cast<UINT8>((clearColor >> 16) & 0xff);
 
-	if(clearPixel.Red != CspBackgroundClear.Red || clearPixel.Green != CspBackgroundClear.Green || clearPixel.Blue != CspBackgroundClear.Blue)
+	if (clearPixel.Red != CspBackgroundClear.Red || clearPixel.Green != CspBackgroundClear.Green || clearPixel.Blue != CspBackgroundClear.Blue)
+	{
 		CspScreenNeedRedraw													= TRUE;
+	}
 
 	CspBackgroundClear														= clearPixel;
 	CsInitializeBootVideo(nullptr);
@@ -735,42 +861,44 @@ EFI_STATUS CsInitializeBootVideo(BOOT_VIDEO* bootVideo)
 	//
 	// get info
 	//
-	if(!CspFrameBufferAddress)
+	if (!CspFrameBufferAddress)
 	{
 		//
 		// check graphics output protocol
 		//
 		EFI_GRAPHICS_OUTPUT_PROTOCOL* graphicsOutputProtocol				= nullptr;
-		if(!EFI_ERROR(EfiBootServices->HandleProtocol(EfiSystemTable->ConsoleOutHandle, &EfiGraphicsOutputProtocolGuid, reinterpret_cast<VOID**>(&graphicsOutputProtocol))))
+
+		if (!EFI_ERROR(EfiBootServices->HandleProtocol(EfiSystemTable->ConsoleOutHandle, &EfiGraphicsOutputProtocolGuid, reinterpret_cast<VOID**>(&graphicsOutputProtocol))))
 		{
 			CspFrameBufferAddress											= graphicsOutputProtocol->Mode->FrameBufferBase;
-			if(CspFrameBufferAddress)
+
+			if (CspFrameBufferAddress)
 			{
 				CspColorDepth												= 0;
 				CspFrameBufferSize											= graphicsOutputProtocol->Mode->FrameBufferSize;
 				CspHorzRes													= graphicsOutputProtocol->Mode->Info->HorizontalResolution;
 				CspVertRes													= graphicsOutputProtocol->Mode->Info->VerticalResolution;
 
-				if(graphicsOutputProtocol->Mode->Info->PixelFormat == PixelBitMask)
+				if (graphicsOutputProtocol->Mode->Info->PixelFormat == PixelBitMask)
 				{
 					UINT32 colorMask										= graphicsOutputProtocol->Mode->Info->PixelInformation.BlueMask;
 					colorMask												|= graphicsOutputProtocol->Mode->Info->PixelInformation.GreenMask;
 					colorMask												|= graphicsOutputProtocol->Mode->Info->PixelInformation.RedMask;
 
-					for(UINTN i = 0; i < 32; i ++, colorMask >>= 1)
+					for (UINTN i = 0; i < 32; i++, colorMask >>= 1)
 					{
-						if(colorMask & 1)
+						if (colorMask & 1)
 							CspColorDepth									+= 1;
 					}
 
 					CspColorDepth											= (CspColorDepth + 7) & ~7;
 				}
-				else if(graphicsOutputProtocol->Mode->Info->PixelFormat != PixelBltOnly)
+				else if (graphicsOutputProtocol->Mode->Info->PixelFormat != PixelBltOnly)
 				{
 					CspColorDepth											= 32;
 				}
 
-				if(!CspColorDepth)
+				if (!CspColorDepth)
 				{
 					CspFrameBufferSize										= 0;
 					CspFrameBufferAddress									= 0;
@@ -787,18 +915,21 @@ EFI_STATUS CsInitializeBootVideo(BOOT_VIDEO* bootVideo)
 		//
 		// check device protocol?
 		//
-		if(!CspFrameBufferAddress)
+		if (!CspFrameBufferAddress)
 		{
 			APPLE_GRAPH_INFO_PROTOCOL* graphInfoProtocol					= nullptr;
-			if(!EFI_ERROR(EfiBootServices->LocateProtocol(&AppleGraphInfoProtocolGuid, 0, reinterpret_cast<VOID**>(&graphInfoProtocol))))
+
+			if (!EFI_ERROR(EfiBootServices->LocateProtocol(&AppleGraphInfoProtocolGuid, 0, reinterpret_cast<VOID**>(&graphInfoProtocol))))
 			{
-				if(EFI_ERROR(graphInfoProtocol->GetInfo(graphInfoProtocol, &CspFrameBufferAddress, &CspFrameBufferSize, &CspBytesPerRow, &CspHorzRes, &CspVertRes, &CspColorDepth)))
+				if (EFI_ERROR(graphInfoProtocol->GetInfo(graphInfoProtocol, &CspFrameBufferAddress, &CspFrameBufferSize, &CspBytesPerRow, &CspHorzRes, &CspVertRes, &CspColorDepth)))
+				{
 					CspFrameBufferAddress									= 0;
+				}
 			}
 		}
 	}
 
-	if(bootVideo)
+	if (bootVideo)
 	{
 		bootVideo->BaseAddress												= static_cast<UINT32>(CspFrameBufferAddress);
 		bootVideo->BytesPerRow												= CspBytesPerRow;
@@ -815,7 +946,7 @@ EFI_STATUS CsInitializeBootVideo(BOOT_VIDEO* bootVideo)
 //
 VOID CsPrintf(CHAR8 CONST* printForamt, ...)
 {
-	if(EfiSystemTable && EfiSystemTable->ConOut && EfiSystemTable->ConsoleOutHandle)
+	if (EfiSystemTable && EfiSystemTable->ConOut && EfiSystemTable->ConsoleOutHandle)
 	{
 		STATIC CHAR8 utf8Buffer[1024]										= {0};
 		STATIC CHAR16 unicodeBuffer[1024]									= {0};
@@ -826,13 +957,14 @@ VOID CsPrintf(CHAR8 CONST* printForamt, ...)
 
 		CHAR16 tempBuffer[2]												= {0};
 		BlUtf8ToUnicode(utf8Buffer, strlen(utf8Buffer), unicodeBuffer, ARRAYSIZE(unicodeBuffer) - 1);
-		for(UINTN i = 0; i < ARRAYSIZE(unicodeBuffer) && unicodeBuffer[i]; i ++)
+
+		for (UINTN i = 0; i < ARRAYSIZE(unicodeBuffer) && unicodeBuffer[i]; i++)
 		{
-			if(unicodeBuffer[i] == L'\n')
+			if (unicodeBuffer[i] == L'\n')
 			{
 				EfiSystemTable->ConOut->OutputString(EfiSystemTable->ConOut, CHAR16_STRING(L"\r\n"));
 			}
-			else if(unicodeBuffer[i] == L'\t')
+			else if (unicodeBuffer[i] == L'\t')
 			{
 				EfiSystemTable->ConOut->OutputString(EfiSystemTable->ConOut, CHAR16_STRING(L"    "));
 			}
@@ -851,33 +983,47 @@ VOID CsPrintf(CHAR8 CONST* printForamt, ...)
 EFI_STATUS CsConnectDevice(BOOLEAN connectAll, BOOLEAN connectDisplay)
 {
 	EFI_STATUS status														= EFI_SUCCESS;
-	if(!CspDeviceControlProtocol)
+
+	if (!CspDeviceControlProtocol)
 	{
-		if(EFI_ERROR(EfiBootServices->LocateProtocol(&AppleDeviceControlProtocolGuid, nullptr, reinterpret_cast<VOID**>(&CspDeviceControlProtocol))))
+		if (EFI_ERROR(EfiBootServices->LocateProtocol(&AppleDeviceControlProtocolGuid, nullptr, reinterpret_cast<VOID**>(&CspDeviceControlProtocol))))
+		{
 			CspDeviceControlProtocol										= ArchConvertAddressToPointer(1, APPLE_DEVICE_CONTROL_PROTOCOL*);
+		}
 	}
 
-	if(ArchConvertPointerToAddress(CspDeviceControlProtocol) >= 2)
+	if (ArchConvertPointerToAddress(CspDeviceControlProtocol) >= 2)
 	{
-		if(connectAll)
+		if (connectAll)
+		{
 			status															= CspDeviceControlProtocol->ConnectAll();
-		if(connectDisplay)
+		}
+		if (connectDisplay)
+		{
 			status															= CspDeviceControlProtocol->ConnectDisplay();
+		}
 	}
 
-	if(!CspGraphConfigProtocol)
+	if (!CspGraphConfigProtocol)
 	{
-		if(EFI_ERROR(EfiBootServices->LocateProtocol(&AppleGraphConfigProtocolGuid, nullptr, reinterpret_cast<VOID**>(&CspGraphConfigProtocol))))
+		if (EFI_ERROR(EfiBootServices->LocateProtocol(&AppleGraphConfigProtocolGuid, nullptr, reinterpret_cast<VOID**>(&CspGraphConfigProtocol))))
+		{
 			CspGraphConfigProtocol											= ArchConvertAddressToPointer(1, APPLE_GRAPH_CONFIG_PROTOCOL*);
+		}
 	}
 
-	if(connectAll && connectDisplay)
+	if (connectAll && connectDisplay)
+	{
 		CspRestoreGraphConfig(0, nullptr, nullptr, nullptr);
+	}
 
 	UINT32 result[sizeof(INTN) / sizeof(UINT32)]							= {0};
 	UINTN dataSize															= sizeof(result);
-	if(!EFI_ERROR(EfiRuntimeServices->GetVariable(CHAR16_STRING(L"gfx-saved-config-restore-status"), &AppleFirmwareVariableGuid, nullptr, &dataSize, result)))
+
+	if (!EFI_ERROR(EfiRuntimeServices->GetVariable(CHAR16_STRING(L"gfx-saved-config-restore-status"), &AppleFirmwareVariableGuid, nullptr, &dataSize, result)))
+	{
 		CspGfxSavedConfigRestoreStatus										= static_cast<INT32>(result[0] | (result[ARRAYSIZE(result) - 1] & 0x80000000));
+	}
 
 	return status;
 }
@@ -895,8 +1041,10 @@ EFI_STATUS CsDrawBootImage(BOOLEAN normalLogo)
 		//
 		// check graph mode
 		//
-		if(!CspFrameBufferAddress || CspConsoleMode != EfiConsoleControlScreenGraphics)
+		if (!CspFrameBufferAddress || CspConsoleMode != EfiConsoleControlScreenGraphics)
+		{
 			try_leave(NOTHING);
+		}
 
 		CsClearScreen();
 		//
@@ -905,8 +1053,11 @@ EFI_STATUS CsDrawBootImage(BOOLEAN normalLogo)
 		EFI_UGA_PIXEL* logoImage											= nullptr;
 		UINTN imageWidth													= 0;
 		UINTN imageHeight													= 0;
-		if(EFI_ERROR(status = CspConvertLogoImage(normalLogo, &logoImage, &imageWidth, &imageHeight)))
+
+		if (EFI_ERROR(status = CspConvertLogoImage(normalLogo, &logoImage, &imageWidth, &imageHeight)))
+		{
 			try_leave(NOTHING);
+		}
 
 		//
 		// draw it
@@ -917,8 +1068,10 @@ EFI_STATUS CsDrawBootImage(BOOLEAN normalLogo)
 		//
 		// show indicator only in netboot mode
 		//
-		if(EFI_ERROR(status) || !normalLogo || !BlTestBootMode(BOOT_MODE_NET))
+		if (EFI_ERROR(status) || !normalLogo || !BlTestBootMode(BOOT_MODE_NET))
+		{
 			try_leave(NOTHING);
+		}
 
 		//
 		// setup indicator info
@@ -929,20 +1082,27 @@ EFI_STATUS CsDrawBootImage(BOOLEAN normalLogo)
 		CspIndicatorFrameCount												= 18;
 		UINTN imageSize														= CspIndicatorWidth * CspIndicatorHeight * CspIndicatorFrameCount;
 		dataBuffer															= static_cast<UINT8*>(MmAllocatePool(imageSize));
-		if(!dataBuffer)
+
+		if (!dataBuffer)
+		{
 			try_leave(status = EFI_OUT_OF_RESOURCES);
+		}
 
 		//
 		// decompress data
 		//
-		if(EFI_ERROR(status = BlDecompressLZSS(CspHiDPIMode ? CspIndicator2x : CspIndicator, CspHiDPIMode ? sizeof(CspIndicator2x) : sizeof(CspIndicator), dataBuffer, imageSize, &imageSize)))
+		if (EFI_ERROR(status = BlDecompressLZSS(CspHiDPIMode ? CspIndicator2x : CspIndicator, CspHiDPIMode ? sizeof(CspIndicator2x) : sizeof(CspIndicator), dataBuffer, imageSize, &imageSize)))
+		{
 			try_leave(NOTHING);
+		}
 
 		//
 		// convert image
 		//
-		if(EFI_ERROR(status = CspConvertImage(&CspIndicatorImage, dataBuffer, CspIndicatorWidth, CspIndicatorHeight, CspIndicatorFrameCount, CspHiDPIMode ? CspIndicatorLookupTable2x : CspIndicatorLookupTable)))
+		if (EFI_ERROR(status = CspConvertImage(&CspIndicatorImage, dataBuffer, CspIndicatorWidth, CspIndicatorHeight, CspIndicatorFrameCount, CspHiDPIMode ? CspIndicatorLookupTable2x : CspIndicatorLookupTable)))
+		{
 			try_leave(NOTHING);
+		}
 
 		//
 		// draw the 1st frame
@@ -952,8 +1112,10 @@ EFI_STATUS CsDrawBootImage(BOOLEAN normalLogo)
 		//
 		// create timer event
 		//
-		if(EFI_ERROR(status = EfiBootServices->CreateEvent(EFI_EVENT_TIMER | EFI_EVENT_NOTIFY_SIGNAL, EFI_TPL_NOTIFY, &CspIndicatorRefreshTimerEventNotifyRoutine, nullptr, &CspIndicatorRefreshTimerEvent)))
+		if (EFI_ERROR(status = EfiBootServices->CreateEvent(EFI_EVENT_TIMER | EFI_EVENT_NOTIFY_SIGNAL, EFI_TPL_NOTIFY, &CspIndicatorRefreshTimerEventNotifyRoutine, nullptr, &CspIndicatorRefreshTimerEvent)))
+		{
 			try_leave(NOTHING);
+		}
 
 		//
 		// setup 100ms timer
@@ -962,8 +1124,10 @@ EFI_STATUS CsDrawBootImage(BOOLEAN normalLogo)
 	}
 	__finally
 	{
-		if(dataBuffer)
+		if (dataBuffer)
+		{
 			MmFreePool(dataBuffer);
+		}
 	}
 
 	return status;
@@ -983,8 +1147,10 @@ EFI_STATUS CsDrawPanicImage()
 		//
 		// check graph mode
 		//
-		if(!CspFrameBufferAddress || CspConsoleMode != EfiConsoleControlScreenGraphics)
+		if (!CspFrameBufferAddress || CspConsoleMode != EfiConsoleControlScreenGraphics)
+		{
 			try_leave(NOTHING);
+		}
 
 		//
 		// decompress data
@@ -994,18 +1160,24 @@ EFI_STATUS CsDrawPanicImage()
 		UINTN imageSize														= imageWidth * imageHeight;
 
 #if (TARGET_OS >= YOSEMITE)
-		if(EFI_ERROR(status = BlDecompressLZVN(CspHiDPIMode ? ApplePanicDialog2X : ApplePanicDialog, CspHiDPIMode ? sizeof(ApplePanicDialog2X) : sizeof(ApplePanicDialog), imageData, imageSize, &imageSize)))
+		if (EFI_ERROR(status = BlDecompressLZVN(CspHiDPIMode ? ApplePanicDialog2X : ApplePanicDialog, CspHiDPIMode ? sizeof(ApplePanicDialog2X) : sizeof(ApplePanicDialog), imageData, imageSize, &imageSize)))
+		{
 			try_leave(NOTHING);
+		}
 #else
-		if(EFI_ERROR(status = BlDecompressLZSS(CspHiDPIMode ? CspPanicDialog2x : CspPanicDialog, CspHiDPIMode ? sizeof(CspPanicDialog2x) : sizeof(CspPanicDialog), imageData, imageSize, &imageSize)))
+		if (EFI_ERROR(status = BlDecompressLZSS(CspHiDPIMode ? CspPanicDialog2x : CspPanicDialog, CspHiDPIMode ? sizeof(CspPanicDialog2x) : sizeof(CspPanicDialog), imageData, imageSize, &imageSize)))
+		{
 			try_leave(NOTHING);
+		}
 #endif // #if (TARGET_OD => YOSEMITE)
 
 		//
 		// convert it
 		//
-		if(EFI_ERROR(status = CspConvertImage(&panicImage, imageData, imageWidth, imageHeight, 1, CspHiDPIMode ? ApplePanicDialog2XClut : ApplePanicDialogClut)))
+		if (EFI_ERROR(status = CspConvertImage(&panicImage, imageData, imageWidth, imageHeight, 1, CspHiDPIMode ? ApplePanicDialog2XClut : ApplePanicDialogClut)))
+		{
 			try_leave(NOTHING);
+		}
 
 		//
 		// draw it
@@ -1014,11 +1186,15 @@ EFI_STATUS CsDrawPanicImage()
 	}
 	__finally
 	{
-		if(imageData)
+		if (imageData)
+		{
 			MmFreePool(imageData);
+		}
 
-		if(panicImage)
+		if (panicImage)
+		{
 			MmFreePool(panicImage);
+		}
 	}
 
 	return status;
@@ -1038,8 +1214,11 @@ EFI_STATUS CsSetupDeviceTree(BOOT_ARGS* bootArgs)
 		//
 		bootArgs->BootVideo.BaseAddress										= 0;
 		CsInitializeBootVideo(&bootArgs->BootVideo);
-		if(!bootArgs->BootVideo.BaseAddress)
+
+		if (!bootArgs->BootVideo.BaseAddress)
+		{
 			memset(&bootArgs->BootVideo, 0, sizeof(bootArgs->BootVideo));
+		}
 
 		//
 		// setup display mode
@@ -1049,8 +1228,10 @@ EFI_STATUS CsSetupDeviceTree(BOOT_ARGS* bootArgs)
 		//
 		// hi-dpi mode
 		//
-		if(CspHiDPIMode)
+		if (CspHiDPIMode)
+		{
 			bootArgs->Flags													|= 2;	// kBootArgsFlagHiDPI
+		}
 
 		//
 		// allocate FailedCLUT
@@ -1058,8 +1239,11 @@ EFI_STATUS CsSetupDeviceTree(BOOT_ARGS* bootArgs)
 		UINTN bufferLength													= CspHiDPIMode ? sizeof(CspFailedLogoLookupTable2x) : sizeof(CspFailedLogoLookupTable);
 		UINTN allocatedLength												= bufferLength;
 		UINT64 physicalAddress												= MmAllocateKernelMemory(&allocatedLength, nullptr);
-		if(!physicalAddress)
+
+		if (!physicalAddress)
+		{
 			try_leave(status = EFI_OUT_OF_RESOURCES);
+		}
 
 		//
 		// add memory node
@@ -1103,8 +1287,11 @@ EFI_STATUS CsSetupDeviceTree(BOOT_ARGS* bootArgs)
 		bufferLength														= (CspHiDPIMode ? sizeof(CspFailedLogo2x) : sizeof(CspFailedLogo)) + sizeof(BOOT_PROGRESS_ELEMENT);
 		allocatedLength														= bufferLength;
 		physicalAddress														= MmAllocateKernelMemory(&allocatedLength, 0);
-		if(!physicalAddress)
+
+		if (!physicalAddress)
+		{
 			try_leave(status = EFI_OUT_OF_RESOURCES);
+		}
 
 		//
 		// add memory node
@@ -1141,8 +1328,10 @@ VOID CsClearScreen()
 //
 EFI_STATUS CsFinalize()
 {
-	if(!CspIndicatorRefreshTimerEvent)
+	if (!CspIndicatorRefreshTimerEvent)
+	{
 		return EFI_SUCCESS;
+	}
 
 	EfiBootServices->CloseEvent(CspIndicatorRefreshTimerEvent);
 	CspIndicatorRefreshTimerEvent											= nullptr;
@@ -1163,48 +1352,62 @@ VOID CsDrawPreview(HIBERNATE_PREVIEW* previewBuffer, UINT32 imageIndex, UINT8 pr
 		//
 		// setup graph
 		//
-		if(!fromFV2 && (EFI_ERROR(CsConnectDevice(FALSE, TRUE)) || EFI_ERROR(CsInitializeGraphMode())))
+		if (!fromFV2 && (EFI_ERROR(CsConnectDevice(FALSE, TRUE)) || EFI_ERROR(CsInitializeGraphMode())))
+		{
 			try_leave(NOTHING);
+		}
 
 		//
 		// get graph info
 		//
-		if(EFI_ERROR(CsInitializeBootVideo(nullptr)) || !CspFrameBufferAddress)
+		if (EFI_ERROR(CsInitializeBootVideo(nullptr)) || !CspFrameBufferAddress)
+		{
 			try_leave(NOTHING);
+		}
 
 		//
 		// save gfx restore status
 		//
-		if(gfxRestoreStatus)
+		if (gfxRestoreStatus)
+		{
 			*gfxRestoreStatus												= CspGfxSavedConfigRestoreStatus;
+		}
 
 		//
 		// allocate config buffer
 		//
-		if(ArchConvertPointerToAddress(CspGraphConfigProtocol) >= 2)
+		if (ArchConvertPointerToAddress(CspGraphConfigProtocol) >= 2)
+		{
 			configBuffer													= MmAllocatePool(0x1800);
+		}
 
 		//
 		// error gfx status
 		//
-		if(CspGfxSavedConfigRestoreStatus < -1)
+		if (CspGfxSavedConfigRestoreStatus < -1)
+		{
 			previewBuffer													= nullptr;
+		}
 
 		//
 		// show preview buffer or boot image
 		//
-		if(previewBuffer && !EFI_ERROR(CspDecodeAndDrawPreviewBuffer(previewBuffer, imageIndex, CspFrameBufferAddress, CspHorzRes, CspVertRes, CspColorDepth, CspBytesPerRow, colorMode, configBuffer)))
+		if (previewBuffer && !EFI_ERROR(CspDecodeAndDrawPreviewBuffer(previewBuffer, imageIndex, CspFrameBufferAddress, CspHorzRes, CspVertRes, CspColorDepth, CspBytesPerRow, colorMode, configBuffer)))
 		{
-			if(ArchConvertPointerToAddress(CspGraphConfigProtocol) >= 2)
+			if (ArchConvertPointerToAddress(CspGraphConfigProtocol) >= 2)
 			{
-				if(colorMode)
+				if (colorMode)
+				{
 					CspRestoreGraphConfig(0x400, configBuffer, Add2Ptr(configBuffer, 0x800, VOID*), Add2Ptr(configBuffer, 0x1000, VOID*));
+				}
 				else
+				{
 					CspRestoreGraphConfig(0, nullptr, nullptr, nullptr);
+				}
 				
 			}
 		}
-		else if(!colorMode)
+		else if (!colorMode)
 		{
 			CsDrawBootImage(TRUE);
 			CspRestoreGraphConfig(0, nullptr, nullptr, nullptr);
@@ -1214,8 +1417,11 @@ VOID CsDrawPreview(HIBERNATE_PREVIEW* previewBuffer, UINT32 imageIndex, UINT8 pr
 		// calc pixel shift (16 = 1, 32 = 2)
 		//
 		UINT32 pixelShift													= CspColorDepth >> 4;
-		if(!progressSaveUnder || pixelShift < 1)
+
+		if (!progressSaveUnder || pixelShift < 1)
+		{
 			try_leave(NOTHING);
+		}
 
 		//
 		// calc screen buffer
@@ -1225,22 +1431,26 @@ VOID CsDrawPreview(HIBERNATE_PREVIEW* previewBuffer, UINT32 imageIndex, UINT8 pr
 		screenBuffer														+= (CspVertRes - HIBERNATE_PROGRESS_ORIGINY - HIBERNATE_PROGRESS_HEIGHT) * CspBytesPerRow;
 
 		UINTN index[HIBERNATE_PROGRESS_COUNT]								= {0};
-		for(UINTN y = 0; y < HIBERNATE_PROGRESS_HEIGHT; y ++)
+
+		for (UINTN y = 0; y < HIBERNATE_PROGRESS_HEIGHT; y++)
 		{
 			VOID* outputBuffer												= screenBuffer + y * CspBytesPerRow;
-			for(UINTN blob = 0; blob < HIBERNATE_PROGRESS_COUNT; blob ++)
+
+			for (UINTN blob = 0; blob < HIBERNATE_PROGRESS_COUNT; blob++)
 			{
 				UINT32 color												= blob ? HIBERNATE_PROGRESS_DARK_GRAY : HIBERNATE_PROGRESS_MID_GRAY;
-				for(UINTN x = 0; x < HIBERNATE_PROGRESS_WIDTH; x ++)
+
+				for (UINTN x = 0; x < HIBERNATE_PROGRESS_WIDTH; x++)
 				{
 					UINT8 alpha												= HbpProgressAlpha[y][x];
 					UINT32 result											= color;
-					if(alpha)
+
+					if (alpha)
 					{
-						if(0xff != alpha)
+						if (0xff != alpha)
 						{
 							UINT8 dstColor									= *static_cast<UINT8*>(outputBuffer);
-							if(pixelShift == 1)
+							if (pixelShift == 1)
 								dstColor									= ((dstColor & 0x1f) << 3) | ((dstColor & 0x1f) >> 2);
 
 							progressSaveUnder[blob][index[blob]]			= dstColor;
@@ -1248,7 +1458,7 @@ VOID CsDrawPreview(HIBERNATE_PREVIEW* previewBuffer, UINT32 imageIndex, UINT8 pr
 							result											= ((255 - alpha) * dstColor + alpha * result) / 255;
 						}
 
-						if(pixelShift == 1)
+						if (pixelShift == 1)
 						{
 							result											>>= 3;
 							*static_cast<UINT16*>(outputBuffer)				= static_cast<UINT16>((result << 10) | (result << 5) | result);
@@ -1268,8 +1478,10 @@ VOID CsDrawPreview(HIBERNATE_PREVIEW* previewBuffer, UINT32 imageIndex, UINT8 pr
 	}
 	__finally
 	{
-		if(configBuffer)
+		if (configBuffer)
+		{
 			MmFreePool(configBuffer);
+		}
 	}
 }
 
@@ -1282,8 +1494,11 @@ VOID CsUpdateProgress(UINT8 progressSaveUnder[HIBERNATE_PROGRESS_COUNT][HIBERNAT
 	// calc pixel shift (16 = 1, 32 = 2)
 	//
 	UINT32 pixelShift														= CspColorDepth >> 4;
-	if(pixelShift < 1 || !CspFrameBufferAddress)
+
+	if (pixelShift < 1 || !CspFrameBufferAddress)
+	{
 		return;
+	}
 
 	//
 	// calc screen buffer
@@ -1295,26 +1510,29 @@ VOID CsUpdateProgress(UINT8 progressSaveUnder[HIBERNATE_PROGRESS_COUNT][HIBERNAT
 	UINTN lastBlob															= currentBlob < HIBERNATE_PROGRESS_COUNT ? currentBlob : HIBERNATE_PROGRESS_COUNT - 1;
 	screenBuffer															+= (prevBlob * (HIBERNATE_PROGRESS_WIDTH + HIBERNATE_PROGRESS_SPACING)) << pixelShift;
 	UINTN index[HIBERNATE_PROGRESS_COUNT]									= {0};
-	for(UINTN y = 0; y < HIBERNATE_PROGRESS_HEIGHT; y ++)
+
+	for (UINTN y = 0; y < HIBERNATE_PROGRESS_HEIGHT; y++)
 	{
 		VOID* outputBuffer													= screenBuffer + y * CspBytesPerRow;
-		for(UINTN blob = prevBlob; blob <= lastBlob; blob ++)
+
+		for (UINTN blob = prevBlob; blob <= lastBlob; blob++)
 		{
 			UINT32 color													= blob < currentBlob ? HIBERNATE_PROGRESS_LIGHT_GRAY : HIBERNATE_PROGRESS_MID_GRAY;
-			for(UINTN x = 0; x < HIBERNATE_PROGRESS_WIDTH; x ++)
+			for (UINTN x = 0; x < HIBERNATE_PROGRESS_WIDTH; x++)
 			{
 				UINT8 alpha													= HbpProgressAlpha[y][x];
 				UINT32 result												= color;
-				if(alpha)
+
+				if (alpha)
 				{
-					if(0xff != alpha)
+					if (0xff != alpha)
 					{
 						UINT8 dstColor										= progressSaveUnder[blob][index[blob]];
 						index[blob]											+= 1;
 						result												= ((255 - alpha) * dstColor + alpha * result) / 255;
 					}
 
-					if(pixelShift == 1)
+					if (pixelShift == 1)
 					{
 						result												>>= 3;
 						*static_cast<UINT16*>(outputBuffer)					= static_cast<UINT16>((result << 10) | (result << 5) | result);
