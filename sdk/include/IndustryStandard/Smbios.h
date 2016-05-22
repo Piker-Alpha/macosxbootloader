@@ -316,6 +316,9 @@ typedef struct {
 } SMBIOS_TABLE_TYPE16;
 
 typedef struct {
+  //
+  // SMBIOS v2.1+
+  //
   SMBIOS_TABLE_HEADER   Hdr;
   UINT16                MemoryArrayHandle;
   UINT16                MemoryErrorInformationHandle;
@@ -328,15 +331,23 @@ typedef struct {
   SMBIOS_TABLE_STRING   BankLocator;
   UINT8                 MemoryType;
   UINT16                TypeDetail;
+  //
+  // SMBIOS v2.3+
+  //
   UINT16                Speed;
   SMBIOS_TABLE_STRING   Manufacturer;
   SMBIOS_TABLE_STRING   SerialNumber;
   SMBIOS_TABLE_STRING   AssetTag;
   SMBIOS_TABLE_STRING   PartNumber;
   //
-  // Add for smbios 2.6
+  // SMBIOS v2.6+
   //  
   UINT8                 Attributes;
+  //
+  // SMBIOS 2.7+
+  UINT32                ExtendedSize;
+  UINT16                ConfiguredMemoryClockSpeed;
+  //
 } SMBIOS_TABLE_TYPE17;
 
 typedef struct {
