@@ -274,6 +274,13 @@ EFI_STATUS PeSetupDeviceTree()
 #endif
 								memcpy((CHAR8 *)boardId, (CHAR8 *)MACBOOKPRO_31, 12);
 							}
+							else if (memcmp((CHAR8 *)boardId, (CHAR8 *)"Mac-F223BEC8", 12) == 0) // Xserve1,1
+							{
+#if DEBUG_BOARD_ID_CSPRINTF
+								CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS board-id: %s replaced with: %s\n"), (CHAR8 *)boardId, (CHAR8 *)MACPRO_31);
+#endif
+								memcpy((CHAR8 *)boardId, (CHAR8 *)MACPRO_31, 12);
+							}
 
 							//
 							// Do we still need this?
