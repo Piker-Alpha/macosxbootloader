@@ -339,15 +339,19 @@ EFI_STATUS BlDetectMemorySize()
 
 				SMBIOS_TABLE_TYPE17* table17								= reinterpret_cast<SMBIOS_TABLE_TYPE17*>(startOfTable);
 
-				if (table17->Size != 0xffff)
+				if (table17->Size > 0 && table17->Size != 0xffff) // Module installed with known size (0xffff is unknown)?
 				{
-					// The granularity depends on bit-15 (0x8000). If set the value is given in kilobyte units otherwise in megabytes units.
-					BlpMemorySize											+= (static_cast<UINT64>(table17->Size) << ((table17->Size & 0x8000) ? 10 : 20));
-				}
-				else if (table17->Size > 0)
-				{
-					// Use Extended Size field for 32/64/128 GB modules.
-					BlpMemorySize											+= (static_cast<UINT64>(table17->ExtendedSize) << 10);
+					// Check module size.
+					if (table17->Size == 0x7fff) // Greater than 32 GB?
+					{
+						// Yes. Use the ExtendedSize field for this module.
+						BlpMemorySize										+= (static_cast<UINT64>(table17->ExtendedSize) << 10);
+					}
+					else
+					{
+						// The granularity depends on bit-15 (0x8000). If set the value is given in kilobyte units otherwise in megabytes units.
+						BlpMemorySize										+= (static_cast<UINT64>(table17->Size) << ((table17->Size & 0x8000) ? 10 : 20));
+					}
 				}
 			}
 			else if (tableHeader->Type == 1) // System Information.
