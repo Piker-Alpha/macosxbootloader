@@ -256,16 +256,16 @@ EFI_STATUS PeSetupDeviceTree()
 							if (memcmp((CHAR8 *)boardId, (CHAR8 *)"Mac-F4208DC8", 12) == 0) // MacPro1,1
 							{
 #if DEBUG_BOARD_ID_CSPRINTF
-								CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS board-id: %s replaced with: %s\n"), (CHAR8 *)boardId, (CHAR8 *)MACPRO_31);
+								CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS board-id: %s replaced with: %s\n"), (CHAR8 *)boardId, (CHAR8 *)MACPRO_41);
 #endif
-								memcpy((CHAR8 *)boardId, (CHAR8 *)MACPRO_31, 12);
+								memcpy((CHAR8 *)boardId, (CHAR8 *)MACPRO_41, 12);
 							}
 							else if (memcmp((CHAR8 *)boardId, (CHAR8 *)"Mac-F4208DA9", 12) == 0) // MacPro2,1
 							{
 #if DEBUG_BOARD_ID_CSPRINTF
-								CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS board-id: %s replaced with: %s\n"), (CHAR8 *)boardId, (CHAR8 *)MACPRO_31);
+								CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS board-id: %s replaced with: %s\n"), (CHAR8 *)boardId, (CHAR8 *)MACPRO_41);
 #endif
-								memcpy((CHAR8 *)boardId, (CHAR8 *)MACPRO_31, 12);
+								memcpy((CHAR8 *)boardId, (CHAR8 *)MACPRO_41, 12);
 							}
 							else if (memcmp((CHAR8 *)boardId, (CHAR8 *)"Mac-F42187C8", 12) == 0)// MacBookPro2,2
 							{
@@ -277,9 +277,9 @@ EFI_STATUS PeSetupDeviceTree()
 							else if (memcmp((CHAR8 *)boardId, (CHAR8 *)"Mac-F223BEC8", 12) == 0) // Xserve1,1
 							{
 #if DEBUG_BOARD_ID_CSPRINTF
-								CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS board-id: %s replaced with: %s\n"), (CHAR8 *)boardId, (CHAR8 *)MACPRO_31);
+								CsPrintf(CHAR8_CONST_STRING("PIKE: SMBIOS board-id: %s replaced with: %s\n"), (CHAR8 *)boardId, (CHAR8 *)MACPRO_41);
 #endif
-								memcpy((CHAR8 *)boardId, (CHAR8 *)MACPRO_31, 12);
+								memcpy((CHAR8 *)boardId, (CHAR8 *)MACPRO_41, 12);
 							}
 
 							//

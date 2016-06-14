@@ -44,7 +44,7 @@
 #define DO_REPLACE_BOARD_ID													1
 
 #if DO_REPLACE_BOARD_ID
-	#define MACPRO_31														"Mac-F42C88C8"
+	#define MACPRO_41														"Mac-F221BEC8"
 	#define MACBOOKPRO_31													"Mac-F4238BC8"
 
 	#define DEBUG_BOARD_ID_CSPRINTF											0
