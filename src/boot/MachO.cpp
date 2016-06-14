@@ -1283,17 +1283,17 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 
 				case MACH_O_COMMAND_SYMTAB:
 				{
-#if (PATCH_LOAD_EXECUTABLE && (TARGET_OS == EL_CAPITAN))
+#if (PATCH_LOAD_EXECUTABLE && (TARGET_OS >= EL_CAPITAN))
 					BOOLEAN loadExecutablePatched							= FALSE;
 #endif
 
-#if (PATCH_READ_STARTUP_EXTENSIONS && (TARGET_OS == EL_CAPITAN))
+#if (PATCH_READ_STARTUP_EXTENSIONS && (TARGET_OS >= EL_CAPITAN))
 					BOOLEAN readStartExtensionsPatched						= FALSE;
 #endif
 					UINT64 index											= 0;
 					UINT64 asld												= LdrGetASLRDisplacement();
 
-#if ((PATCH_LOAD_EXECUTABLE || PATCH_READ_STARTUP_EXTENSIONS) && (TARGET_OS == EL_CAPITAN))
+#if ((PATCH_LOAD_EXECUTABLE || PATCH_READ_STARTUP_EXTENSIONS) && (TARGET_OS >= EL_CAPITAN))
 					UINT64 offset											= 0;
 					UINT64 startAddress										= 0;
 					UINT64 endAddress										= 0;
@@ -1313,7 +1313,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 							symbolEntry->Value								+= LdrGetASLRDisplacement();
 						}
 
-#if (PATCH_LOAD_EXECUTABLE && (TARGET_OS == EL_CAPITAN))
+#if (PATCH_LOAD_EXECUTABLE && (TARGET_OS >= EL_CAPITAN))
 						if ((loadExecutablePatched == FALSE) && (symbolEntry->SectionIndex == 1)) // __TEXT,__text
 						{
 							if (!strcmp(CHAR8_CONST_STRING("__ZN6OSKext14loadExecutableEv"), stringTable + symbolEntry->StringIndex))
@@ -1356,7 +1356,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 							}
 						}
 
-#if (PATCH_READ_STARTUP_EXTENSIONS && (TARGET_OS == EL_CAPITAN))
+#if (PATCH_READ_STARTUP_EXTENSIONS && (TARGET_OS >= EL_CAPITAN))
 						else if ((readStartExtensionsPatched == FALSE) && (symbolEntry->SectionIndex == 25)) // __KLD,__text
 						{
 							if (!strcmp(CHAR8_CONST_STRING("__ZN12KLDBootstrap21readStartupExtensionsEv"), stringTable + symbolEntry->StringIndex))
@@ -1388,7 +1388,7 @@ EFI_STATUS MachLoadMachO(IO_FILE_HANDLE* fileHandle, MACH_O_LOADED_INFO* loadedI
 #endif
 							}
 						}
-#endif // #if (PATCH_READ_STARTUP_EXTENSIONS && (TARGET_OS == EL_CAPITAN))
+#endif // #if (PATCH_READ_STARTUP_EXTENSIONS && (TARGET_OS >= EL_CAPITAN))
 					}
 				}
 				break;

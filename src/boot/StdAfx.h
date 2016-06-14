@@ -14,8 +14,9 @@
 #define OS_LEGACY															6
 #define YOSEMITE															10
 #define EL_CAPITAN															11
+#define SIERRA																12
 
-#define TARGET_OS															EL_CAPITAN
+#define TARGET_OS															SIERRA
 
 #if (TARGET_OS >= YOSEMITE)
 #ifndef LEGACY_GREY_SUPPORT
@@ -29,9 +30,9 @@
 
 #define PATCH_LOAD_EXECUTABLE												1
 //
-// grep '\x48\x89\xc3\x48\x85\xdb\x74\x70' /S*/L*/Kernels/kernel
+// grep '\x48\x89\xc3\x48\x85\xdb\x74\x71' /S*/L*/Kernels/kernel
 //
-#define LOAD_EXECUTABLE_TARGET_UINT64										0x487074db8548c389ULL
+#define LOAD_EXECUTABLE_TARGET_UINT64										0x487174db8548c389ULL
 #define LOAD_EXECUTABLE_PATCH_UINT64										0x4812ebdb8548c389ULL
 
 #define PATCH_READ_STARTUP_EXTENSIONS										0
@@ -71,7 +72,7 @@
 #define SWAP32(V)															((((UINT32)(V) & 0xff) << 24) | (((UINT32)(V) & 0xff00) << 8) | (((UINT32)(V) & 0xff0000) >> 8) |  (((UINT32)(V) & 0xff000000) >> 24))
 #define SWAP_BE32_TO_HOST													SWAP32
 
-#if (TARGET_OS == EL_CAPITAN)
+#if (TARGET_OS >= EL_CAPITAN)
 #ifndef kBootArgsFlagCSRActiveConfig
 	#define kBootArgsFlagCSRActiveConfig	(1 << 3)	// 8
 #endif
@@ -104,7 +105,7 @@
 			CSR_ALLOW_UNRESTRICTED_NVRAM | \
 			CSR_ALLOW_DEVICE_CONFIGURATION)
 #endif
-#endif // #if (TARGET_OS == YOSMITE)
+#endif // #if (TARGET_OS >= YOSMITE)
 
 #include "EfiCommon.h"
 #include "EfiApi.h"

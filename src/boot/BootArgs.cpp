@@ -342,7 +342,7 @@ EFI_STATUS BlInitializeBootArgs(EFI_DEVICE_PATH_PROTOCOL* bootDevicePath, EFI_DE
 		//
 		AcpiGetPciConfigSpaceInfo(&bootArgs->PCIConfigSpaceBaseAddress, &bootArgs->PCIConfigSpaceStartBusNumber, &bootArgs->PCIConfigSpaceEndBusNumber);
 
-#if (TARGET_OS == EL_CAPITAN)
+#if (TARGET_OS >= EL_CAPITAN)
 		//
 		// Boot P-State limit for Power Management (set to 0 = no limit)
 		//
@@ -788,7 +788,7 @@ EFI_STATUS BlFinalizeBootArgs(BOOT_ARGS* bootArgs, CHAR8 CONST* kernelCommandLin
 	return status;
 }
 
-#if (TARGET_OS == EL_CAPITAN)
+#if (TARGET_OS >= EL_CAPITAN)
 //
 // Configure System Integrity Protection.
 //

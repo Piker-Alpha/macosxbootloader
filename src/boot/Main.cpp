@@ -693,7 +693,7 @@ EFI_STATUS EFIAPI EfiMain(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systemTable)
 		//
 		CsFinalize();
 
-#if (TARGET_OS == EL_CAPITAN)
+#if (TARGET_OS >= EL_CAPITAN)
 		//
 		// SIP configuration.
 		//
