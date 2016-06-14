@@ -1,27 +1,25 @@
 Introduction
 ------------
 
-This Github project is a new and updated branch of the [Yosemite tree](https://github.com/Piker-Alpha/macosxbootloader/tree/master) and is now targetted at OS X 10.11 El Capitan.
+This Github project is a new and updated branch of the [El-Capitan tree](https://github.com/Piker-Alpha/macosxbootloader/tree/El-Capitan) and is now targetted at macOS X 10.12 Sierra.
 
 
 Goals
 -----
 
-This project aims to add support for El Capitan (OS X 10.11) for unsupported Mac hardware with a 32-bit only EFI implementation. Like for example the first and second generation Mac Pro models. Though it should work well with any other model with a 32-bit EFI implementation.
+This project aims to add support for Sierra (macOS 10.12) for unsupported Mac hardware with a 32-bit only EFI implementation. Like for example the first and second generation Mac Pro models. Though it should work well with any other model with a 32-bit EFI implementation.
 
 
 Current State
 -------------
 
-The current state of this project is: Phase 1, 2 and 3 completed (OS X 10.11 El Capitan is now fully supported).
-
-Note: For more information about the development phases, please visit the [TODO list](https://github.com/Piker-Alpha/macosxbootloader/blob/El-Capitan/TODO.md).
+Work in progress...
 
 
 Download
 --------
 
-Prebuilt copies of boot.efi can be downloaded from the [project download page](http://piker-alpha.github.io/macosxbootloader/).
+Prebuilt copies of the new boot.efi for macOS 10.12 Sierra are not yet available.
 
 
 Compilation
@@ -41,7 +39,7 @@ This project would not have been possible without the help of Peter Holbrook and
 Donations
 ---------
 
-If you like to support my work then you may want to consider to [make a donation](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JXFBXK7J97RAE)
+I do not accept donation at this time.
 
 
 Help
@@ -71,6 +69,6 @@ Note: "Tiamo" released his work under a [BSD-3-Clause license](http://opensource
 Disclaimer
 ----------
 
-Copyright (c) 2014-2015, by Pike R. Alpha – All right reserved.
+Copyright (c) 2014-2016, by Pike R. Alpha – All right reserved.
 
 Macosxbootloader is maintained by Pike R. Alpha.
