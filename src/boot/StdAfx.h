@@ -51,7 +51,7 @@
 	#define DEBUG_BOARD_ID_CSPRINTF											0
 #endif
 
-
+#define USE_FIXED_SMBIOS_UUID												1
 
 #define NOTHING
 #define BOOTAPI																__cdecl

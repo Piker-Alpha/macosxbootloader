@@ -12,6 +12,7 @@
 //
 STATIC CHAR8 PepModelName[0x41]												= {0};
 
+
 //
 // init platform expert
 //
@@ -23,7 +24,17 @@ EFI_STATUS PeInitialize()
 		return EFI_OUT_OF_RESOURCES;
 
 	EFI_GUID smbiosUuid														= BlGetSmbiosUuid();
+
+#if USE_FIXED_SMBIOS_UUID
+	//
+	// Replace the value with a randomly generated UUID.
+	//
+	STATIC CHAR8 mySmbiosUuid[]												= { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10 };
+
+	DevTreeAddProperty(platformNode, CHAR8_CONST_STRING("system-id"), (CHAR8*)&mySmbiosUuid, 16, TRUE);
+#else
 	DevTreeAddProperty(platformNode, CHAR8_CONST_STRING("system-id"), (CHAR8*)&smbiosUuid, 16, TRUE);
+#enfid
 
 	EFI_DATA_HUB_PROTOCOL* dataHubProtocol									= nullptr;
 	EFI_STATUS status														= EfiBootServices->LocateProtocol(&EfiDataHubProtocolGuid, nullptr, reinterpret_cast<VOID**>(&dataHubProtocol));
