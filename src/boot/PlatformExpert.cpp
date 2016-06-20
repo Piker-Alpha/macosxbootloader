@@ -34,7 +34,7 @@ EFI_STATUS PeInitialize()
 	DevTreeAddProperty(platformNode, CHAR8_CONST_STRING("system-id"), (CHAR8*)&mySmbiosUuid, 16, TRUE);
 #else
 	DevTreeAddProperty(platformNode, CHAR8_CONST_STRING("system-id"), (CHAR8*)&smbiosUuid, 16, TRUE);
-#enfid
+#endif
 
 	EFI_DATA_HUB_PROTOCOL* dataHubProtocol									= nullptr;
 	EFI_STATUS status														= EfiBootServices->LocateProtocol(&EfiDataHubProtocolGuid, nullptr, reinterpret_cast<VOID**>(&dataHubProtocol));
