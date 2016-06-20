@@ -23,8 +23,6 @@ EFI_STATUS PeInitialize()
 	if(!platformNode)
 		return EFI_OUT_OF_RESOURCES;
 
-	EFI_GUID smbiosUuid														= BlGetSmbiosUuid();
-
 #if USE_FIXED_SMBIOS_UUID
 	//
 	// Replace the value with a randomly generated UUID.
@@ -33,6 +31,8 @@ EFI_STATUS PeInitialize()
 
 	DevTreeAddProperty(platformNode, CHAR8_CONST_STRING("system-id"), (CHAR8*)&mySmbiosUuid, 16, TRUE);
 #else
+	EFI_GUID smbiosUuid														= BlGetSmbiosUuid();
+
 	DevTreeAddProperty(platformNode, CHAR8_CONST_STRING("system-id"), (CHAR8*)&smbiosUuid, 16, TRUE);
 #endif
 
