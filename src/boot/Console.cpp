@@ -856,7 +856,7 @@ EFI_STATUS CsInitializeGraphMode()
 //
 // setup boot video
 //
-EFI_STATUS CsInitializeBootVideo(BOOT_VIDEO* bootVideo)
+EFI_STATUS CsInitializeBootVideo(BOOT_VIDEO_V1* bootVideo)
 {
 	//
 	// get info

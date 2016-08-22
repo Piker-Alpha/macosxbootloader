@@ -719,7 +719,7 @@ VOID HbpContinueResumeFromHibernate(UINT8 CONST* imageKey, UINTN imageKeyLength,
 		}
 		else
 		{
-			BOOT_VIDEO bootVideo											= {0};
+			BOOT_VIDEO_V1 bootVideo											= {0};
 			CsInitializeBootVideo(&bootVideo);
 			graphics->BaseAddress											= bootVideo.BaseAddress;
 			graphics->BytesPerRow											= bootVideo.BytesPerRow;

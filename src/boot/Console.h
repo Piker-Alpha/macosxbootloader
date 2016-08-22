@@ -40,7 +40,7 @@ EFI_STATUS CsDrawPanicImage();
 //
 // initialize boot video
 //
-EFI_STATUS CsInitializeBootVideo(struct _BOOT_VIDEO* bootVideo);
+EFI_STATUS CsInitializeBootVideo(struct _BOOT_VIDEO_V1* bootVideo);
 
 //
 // setup device tree

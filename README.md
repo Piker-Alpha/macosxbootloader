@@ -1,7 +1,7 @@
 Introduction
 ------------
 
-This Github project is a new and updated branch of the [El-Capitan tree](https://github.com/Piker-Alpha/macosxbootloader/tree/El-Capitan) and is now targetted at macOS X 10.12 Sierra.
+This Github project is a new and updated branch of the [El-Capitan tree](https://github.com/Piker-Alpha/macosxbootloader/tree/El-Capitan) and is now targetted at macOS Sierra 10.12.
 
 
 Goals
@@ -63,7 +63,7 @@ License
 
 My work is licensed under [the Creative Commons Attribution-NonCommercial 3.0 Unported License](http://creativecommons.org/licenses/by-nc/3.0/) and as such you must add a link to this license. Even if you only use a download link. Also note the term "NonCommercial" because I don't want to see my work end up anywhere else but here.
 
-Note: "Tiamo" released his work under a [BSD-3-Clause license](http://opensource.org/licenses/BSD-3-Clause)
+Note: "Tiamo" released his work under a [BSD-3-Clause license](http://opensource.org/licenses/BSD-3-Clause) and I do not claim ownership of his work, but I simply used a different license for my work.
 
 
 Disclaimer
