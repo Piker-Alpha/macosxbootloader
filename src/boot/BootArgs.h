@@ -11,10 +11,10 @@
 // video
 //
 #include <pshpack1.h>
-typedef struct _BOOT_VIDEO
+typedef struct _BOOT_VIDEO_V1
 {
 	//
-	// vram base address
+	// 32-bit VRAM base address.
 	//
 	UINT32																	BaseAddress;
 
@@ -42,7 +42,47 @@ typedef struct _BOOT_VIDEO
 	// color depth
 	//
 	UINT32																	ColorDepth;
-}BOOT_VIDEO;
+}BOOT_VIDEO_V1;
+
+#if (TARGET_OS >= SIERRA)
+typedef struct _BOOT_VIDEO_V2
+{
+	//
+	// mode,1 = graph,2 = text
+	//
+	UINT32																	DisplayMode;
+	
+	//
+	// bytes per row
+	//
+	UINT32																	BytesPerRow;
+	
+	//
+	// horz res
+	//
+	UINT32																	HorzRes;
+	
+	//
+	// vert res
+	//
+	UINT32																	VertRes;
+	
+	//
+	// color depth
+	//
+	UINT32																	ColorDepth;
+
+	//
+	// Reserved / unused.
+	//
+	UINT32																	Reserved[7];
+
+	//
+	// 64-bit VRAM base address.
+	//
+	UINT64																	BaseAddress;
+}BOOT_VIDEO_V2;
+#enif
 
 //
 // boot arg
@@ -100,9 +140,9 @@ typedef struct _BOOT_ARGS
 	UINT32																	MemoryMapDescriptorVersion;
 
 	//
-	// video
+	// Boot Video Version 1.
 	//
-	BOOT_VIDEO																BootVideo;
+	BOOT_VIDEO_V1															BootVideo_V1;
 
 	//
 	// device tree physical address < 4GB
@@ -229,17 +269,29 @@ typedef struct _BOOT_ARGS
 	//
 	//
 	UINT16																	BootProgressMeterEnd;
+#endif
 
+#if (TARGET_OS >= SIERRA)
+	//
+	// Boot Video Version 2.
+	//
+	BOOT_VIDEO_V2															BootVideo_V2;
+
+	//
+	// padding.
+	//
+	UINT32																	Reserved4[712];
+#elif (TARGET_OS >= EL_CAPITAN)
 	//
 	// padding
 	//
 	UINT32																	Reserved4[726];
-#else // #if (TARGET_OS >= EL_CAPITAN)
+#else // #if (TARGET_OS >= MOUNTAIN_LION
 	//
 	// padding
 	//
 	UINT32																	Reserved4[730];
-#endif // #if (TARGET_OS >= EL_CAPITAN)
+#endif
 }BOOT_ARGS;
 #include <poppack.h>
 
