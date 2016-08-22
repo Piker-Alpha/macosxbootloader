@@ -82,7 +82,7 @@ typedef struct _BOOT_VIDEO_V2
 	//
 	UINT64																	BaseAddress;
 }BOOT_VIDEO_V2;
-#enif
+#endif
 
 //
 // boot arg
