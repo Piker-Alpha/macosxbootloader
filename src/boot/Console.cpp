@@ -1212,18 +1212,18 @@ EFI_STATUS CsSetupDeviceTree(BOOT_ARGS* bootArgs)
 		//
 		// boot video
 		//
-		bootArgs->BootVideo.BaseAddress										= 0;
-		CsInitializeBootVideo(&bootArgs->BootVideo);
+		bootArgs->BootVideo_V1.BaseAddress									= 0;
+		CsInitializeBootVideo(&bootArgs->BootVideo_V1);
 
-		if (!bootArgs->BootVideo.BaseAddress)
+		if (!bootArgs->BootVideo_V1.BaseAddress)
 		{
-			memset(&bootArgs->BootVideo, 0, sizeof(bootArgs->BootVideo));
+			memset(&bootArgs->BootVideo_V1, 0, sizeof(bootArgs->BootVideo_V1));
 		}
 
 		//
 		// setup display mode
 		//
-		bootArgs->BootVideo.DisplayMode										= BlTestBootMode(BOOT_MODE_GRAPH) ? 1 : 2;
+		bootArgs->BootVideo_V1.DisplayMode									= BlTestBootMode(BOOT_MODE_GRAPH) ? 1 : 2;
 
 		//
 		// hi-dpi mode
